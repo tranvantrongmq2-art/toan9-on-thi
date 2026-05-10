@@ -144,27 +144,20 @@ code {
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
-/* Chữ chính "Toán 9 Thầy Trong !" — màu gradient shimmer */
-.logo-main {
+/* Tagline chính — màu gradient shimmer */
+.logo-tagline {
   display: block;
-  font-size: 1rem;
+  font-size: 0.88rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
   background: linear-gradient(90deg, #f59e0b, #ef4444, #a855f7, #3b82f6, #10b981, #f59e0b);
   background-size: 300% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: tagline-shimmer 4s linear infinite;
-}
-/* Tagline nhỏ bên dưới */
-.logo-tagline {
-  display: block;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--text-muted);
-  white-space: nowrap;
+  text-shadow: none;
 }
 .logo-text span {
   display: block;
@@ -1089,11 +1082,9 @@ details[open] > summary { margin-bottom: 0; }
   .header { height: 50px; }
   .header-inner { padding: 0 12px; gap: 8px; }
 
-  /* Logo mobile: giữ "Toán 9 Thầy Trong !" có màu, ẩn tagline dài */
+  /* Logo mobile: chỉ hiện tagline shimmer, thu nhỏ chút */
   .logo-icon { width: 30px; height: 30px; font-size: 15px; border-radius: 8px; }
-  .logo-text { font-size: 0.9rem; }
-  .logo-main { font-size: 0.88rem; }
-  .logo-tagline { display: none; }
+  .logo-tagline { font-size: 0.72rem; }
 
   /* Nav: thu gọn — chỉ emoji + chữ rất ngắn */
   .nav { gap: 1px; }
@@ -1122,15 +1113,17 @@ details[open] > summary { margin-bottom: 0; }
   .toast-container { bottom: 16px; right: 12px; left: 12px; }
   .toast { max-width: 100%; }
 
-  /* Dots câu hỏi: cuộn ngang 1 hàng, không xuống dòng */
+  /* Dots câu hỏi: 1 hàng ngang, vuốt được, hiện đủ không bị ẩn */
   .question-dots {
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 2px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-light) transparent;
+    padding-bottom: 4px;
   }
-  .question-dots::-webkit-scrollbar { display: none; }
+  .question-dots::-webkit-scrollbar { height: 3px; }
+  .question-dots::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 99px; }
   .dot { flex-shrink: 0; }
 
   .setup-steps { gap: 12px; }
