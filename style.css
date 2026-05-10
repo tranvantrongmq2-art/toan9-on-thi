@@ -144,6 +144,28 @@ code {
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
+/* Chữ chính "Toán 9 Thầy Trong !" — màu gradient shimmer */
+.logo-main {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #f59e0b, #ef4444, #a855f7, #3b82f6, #10b981, #f59e0b);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: tagline-shimmer 4s linear infinite;
+}
+/* Tagline nhỏ bên dưới */
+.logo-tagline {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
 .logo-text span {
   display: block;
   font-size: 0.82rem;
@@ -1067,10 +1089,11 @@ details[open] > summary { margin-bottom: 0; }
   .header { height: 50px; }
   .header-inner { padding: 0 12px; gap: 8px; }
 
-  /* Logo: ẩn tagline "Ôn thi tuyển sinh...", chỉ giữ icon + "Toán 9" */
+  /* Logo mobile: giữ "Toán 9 Thầy Trong !" có màu, ẩn tagline dài */
   .logo-icon { width: 30px; height: 30px; font-size: 15px; border-radius: 8px; }
   .logo-text { font-size: 0.9rem; }
-  .logo-text span { display: none; }
+  .logo-main { font-size: 0.88rem; }
+  .logo-tagline { display: none; }
 
   /* Nav: thu gọn — chỉ emoji + chữ rất ngắn */
   .nav { gap: 1px; }
