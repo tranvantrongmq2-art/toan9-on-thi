@@ -30,12 +30,19 @@
       </div>
     </a>
     <nav class="nav">
-      <a href="index.html" class="active">🏠 Làm bài</a>
-      <a href="rank.html">🏆 Xếp hạng</a>
-      <a href="upload.html">📤 Upload đề</a>
+      <a href="index.html" class="active"><span class="nav-emoji">🏠</span><span class="nav-label"> Làm bài</span></a>
+      <a href="rank.html"><span class="nav-emoji">🏆</span><span class="nav-label"> Xếp hạng</span></a>
+      <!-- Nút Upload chỉ hiện với thầy đã đăng nhập -->
+      <a href="upload.html" id="navUpload" style="display:none;"><span class="nav-emoji">📤</span><span class="nav-label"> Upload đề</span></a>
     </nav>
   </div>
 </header>
+<script>
+  // Hiện nút Upload nếu thầy đã xác thực trong phiên này
+  if (sessionStorage.getItem('teacher_auth') === '1') {
+    document.getElementById('navUpload').style.display = '';
+  }
+</script>
 <!-- ===== MAIN CONTENT ===== -->
 <main class="main">
   <!-- App container - JS sẽ render vào đây -->
