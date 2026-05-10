@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ôn Thi Toán Lớp 9 - Tuyển sinh Lớp 10</title>
+  <meta name="description" content="Hệ thống ôn tập trắc nghiệm Toán lớp 9 chuẩn bị thi tuyển sinh lớp 10">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📐</text></svg>">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- MathJax - render công thức toán -->
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']] } };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">📐</div>
+      <div class="logo-text">
+        Toán 9
+        <span>Ôn thi tuyển sinh lớp 10 với Thầy Trong !!!</span>
+      </div>
+    </a>
+    <nav class="nav">
+      <a href="index.html" class="active">🏠 Làm bài</a>
+      <a href="rank.html">🏆 Xếp hạng</a>
+      <a href="upload.html">📤 Upload đề</a>
+    </nav>
+  </div>
+</header>
+<!-- ===== MAIN CONTENT ===== -->
+<main class="main">
+  <!-- App container - JS sẽ render vào đây -->
+  <div id="app"></div>
+</main>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Đề Thi - Ôn Thi Toán 9</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📤</text></svg>">
+
+  <!-- Mammoth.js - đọc file .docx -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+  <!-- MathJax - render công thức toán -->
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']] } };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Firebase SDK -->
+ 
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">📐</div>
+      <div class="logo-text">
+        Toán 9
+        <span>Ôn thi tuyển sinh lớp 10</span>
+      </div>
+    </a>
+    <nav class="nav">
+      <a href="index.html">🏠 Làm bài</a>
+      <a href="rank.html">🏆 Xếp hạng</a>
+      <a href="upload.html" class="active">📤 Upload đề</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- HƯỚNG DẪN ĐỊNH DẠNG -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2>📋 Hướng dẫn định dạng file</h2>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info">
+        ℹ️ File hỗ trợ <strong>không giới hạn số câu hỏi</strong>. Công thức toán dùng ký hiệu LaTeX bao trong <code>$...$</code> sẽ hiển thị đúng. Bạn có thể thêm ảnh cho từng câu sau khi upload.
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;flex-wrap:wrap;">
+        <div>
+          <h4 style="font-weight:800;margin-bottom:12px;">✅ Định dạng đúng:</h4>
+          <div style="background:#1e293b;color:#e2e8f0;padding:18px;border-radius:10px;font-family:monospace;font-size:0.88rem;line-height:1.8;">
+            <span style="color:#60a5fa;">Câu 1:</span> Nghiệm của $2x + 6 = 0$ là?<br>
+            <span style="color:#86efac;">A.</span> $x = 3$<br>
+            <span style="color:#86efac;">B.</span> $x = -3$<br>
+            <span style="color:#86efac;">C.</span> $x = 6$<br>
+            <span style="color:#86efac;">D.</span> $x = -6$<br>
+            <span style="color:#fbbf24;">Đáp án:</span> B<br>
+            <br>
+            <span style="color:#60a5fa;">Câu 2:</span> Cho $x^2 - 5x + 6 = 0$, nghiệm là?<br>
+            ...
+          </div>
+        </div>
+        <div>
+          <h4 style="font-weight:800;margin-bottom:12px;">📌 Lưu ý quan trọng:</h4>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+            <li>✅ Bắt đầu bằng <code>Câu 1:</code>, <code>Câu 2:</code>... (không giới hạn số câu)</li>
+            <li>✅ Mỗi đáp án một dòng: <code>A.</code>, <code>B.</code>, <code>C.</code>, <code>D.</code></li>
+            <li>✅ Ghi đáp án: <code>Đáp án: B</code></li>
+            <li>✅ Công thức toán bọc trong <code>$...$</code> ví dụ: <code>$x^2 + 1 = 0$</code></li>
+            <li>✅ Sau khi upload, thêm ảnh hình học cho từng câu bên dưới</li>
+            <li>❌ Không dùng bảng, không để trống giữa A, B, C, D và nội dung</li>
+          </ul>
+          <div class="mt-3">
+            <button class="btn btn-outline btn-sm" onclick="downloadSampleDoc()">
+              📄 Tải file mẫu (txt)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD FORM -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2>📤 Upload file đề thi</h2>
+    </div>
+    <div class="card-body">
+
+      <!-- Upload zone -->
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon">📂</div>
+        <h3>Kéo thả file vào đây hoặc click để chọn</h3>
+        <p>Hỗ trợ: .docx, .txt | Tối đa 10MB</p>
+        <input type="file" id="fileInput" accept=".docx,.txt" onchange="handleFileSelect(event)">
+      </div>
+
+      <!-- Chọn chủ đề cho file upload -->
+      <div class="form-group mt-3">
+        <label>📚 Chủ đề của bộ câu hỏi này:</label>
+        <select class="form-control" id="uploadTopic">
+          <option value="dai-so">Đại số</option>
+          <option value="hinh-hoc">Hình học</option>
+          <option value="tong-hop">Đề tổng hợp</option>
+        </select>
+      </div>
+
+      <!-- Trạng thái file -->
+      <div id="fileStatus" class="hidden"></div>
+
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div id="previewSection" class="card hidden">
+    <div class="card-header">
+      <h2>👁️ Xem trước & Thêm ảnh hình học</h2>
+    </div>
+    <div class="card-body">
+      <div id="parseStatus" class="mb-3"></div>
+
+      <!-- MathJax preview note -->
+      <div class="alert alert-info mb-3" style="font-size:0.88rem;">
+        📐 Công thức toán trong dấu <code>$...$</code> sẽ hiển thị đúng khi làm bài. Cột <strong>Ảnh</strong>: click 📎 để thêm hình minh họa cho câu hình học (lưu dưới dạng base64 trong trình duyệt).
+      </div>
+
+      <div id="previewCards"></div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;">
+        <button class="btn btn-primary" id="btnSave" onclick="saveQuestions()">
+          💾 Lưu vào hệ thống
+        </button>
+        <button class="btn btn-outline" onclick="resetUpload()">
+          🔄 Upload lại
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUẢN LÝ DỮ LIỆU -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <h2>🗂️ Quản lý dữ liệu câu hỏi</h2>
+    </div>
+    <div class="card-body">
+
+      <!-- Tổng quan số câu hiện có -->
+      <div id="dataOverview" class="data-overview mb-4">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+
+      <!-- Xóa theo chủ đề -->
+      <div class="delete-section mb-4">
+        <h4 style="font-weight:700;margin-bottom:6px;">🗑️ Xóa câu hỏi đã tải lên</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px;">
+          Xóa toàn bộ câu hỏi của một chủ đề cụ thể (do thầy upload lên). Không ảnh hưởng đến câu hỏi mẫu có sẵn.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+          <select class="form-control" id="deleteTopicSelect" style="max-width:200px;">
+            <option value="dai-so">📘 Đại số</option>
+            <option value="hinh-hoc">📐 Hình học</option>
+            <option value="tong-hop">📚 Tổng hợp</option>
+            <option value="__all__">🗂️ Tất cả chủ đề</option>
+          </select>
+          <button class="btn btn-danger" onclick="confirmDeleteUploaded()">
+            🗑️ Xóa câu hỏi đã upload
+          </button>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+
+      <!-- Xóa dữ liệu mẫu -->
+      <div class="delete-section mb-4">
+        <h4 style="font-weight:700;margin-bottom:6px;">🧹 Xóa dữ liệu câu hỏi mẫu</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px;">
+          Xóa bộ câu hỏi mẫu có sẵn trong hệ thống (30 câu mặc định). Sau khi xóa, chỉ câu hỏi thầy upload mới được dùng. Có thể khôi phục bằng cách tải lại trang nếu chưa lưu vào Firebase.
+        </p>
+        <button class="btn btn-warning" onclick="confirmDeleteSample()">
+          🧹 Xóa câu hỏi mẫu (localStorage)
+        </button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+
+      <!-- Xóa toàn bộ kết quả thi -->
+      <div class="delete-section">
+        <h4 style="font-weight:700;margin-bottom:6px;">📊 Xóa kết quả bài thi</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px;">
+          Xóa toàn bộ lịch sử điểm số và bảng xếp hạng. Hành động này <strong>không thể hoàn tác</strong>.
+        </p>
+        <button class="btn btn-danger" onclick="confirmDeleteResults()">
+          ❌ Xóa toàn bộ kết quả thi
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HƯỚNG DẪN FIREBASE -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <h2>🔥 Hướng dẫn cài đặt Firebase</h2>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-warning mb-4">
+        ⚠️ Nếu chưa cài Firebase, câu hỏi sẽ được lưu trên máy tính (localStorage). Khi đóng trình duyệt dữ liệu vẫn còn nhưng chỉ dùng được trên máy đó.
+      </div>
+
+      <div class="setup-steps">
+        <div class="setup-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Tạo tài khoản Firebase</h4>
+            <p>Truy cập <a href="https://console.firebase.google.com" target="_blank" style="color:var(--primary)">console.firebase.google.com</a> → Đăng nhập bằng Google → Tạo project mới</p>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Tạo Firestore Database</h4>
+            <p>Trong Firebase Console → Firestore Database → Create database → Chọn "Start in test mode" → Chọn vị trí (asia-southeast1)</p>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Lấy cấu hình Firebase</h4>
+            <p>Project Settings (⚙️) → Your apps → Web app → Add app → Sao chép config object</p>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Điền config vào app.js</h4>
+            <p>Mở file <code>app.js</code> → Tìm biến <code>FIREBASE_CONFIG</code> → Điền các giá trị từ bước 3</p>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <h4>Bỏ comment Firebase SDK</h4>
+            <p>Trong cả 3 file HTML, tìm phần comment <code>&lt;!-- Firebase SDK --&gt;</code> → Xóa dòng <code>&lt;!--</code> và <code>--&gt;</code></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input thủ công firebase config -->
+      <details class="mt-4">
+        <summary style="cursor:pointer;font-weight:800;padding:12px;background:var(--surface2);border-radius:8px;">
+          ⚡ Nhập Firebase Config nhanh (dán từ Firebase Console)
+        </summary>
+        <div style="margin-top:14px;">
+          <div class="form-group">
+            <label>Firebase Config JSON (dán nguyên khối config):</label>
+            <textarea class="form-control" id="firebaseConfigInput" rows="8" 
+                      placeholder='Dán config vào đây, ví dụ:
+{
+  "apiKey": "AIza...",
+  "authDomain": "project.firebaseapp.com",
+  "projectId": "project-id",
+  ...
+}'></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="applyFirebaseConfig()">
+            ✅ Áp dụng config
+          </button>
+          <p class="text-muted mt-2" style="font-size:0.82rem;">
+            * Config sẽ được lưu vào localStorage và áp dụng ngay lập tức. 
+            Để dùng vĩnh viễn, hãy chỉnh trực tiếp trong file app.js.
+          </p>
+        </div>
+      </details>
+    </div>
+  </div>
+
+</main>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="app.js"></script>
+<script>
+// ====================================================
+// UPLOAD PAGE LOGIC
+// ====================================================
+
+let parsedQuestions = [];
+
+// Setup drag & drop
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadZone.classList.add('dragover');
+});
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+});
+
+// Chọn file
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) processFile(file);
+}
+
+// Xử lý file
+async function processFile(file) {
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  if (file.size > maxSize) {
+    showToast('File quá lớn! Tối đa 10MB.', 'error');
+    return;
+  }
+
+  const fileStatus = document.getElementById('fileStatus');
+  fileStatus.className = 'alert alert-info';
+  fileStatus.innerHTML = `⏳ Đang đọc file <strong>${file.name}</strong>...`;
+  fileStatus.classList.remove('hidden');
+
+  try {
+    let text = '';
+
+    if (file.name.endsWith('.docx')) {
+      // Đọc file .docx bằng Mammoth
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      text = result.value;
+    } else if (file.name.endsWith('.txt')) {
+      // Đọc file .txt
+      text = await file.text();
+    } else {
+      throw new Error('Chỉ hỗ trợ file .docx và .txt!');
+    }
+
+    // Parse nội dung thành câu hỏi
+    parsedQuestions = parseQuestions(text);
+
+    if (parsedQuestions.length === 0) {
+      fileStatus.className = 'alert alert-danger';
+      fileStatus.innerHTML = `❌ Không tìm thấy câu hỏi nào! Kiểm tra lại định dạng file.`;
+      return;
+    }
+
+    fileStatus.className = 'alert alert-success';
+    fileStatus.innerHTML = `✅ Đọc thành công! Tìm thấy <strong>${parsedQuestions.length} câu hỏi</strong> từ file <strong>${file.name}</strong>`;
+
+    // Hiển thị preview
+    renderPreview(parsedQuestions);
+
+  } catch (error) {
+    console.error(error);
+    fileStatus.className = 'alert alert-danger';
+    fileStatus.innerHTML = `❌ Lỗi đọc file: ${error.message}`;
+  }
+}
+
+// ====================================================
+// PARSER - Chuyển text thành câu hỏi
+// ====================================================
+function parseQuestions(text) {
+  const questions = [];
+
+  // Chuẩn hóa text
+  const lines = text
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 0);
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Phát hiện dòng câu hỏi: "Câu 1:", "Câu 1.", "1.", "1)"
+    const qMatch = line.match(/^(?:câu\s*)?(\d+)[.:)]\s*(.+)/i);
+    if (!qMatch) { i++; continue; }
+
+    const questionText = qMatch[2].trim();
+    const options = [];
+    let correctAnswer = -1;
+
+    i++;
+
+    // Đọc các lựa chọn A, B, C, D
+    while (i < lines.length && options.length < 4) {
+      const optLine = lines[i];
+
+      // Nhận dạng đáp án: A. / A) / A: hoặc a. / a) 
+      const optMatch = optLine.match(/^([A-Da-d])[.):\s]\s*(.+)/);
+      if (optMatch) {
+        options.push(optMatch[2].trim());
+        i++;
+        continue;
+      }
+
+      // Nếu gặp "Đáp án:" thì dừng đọc options
+      if (/^(?:đáp\s*án|đúng|correct)[:\s]/i.test(optLine)) break;
+
+      // Nếu gặp câu hỏi tiếp theo thì dừng
+      if (/^(?:câu\s*)?\d+[.:)]/i.test(optLine)) break;
+
+      i++;
+    }
+
+    // Đọc đáp án
+    if (i < lines.length) {
+      const ansLine = lines[i];
+      const ansMatch = ansLine.match(/^(?:đáp\s*án|đúng|correct)[:\s]*([A-Da-d])/i);
+      if (ansMatch) {
+        const ansLetter = ansMatch[1].toUpperCase();
+        correctAnswer = 'ABCD'.indexOf(ansLetter);
+        i++;
+      }
+    }
+
+    // Chỉ lưu câu hỏi hợp lệ
+    if (options.length === 4 && correctAnswer >= 0 && questionText.length > 3) {
+      questions.push({
+        text: questionText,
+        options: options,
+        correct: correctAnswer,
+        topic: document.getElementById('uploadTopic')?.value || 'tong-hop'
+      });
+    }
+  }
+
+  return questions;
+}
+
+// Render preview - dạng card, mỗi câu có ô upload ảnh
+function renderPreview(questions) {
+  const previewSection = document.getElementById('previewSection');
+  const parseStatus = document.getElementById('parseStatus');
+
+  previewSection.classList.remove('hidden');
+
+  parseStatus.innerHTML = `
+    <div class="alert alert-success">
+      ✅ Tổng: <strong>${questions.length} câu hỏi</strong> hợp lệ — không giới hạn số câu khi làm bài, hệ thống sẽ trộn ngẫu nhiên.
+    </div>
+  `;
+
+  const opts = ['A','B','C','D'];
+  const cards = questions.map((q, i) => `
+    <div class="preview-q-card" id="pqc-${i}" style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;background:var(--surface);">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <span style="min-width:32px;height:32px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">${i+1}</span>
+        <div style="flex:1;">
+          <div style="font-weight:600;margin-bottom:8px;line-height:1.6;">${q.text}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+            ${q.options.map((o,j) => `
+              <div style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);font-size:0.88rem;
+                          background:${j===q.correct ? 'rgba(16,185,129,0.12)' : 'var(--surface2)'};
+                          border-color:${j===q.correct ? 'var(--success)' : 'var(--border)'};">
+                <strong style="color:${j===q.correct?'var(--success)':'var(--text-muted)'};">${opts[j]}.</strong> ${o}
+                ${j===q.correct ? ' <span style="color:var(--success);font-size:0.8rem;">✓</span>' : ''}
+              </div>
+            `).join('')}
+          </div>
+          <!-- Ô upload ảnh -->
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--primary);font-weight:600;">
+              <input type="file" accept="image/*" style="display:none;" onchange="handleQuestionImage(event, ${i})">
+              📎 Thêm ảnh hình học
+            </label>
+            <div id="imgPreview-${i}" style="display:none;">
+              <img id="imgThumb-${i}" style="max-height:80px;border-radius:6px;border:1px solid var(--border);">
+              <button onclick="removeQuestionImage(${i})" style="margin-left:6px;background:none;border:none;cursor:pointer;color:var(--danger);font-size:0.85rem;">✕ Xóa</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('previewCards').innerHTML = cards;
+
+  previewSection.scrollIntoView({ behavior: 'smooth' });
+
+  // Re-render công thức toán trong preview
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise([document.getElementById('previewCards')]);
+  }
+}
+
+// Xử lý ảnh cho câu hỏi
+function handleQuestionImage(event, index) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Ảnh quá lớn! Tối đa 5MB.', 'warning');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    // Lưu vào parsedQuestions
+    parsedQuestions[index].imageUrl = dataUrl;
+    // Hiển thị thumbnail
+    const thumb = document.getElementById(`imgThumb-${index}`);
+    const preview = document.getElementById(`imgPreview-${index}`);
+    if (thumb && preview) {
+      thumb.src = dataUrl;
+      preview.style.display = 'flex';
+      preview.style.alignItems = 'center';
+    }
+    showToast(`✅ Đã thêm ảnh cho câu ${index+1}`, 'success', 2000);
+  };
+  reader.readAsDataURL(file);
+}
+
+// Xóa ảnh câu hỏi
+function removeQuestionImage(index) {
+  parsedQuestions[index].imageUrl = null;
+  const preview = document.getElementById(`imgPreview-${index}`);
+  if (preview) preview.style.display = 'none';
+  showToast(`Đã xóa ảnh câu ${index+1}`, 'info', 1500);
+}
+
+// Lưu câu hỏi vào hệ thống
+async function saveQuestions() {
+  if (parsedQuestions.length === 0) {
+    showToast('Không có câu hỏi để lưu!', 'warning');
+    return;
+  }
+
+  const btnSave = document.getElementById('btnSave');
+  btnSave.disabled = true;
+  btnSave.textContent = '⏳ Đang lưu...';
+
+  try {
+    const topic = document.getElementById('uploadTopic').value;
+    const questionsWithTopic = parsedQuestions.map(q => ({ ...q, topic }));
+
+    await uploadQuestions(questionsWithTopic);
+
+    showToast(`✅ Đã lưu ${parsedQuestions.length} câu hỏi thành công!`, 'success', 5000);
+    btnSave.textContent = `✅ Đã lưu ${parsedQuestions.length} câu`;
+
+  } catch (error) {
+    console.error(error);
+    showToast('❌ Lỗi khi lưu: ' + error.message, 'error');
+    btnSave.disabled = false;
+    btnSave.textContent = '💾 Lưu vào hệ thống';
+  }
+}
+
+// Reset upload
+function resetUpload() {
+  parsedQuestions = [];
+  document.getElementById('fileInput').value = '';
+  document.getElementById('fileStatus').classList.add('hidden');
+  document.getElementById('previewSection').classList.add('hidden');
+  document.getElementById('previewCards').innerHTML = '';
+}
+
+// Tải file mẫu
+function downloadSampleDoc() {
+  const sampleContent = `Câu 1: Nghiệm của phương trình $2x + 6 = 0$ là?
+A. $x = 3$
+B. $x = -3$
+C. $x = 6$
+D. $x = -6$
+Đáp án: B
+
+Câu 2: Phương trình $x^2 - 5x + 6 = 0$ có nghiệm là?
+A. $x = 1$ và $x = 6$
+B. $x = 2$ và $x = 3$
+C. $x = -2$ và $x = -3$
+D. $x = 1$ và $x = -6$
+Đáp án: B
+
+Câu 3: Diện tích hình tròn bán kính $r$ tính bằng công thức?
+A. $S = \\pi r$
+B. $S = 2\\pi r$
+C. $S = \\pi r^2$
+D. $S = 2\\pi r^2$
+Đáp án: C
+
+Câu 4: Cho tam giác vuông có hai cạnh góc vuông $a = 3$, $b = 4$. Cạnh huyền $c$ bằng?
+A. $c = 6$
+B. $c = 5$
+C. $c = 7$
+D. $c = \\sqrt{7}$
+Đáp án: B
+
+Câu 5: Căn bậc hai của $144$ là bao nhiêu?
+A. 11
+B. 12
+C. 13
+D. 14
+Đáp án: B`;
+
+  const blob = new Blob([sampleContent], { type: 'text/plain;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'de_thi_mau.txt';
+  link.click();
+  showToast('Đã tải file mẫu!', 'success');
+}
+
+// Áp dụng Firebase config từ input
+function applyFirebaseConfig() {
+  const input = document.getElementById('firebaseConfigInput').value.trim();
+  try {
+    let config = input;
+    // Thử parse JSON
+    if (config.startsWith('{')) {
+      const parsed = JSON.parse(config);
+      localStorage.setItem('firebase_config_override', JSON.stringify(parsed));
+      showToast('✅ Config đã lưu! Vui lòng tải lại trang.', 'success', 5000);
+      setTimeout(() => location.reload(), 2000);
+    } else {
+      showToast('Config không đúng định dạng JSON!', 'error');
+    }
+  } catch (e) {
+    showToast('Lỗi parse JSON: ' + e.message, 'error');
+  }
+}
+
+// ====================================================
+// QUẢN LÝ DỮ LIỆU - XÓA CÂU HỎI & KẾT QUẢ
+// ====================================================
+
+// Đếm số câu hỏi hiện có và hiển thị tổng quan
+async function loadDataOverview() {
+  const el = document.getElementById('dataOverview');
+  if (!el) return;
+
+  const topics = [
+    { id: 'dai-so',   name: 'Đại số',   icon: '📘' },
+    { id: 'hinh-hoc', name: 'Hình học', icon: '📐' },
+    { id: 'tong-hop', name: 'Tổng hợp', icon: '📚' },
+  ];
+
+  try {
+    let rows = '';
+    let grandTotal = 0;
+
+    for (const t of topics) {
+      let count = 0;
+      let source = '';
+
+      if (AppState.useFirebase && AppState.db) {
+        const snap = await AppState.db.collection('questions').where('topic','==',t.id).get();
+        count = snap.size;
+        source = count > 0 ? 'Firebase' : '(chưa có)';
+      } else {
+        const stored = JSON.parse(localStorage.getItem('quiz_questions') || '{}');
+        count = (stored[t.id] || []).length;
+        source = count > 0 ? 'localStorage' : '(chưa có)';
+      }
+
+      grandTotal += count;
+      rows += `
+        <div class="overview-row">
+          <span class="overview-icon">${t.icon}</span>
+          <span class="overview-name">${t.name}</span>
+          <span class="overview-count">${count} câu</span>
+          <span class="overview-source">${source}</span>
+        </div>
+      `;
+    }
+
+    // Đếm kết quả thi
+    let resultCount = 0;
+    if (AppState.useFirebase && AppState.db) {
+      const snap = await AppState.db.collection('results').get();
+      resultCount = snap.size;
+    } else {
+      const results = JSON.parse(localStorage.getItem('quiz_results') || '[]');
+      resultCount = results.length;
+    }
+
+    el.innerHTML = `
+      <div class="overview-grid">
+        ${rows}
+        <div class="overview-row overview-total">
+          <span class="overview-icon">📦</span>
+          <span class="overview-name">Tổng câu hỏi</span>
+          <span class="overview-count" style="color:var(--primary);font-weight:800;">${grandTotal} câu</span>
+          <span class="overview-source"></span>
+        </div>
+        <div class="overview-row" style="border-top:1px dashed var(--border);padding-top:10px;margin-top:4px;">
+          <span class="overview-icon">📊</span>
+          <span class="overview-name">Kết quả bài thi</span>
+          <span class="overview-count" style="color:var(--accent);">${resultCount} lượt</span>
+          <span class="overview-source"></span>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm mt-3" onclick="loadDataOverview()">🔄 Làm mới</button>
+    `;
+  } catch (e) {
+    el.innerHTML = `<div class="alert alert-warning">Không thể đọc dữ liệu: ${e.message}</div>`;
+  }
+}
+
+// Xác nhận và xóa câu hỏi đã upload
+async function confirmDeleteUploaded() {
+  const topicVal = document.getElementById('deleteTopicSelect').value;
+  const topicLabel = topicVal === '__all__'
+    ? 'TẤT CẢ chủ đề'
+    : document.getElementById('deleteTopicSelect').selectedOptions[0].text;
+
+  const confirmed = confirm(
+    `⚠️ XÁC NHẬN XÓA\n\nBạn sắp xóa toàn bộ câu hỏi đã upload của: ${topicLabel}\n\nHành động này KHÔNG THỂ hoàn tác!\n\nBấm OK để xác nhận xóa.`
+  );
+  if (!confirmed) return;
+
+  try {
+    if (topicVal === '__all__') {
+      await deleteUploadedQuestions('dai-so');
+      await deleteUploadedQuestions('hinh-hoc');
+      await deleteUploadedQuestions('tong-hop');
+    } else {
+      await deleteUploadedQuestions(topicVal);
+    }
+    showToast(`✅ Đã xóa câu hỏi: ${topicLabel}`, 'success', 4000);
+    loadDataOverview();
+  } catch (e) {
+    showToast('❌ Lỗi xóa: ' + e.message, 'error');
+  }
+}
+
+// Xóa câu hỏi theo topic
+async function deleteUploadedQuestions(topic) {
+  if (AppState.useFirebase && AppState.db) {
+    // Xóa từ Firestore theo batch
+    const snap = await AppState.db.collection('questions').where('topic','==',topic).get();
+    if (snap.empty) return;
+    const BATCH_SIZE = 400;
+    const docs = snap.docs;
+    for (let i = 0; i < docs.length; i += BATCH_SIZE) {
+      const batch = AppState.db.batch();
+      docs.slice(i, i + BATCH_SIZE).forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    }
+  } else {
+    // Xóa khỏi localStorage
+    const stored = JSON.parse(localStorage.getItem('quiz_questions') || '{}');
+    delete stored[topic];
+    localStorage.setItem('quiz_questions', JSON.stringify(stored));
+  }
+}
+
+// Xác nhận và xóa câu hỏi mẫu (localStorage flag)
+function confirmDeleteSample() {
+  const confirmed = confirm(
+    `⚠️ XÁC NHẬN XÓA CÂU HỎI MẪU\n\nBộ 30 câu hỏi mẫu có sẵn sẽ bị ẩn đi.\nHệ thống sẽ chỉ dùng câu hỏi thầy đã upload.\n\nĐể khôi phục: xóa flag trong localStorage hoặc tải lại code.\n\nBấm OK để xác nhận.`
+  );
+  if (!confirmed) return;
+
+  // Lưu flag ẩn câu hỏi mẫu
+  localStorage.setItem('hide_sample_questions', '1');
+  showToast('✅ Đã ẩn câu hỏi mẫu. Hệ thống chỉ dùng câu hỏi đã upload.', 'success', 5000);
+  loadDataOverview();
+}
+
+// Xác nhận và xóa toàn bộ kết quả thi
+async function confirmDeleteResults() {
+  const confirmed = confirm(
+    `⚠️ XÁC NHẬN XÓA KẾT QUẢ THI\n\nToàn bộ điểm số và bảng xếp hạng sẽ bị xóa vĩnh viễn.\n\nHành động này KHÔNG THỂ hoàn tác!\n\nBấm OK để xác nhận xóa.`
+  );
+  if (!confirmed) return;
+
+  // Xác nhận lần 2 vì quá nguy hiểm
+  const reconfirm = confirm('Bấm OK lần nữa để xác nhận xóa toàn bộ kết quả thi.');
+  if (!reconfirm) return;
+
+  try {
+    if (AppState.useFirebase && AppState.db) {
+      const snap = await AppState.db.collection('results').get();
+      const BATCH_SIZE = 400;
+      const docs = snap.docs;
+      for (let i = 0; i < docs.length; i += BATCH_SIZE) {
+        const batch = AppState.db.batch();
+        docs.slice(i, i + BATCH_SIZE).forEach(d => batch.delete(d.ref));
+        await batch.commit();
+      }
+    } else {
+      localStorage.removeItem('quiz_results');
+    }
+    showToast('✅ Đã xóa toàn bộ kết quả thi.', 'success', 4000);
+    loadDataOverview();
+  } catch (e) {
+    showToast('❌ Lỗi xóa kết quả: ' + e.message, 'error');
+  }
+}
+
+// Khởi động
+document.addEventListener('DOMContentLoaded', () => {
+  initFirebase();
+  // Chờ Firebase khởi xong rồi mới load overview
+  setTimeout(loadDataOverview, 600);
+});
+</script>
+</body>
+</html>
