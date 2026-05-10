@@ -229,11 +229,12 @@ function renderLeaderboard(data) {
     podiumHtml = `
       <div class="leaderboard-podium">
         ${slots.map(s => `
-          <div class="podium-slot ${s.blockClass}">
+          <div class="podium-slot ${s.blockClass}" onclick="rankFirework(${s.pos},'${s.data.studentName.replace(/'/g,"\\'")}')" style="cursor:pointer;" title="Chạm để chúc mừng!">
             <div class="podium-avatar">${s.data.studentName.charAt(0).toUpperCase()}</div>
             <div class="podium-name">${s.data.studentName}</div>
             <div class="podium-score">${s.data.score}</div>
             <div class="podium-block">${s.icon}</div>
+            <div style="font-size:0.6rem;color:#6366f1;animation:hint-pulse 1.8s ease-in-out infinite;margin-top:4px;">👆 Chạm!</div>
           </div>
         `).join('')}
       </div>`;
@@ -244,8 +245,11 @@ function renderLeaderboard(data) {
   const listHtml = top10.map((r, i) => {
     const rank = i + 1;
     const rankInfo = getRank(r.score);
+    const clickAttr = rank <= 3
+      ? `onclick="rankFirework(${rank},'${r.studentName.replace(/'/g,"\\'")}') " style="cursor:pointer;" title="Chạm để chúc mừng!"`
+      : '';
     return `
-      <div class="top10-item">
+      <div class="top10-item" ${clickAttr}>
         <div class="top10-rank">${rank <= 3 ? medals[rank-1] : rank}</div>
         <div>
           <div class="top10-name">${r.studentName}</div>
@@ -552,6 +556,166 @@ document.addEventListener('DOMContentLoaded', () => {
   initFirebase();
   loadRankings();
 });
+
+// ====================================================
+// PHÁO HOA BẢNG XẾP HẠNG
+// ====================================================
+function rankFirework(rank, name) {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const now = ctx.currentTime;
+
+  if (rank === 1) {
+    // 🥇 HẠNG 1: Pháo hoa KHẮP MÀN HÌNH — 8 đợt nổ liên tiếp + fanfare hoành tráng
+    const colors = ['#fbbf24','#fef08a','#f59e0b','#fff','#f43f5e','#a78bfa','#34d399','#38bdf8','#fb923c'];
+    const W = window.innerWidth, H = window.innerHeight;
+
+    // 8 điểm nổ phủ kín màn hình
+    const points = [
+      {x:W*.1, y:H*.2}, {x:W*.9, y:H*.2},
+      {x:W*.5, y:H*.1}, {x:W*.25,y:H*.45},
+      {x:W*.75,y:H*.45},{x:W*.15,y:H*.7},
+      {x:W*.85,y:H*.7}, {x:W*.5, y:H*.55},
+    ];
+    points.forEach((pt, bi) => {
+      setTimeout(() => {
+        for (let i = 0; i < 40; i++) {
+          const p = document.createElement('div');
+          p.className = 'firework-particle';
+          const angle = (i/40)*360 + Math.random()*9;
+          const dist = 70 + Math.random()*160;
+          const size = 5 + Math.random()*9;
+          p.style.cssText = `left:${pt.x}px;top:${pt.y}px;width:${size}px;height:${size}px;
+            background:${colors[(i+bi*4)%colors.length]};
+            --dx:${Math.cos(angle*Math.PI/180)*dist}px;
+            --dy:${Math.sin(angle*Math.PI/180)*dist}px;
+            animation-duration:${0.7+Math.random()*0.7}s;
+            border-radius:${Math.random()>.4?'50%':'3px'};
+            position:fixed;z-index:9999;pointer-events:none;`;
+          document.body.appendChild(p);
+          setTimeout(()=>p.remove(), 1600);
+        }
+      }, bi * 180);
+    });
+
+    // Đợt thứ 2 sau 1.5s — mưa sao từ trên xuống
+    setTimeout(() => {
+      for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+          const p = document.createElement('div');
+          p.className = 'firework-particle';
+          const x = Math.random() * W;
+          const size = 4 + Math.random()*8;
+          p.style.cssText = `left:${x}px;top:-10px;width:${size}px;height:${size}px;
+            background:${colors[i%colors.length]};
+            --dx:${(Math.random()-.5)*60}px;--dy:${100+Math.random()*250}px;
+            animation-duration:${0.8+Math.random()*0.6}s;
+            border-radius:50%;position:fixed;z-index:9999;pointer-events:none;`;
+          document.body.appendChild(p);
+          setTimeout(()=>p.remove(), 1600);
+        }, i * 20);
+      }
+    }, 1500);
+
+    // Âm thanh: fanfare kèn hoành tráng nhiều lớp
+    // Lớp 1: chord fanfare
+    [[523,0],[659,0],[784,0],[1047,0.05]].forEach(([f,t])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='square'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,now+t);
+      g.gain.linearRampToValueAtTime(0.12,now+t+0.06);
+      g.gain.exponentialRampToValueAtTime(0.001,now+t+0.5);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(now+t);o.stop(now+t+0.55);
+    });
+    // Lớp 2: giai điệu thăng tiến
+    [[523,.3],[587,.45],[659,.6],[784,.75],[1047,.9],[1319,1.1]].forEach(([f,t])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sawtooth'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,now+t);
+      g.gain.linearRampToValueAtTime(0.09,now+t+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001,now+t+0.28);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(now+t);o.stop(now+t+0.32);
+    });
+    // Lớp 3: trống bass thình thịch
+    [0, 0.35, 0.7, 1.05].forEach(t=>{
+      const buf=ctx.createBuffer(1,ctx.sampleRate*0.15,ctx.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(d.length*0.2));
+      const src=ctx.createBufferSource(),g=ctx.createGain();
+      const flt=ctx.createBiquadFilter();
+      flt.type='lowpass';flt.frequency.value=150;
+      src.buffer=buf;
+      g.gain.setValueAtTime(0.7,now+t);
+      g.gain.exponentialRampToValueAtTime(0.001,now+t+0.18);
+      src.connect(flt);flt.connect(g);g.connect(ctx.destination);
+      src.start(now+t);
+    });
+
+    showToast(`🥇🎊 XUẤT SẮC! ${name} đứng đầu bảng! Quá tuyệt vời! 🎆`, 'success', 4000);
+  }
+  else if (rank === 2) {
+    // 🥈 Hạng 2: Xoáy ốc + chuông trong
+    const colors=['#e2e8f0','#94a3b8','#7dd3fc','#38bdf8','#fff','#a5f3fc'];
+    const cx=window.innerWidth/2, cy=window.innerHeight*.4;
+    for(let i=0;i<70;i++){
+      setTimeout(()=>{
+        const p=document.createElement('div');
+        p.className='firework-particle';
+        const angle=(i/70)*720;
+        const dist=30+(i/70)*170;
+        const size=4+Math.random()*7;
+        p.style.cssText=`left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;
+          background:${colors[i%colors.length]};
+          --dx:${Math.cos(angle*Math.PI/180)*dist}px;
+          --dy:${Math.sin(angle*Math.PI/180)*dist-90}px;
+          animation-duration:${0.8+Math.random()*0.5}s;
+          border-radius:50%;position:fixed;z-index:9999;pointer-events:none;`;
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),1500);
+      }, i*14);
+    }
+    // Chuông ngân 3 nốt
+    [880,1108,1320,1760].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0.18,now+i*.2);
+      g.gain.exponentialRampToValueAtTime(0.001,now+i*.2+1.4);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(now+i*.2);o.stop(now+i*.2+1.5);
+    });
+    showToast(`🥈✨ Tuyệt vời! ${name} xếp hạng 2! 🌟`, 'success', 3500);
+  }
+  else {
+    // 🥉 Hạng 3: Mưa sao vui + giai điệu bouncy
+    const colors=['#f97316','#fb923c','#fdba74','#10b981','#34d399','#a78bfa','#f43f5e'];
+    for(let i=0;i<70;i++){
+      setTimeout(()=>{
+        const p=document.createElement('div');
+        p.className='firework-particle';
+        const x=Math.random()*window.innerWidth;
+        const size=4+Math.random()*8;
+        p.style.cssText=`left:${x}px;top:-10px;width:${size}px;height:${size}px;
+          background:${colors[i%colors.length]};
+          --dx:${(Math.random()-.5)*80}px;--dy:${80+Math.random()*220}px;
+          animation-duration:${0.7+Math.random()*0.6}s;
+          border-radius:${Math.random()>.5?'50%':'3px'};
+          position:fixed;z-index:9999;pointer-events:none;`;
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),1500);
+      }, i*18);
+    }
+    [392,494,587,698,784,880].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='triangle';o.frequency.value=f;
+      g.gain.setValueAtTime(0.13,now+i*.1);
+      g.gain.exponentialRampToValueAtTime(0.001,now+i*.1+0.28);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(now+i*.1);o.stop(now+i*.1+0.32);
+    });
+    showToast(`🥉🎉 Giỏi lắm! ${name} xếp hạng 3! Cố lên!`, 'success', 3000);
+  }
+}
 </script>
 </body>
 </html>
