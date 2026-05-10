@@ -242,20 +242,26 @@ function renderLeaderboard(data) {
 
   // Top 10 list
   const medals = ['🥇','🥈','🥉'];
+  const isTeacher = sessionStorage.getItem('teacher_auth') === '1';
   const listHtml = top10.map((r, i) => {
     const rank = i + 1;
-    const rankInfo = getRank(r.score);
     const clickAttr = rank <= 3
       ? `onclick="rankFirework(${rank},'${r.studentName.replace(/'/g,"\\'")}') " style="cursor:pointer;" title="Chạm để chúc mừng!"`
       : '';
+    const rid = r.id || `__idx__${allResults.indexOf(r)}`;
+    const safeName = r.studentName.replace(/'/g,"\\'");
+    const deleteBtn = isTeacher
+      ? `<button onclick="event.stopPropagation();deleteResult('${rid}','${safeName}')" class="btn-delete-result" title="Xóa">🗑️</button>`
+      : '';
     return `
-      <div class="top10-item" ${clickAttr}>
+      <div class="top10-item" ${clickAttr} style="position:relative;">
         <div class="top10-rank">${rank <= 3 ? medals[rank-1] : rank}</div>
-        <div>
+        <div style="flex:1;">
           <div class="top10-name">${r.studentName}</div>
           <div class="top10-class">${r.studentClass} · ${renderRankBadge(r.score)}</div>
         </div>
         <div class="top10-score">${r.score}<span style="font-size:0.7rem;color:var(--text-muted)">/10</span></div>
+        ${deleteBtn}
       </div>
     `;
   }).join('');
