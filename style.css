@@ -1122,6 +1122,17 @@ details[open] > summary { margin-bottom: 0; }
   .toast-container { bottom: 16px; right: 12px; left: 12px; }
   .toast { max-width: 100%; }
 
+  /* Dots câu hỏi: cuộn ngang 1 hàng, không xuống dòng */
+  .question-dots {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .question-dots::-webkit-scrollbar { display: none; }
+  .dot { flex-shrink: 0; }
+
   .setup-steps { gap: 12px; }
 }
 
