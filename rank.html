@@ -98,13 +98,7 @@
         <div class="form-group mb-0" style="min-width:160px;">
           <select class="form-control" id="filterClass" onchange="applyFilters()">
             <option value="">📚 Tất cả lớp</option>
-            <option value="9A">Lớp 9A</option>
-            <option value="9B">Lớp 9B</option>
-            <option value="9C">Lớp 9C</option>
-            <option value="9D">Lớp 9D</option>
-            <option value="9E">Lớp 9E</option>
-            <option value="9G">Lớp 9G</option>
-            <option value="9H">Lớp 9H</option>
+            <!-- Các lớp sẽ được thêm động từ dữ liệu thực -->
           </select>
         </div>
         <div class="form-group mb-0" style="min-width:160px;">
@@ -279,10 +273,43 @@ async function loadRankings() {
     allResults = generateSampleResults();
   }
 
+  // Cập nhật danh sách lớp động từ dữ liệu thực
+  populateClassFilter(allResults);
+
   updateStats(allResults);
   renderLeaderboard(allResults);
   applyFilters();
   renderClassStats(allResults);
+}
+
+// Tạo danh sách lớp động từ dữ liệu
+function populateClassFilter(data) {
+  const classes = [...new Set(data.map(r => r.studentClass).filter(Boolean))].sort((a,b) => a.localeCompare(b,'vi'));
+  const sel = document.getElementById('filterClass');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">📚 Tất cả lớp</option>' +
+    classes.map(c => `<option value="${c}">Lớp ${c}</option>`).join('');
+}
+
+// Xóa 1 kết quả (chỉ thầy mới thấy nút xóa)
+async function deleteResult(id, name) {
+  if (!confirm(`Xóa kết quả của "${name}"?`)) return;
+  if (AppState.useFirebase && AppState.db) {
+    try {
+      await AppState.db.collection('results').doc(id).delete();
+      showToast(`Đã xóa kết quả của ${name}`, 'success');
+      loadRankings();
+    } catch(e) {
+      showToast('Lỗi khi xóa: ' + e.message, 'error');
+    }
+  } else {
+    // localStorage fallback
+    let results = JSON.parse(localStorage.getItem('quiz_results') || '[]');
+    results = results.filter((r, i) => (r.id || i.toString()) !== id);
+    localStorage.setItem('quiz_results', JSON.stringify(results));
+    showToast(`Đã xóa kết quả của ${name}`, 'success');
+    loadRankings();
+  }
 }
 
 // Tạo dữ liệu mẫu demo
@@ -354,6 +381,7 @@ function applyFilters() {
 // Render bảng xếp hạng
 function renderTable(data) {
   const rankContent = document.getElementById('rankContent');
+  const isTeacher = sessionStorage.getItem('teacher_auth') === '1';
 
   if (data.length === 0) {
     rankContent.innerHTML = `
@@ -372,6 +400,9 @@ function renderTable(data) {
     const scoreClass = r.score >= 8 ? 'high' : r.score >= 5 ? 'mid' : 'low';
     const time = `${Math.floor(r.timeTaken/60)}:${(r.timeTaken%60).toString().padStart(2,'0')}`;
     const date = r.timestamp ? new Date(r.timestamp).toLocaleDateString('vi-VN') : '-';
+    const deleteBtn = isTeacher && r.id
+      ? `<td><button onclick="deleteResult('${r.id}','${r.studentName.replace(/'/g,"\\'")}') " class="btn-delete-result" title="Xóa">🗑️</button></td>`
+      : isTeacher ? `<td></td>` : '';
 
     return `
       <tr class="${rank <= 3 ? `rank-${rank}` : ''}">
@@ -386,6 +417,7 @@ function renderTable(data) {
         <td style="font-size:0.85rem;color:var(--text-muted)">${r.correct}/${r.total} câu</td>
         <td style="font-size:0.85rem;color:var(--text-muted)">⏱️ ${time}</td>
         <td style="font-size:0.8rem;color:var(--text-muted)">${date}</td>
+        ${deleteBtn}
       </tr>
     `;
   }).join('');
@@ -404,6 +436,7 @@ function renderTable(data) {
             <th>Số câu đúng</th>
             <th>Thời gian</th>
             <th>Ngày</th>
+            ${isTeacher ? '<th>Xóa</th>' : ''}
           </tr>
         </thead>
         <tbody>${rows}</tbody>

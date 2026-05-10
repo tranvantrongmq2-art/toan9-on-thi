@@ -2,8 +2,6 @@
 // APP.JS - Logic chính Hệ thống Ôn tập Toán lớp 9
 // ===================================================
 
-// ---- CẤU HÌNH FIREBASE ----
-// HƯỚNG DẪN: Thay thế các giá trị dưới đây bằng config Firebase của bạn
 const FIREBASE_CONFIG ={
   apiKey: "AIzaSyByp6U-vsE-PeSRzPj_OhWigq3mA97t4Gg",
   authDomain: "ontaptoan9-9b81b.firebaseapp.com",
@@ -335,8 +333,202 @@ function launchFullscreenFireworks() {
 
 
 // ====================================================
-// THANH TIẾN TRÌNH ÔN TẬP
+// BẢNG VINH DANH TOP 3 - TRANG LÀM BÀI
 // ====================================================
+async function loadHonorBoard() {
+  const board = document.getElementById('honorBoard');
+  if (!board) return;
+
+  const results = await fetchResults();
+  // Lấy điểm cao nhất của mỗi học sinh
+  const bestMap = {};
+  results.forEach(r => {
+    const key = r.studentName + '_' + r.studentClass;
+    if (!bestMap[key] || r.score > bestMap[key].score ||
+        (r.score === bestMap[key].score && r.timeTaken < bestMap[key].timeTaken)) {
+      bestMap[key] = r;
+    }
+  });
+  const top3 = Object.values(bestMap)
+    .sort((a, b) => b.score - a.score || a.timeTaken - b.timeTaken)
+    .slice(0, 3);
+
+  if (top3.length === 0) {
+    board.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:20px;">Chưa có dữ liệu. Hãy làm bài đầu tiên! 🎯</p>`;
+    return;
+  }
+
+  // Thứ tự hiển thị: hạng 2 - hạng 1 - hạng 3 (podium style)
+  const slots = [
+    { rank: 1, data: top3[0], pos: 'gold',   icon: '🥇', effect: 1 },
+    { rank: 2, data: top3[1], pos: 'silver', icon: '🥈', effect: 2 },
+    { rank: 3, data: top3[2], pos: 'bronze', icon: '🥉', effect: 3 },
+  ].filter(s => s.data);
+
+  // Sắp xếp hiển thị theo podium: 2-1-3
+  const displayOrder = [
+    slots.find(s => s.rank === 2),
+    slots.find(s => s.rank === 1),
+    slots.find(s => s.rank === 3),
+  ].filter(Boolean);
+
+  board.innerHTML = `
+    <div class="honor-podium">
+      ${displayOrder.map(s => `
+        <div class="honor-slot honor-${s.pos}" onclick="honorFirework(${s.effect}, '${s.data.studentName}')" title="Chạm để chúc mừng!">
+          <div class="honor-crown">${s.icon}</div>
+          <div class="honor-avatar">${s.data.studentName.charAt(0).toUpperCase()}</div>
+          <div class="honor-name">${s.data.studentName}</div>
+          <div class="honor-class">${s.data.studentClass}</div>
+          <div class="honor-score">${s.data.score}<span>/10</span></div>
+          <div class="honor-block">
+            <div class="honor-rank-num">#${s.rank}</div>
+          </div>
+          <div class="honor-tap-hint">👆 Chạm!</div>
+        </div>
+      `).join('')}
+    </div>
+    <p class="honor-footer">✨ Chạm vào tên để tặng pháo hoa chúc mừng!</p>
+  `;
+}
+
+// 3 hiệu ứng pháo hoa + âm thanh khác nhau cho từng hạng
+function honorFirework(effect, name) {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const now = ctx.currentTime;
+
+  if (effect === 1) {
+    // 🥇 Hạng 1: Pháo hoa bùng nổ rực rỡ + kèn fanfare
+    _firework_burst(100, ['#fbbf24','#fef08a','#f59e0b','#fff','#fde68a','#f43f5e']);
+    // Âm fanfare kèn
+    [[523,0],[659,0.15],[784,0.3],[1047,0.45]].forEach(([freq, t]) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      g.gain.setValueAtTime(0, now + t);
+      g.gain.linearRampToValueAtTime(0.18, now + t + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.001, now + t + 0.35);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(now + t); osc.stop(now + t + 0.4);
+    });
+    showToast(`🥇 Xuất sắc! Chúc mừng ${name} đứng đầu! 🎊`, 'success', 3000);
+  }
+  else if (effect === 2) {
+    // 🥈 Hạng 2: Pháo hoa xoáy + âm chuông ngân
+    _firework_spiral(60, ['#e2e8f0','#94a3b8','#cbd5e1','#7dd3fc','#38bdf8','#fff']);
+    // Âm chuông trong
+    [880, 1108, 1320].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      g.gain.setValueAtTime(0.2, now + i * 0.18);
+      g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.18 + 1.2);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(now + i * 0.18); osc.stop(now + i * 0.18 + 1.3);
+    });
+    showToast(`🥈 Tuyệt vời! ${name} xếp hạng 2! 🌟`, 'success', 3000);
+  }
+  else {
+    // 🥉 Hạng 3: Pháo hoa mưa sao + âm vui nhộn
+    _firework_rain(80, ['#f97316','#fb923c','#fdba74','#10b981','#34d399','#a78bfa']);
+    // Âm vui nhộn bouncy
+    [392, 494, 587, 698, 784].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      g.gain.setValueAtTime(0.15, now + i * 0.1);
+      g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.25);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.3);
+    });
+    showToast(`🥉 Giỏi lắm! ${name} xếp hạng 3! 🎉`, 'success', 3000);
+  }
+}
+
+// Hiệu ứng 1: Nổ bùng từ trung tâm (cho hạng 1)
+function _firework_burst(count, colors) {
+  const cx = window.innerWidth / 2, cy = window.innerHeight * 0.35;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'firework-particle';
+    const angle = (i / count) * 360 + Math.random() * 8;
+    const dist = 60 + Math.random() * 180;
+    const dx = Math.cos(angle * Math.PI / 180) * dist;
+    const dy = Math.sin(angle * Math.PI / 180) * dist;
+    const size = 5 + Math.random() * 9;
+    p.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;
+      background:${colors[i % colors.length]};--dx:${dx}px;--dy:${dy}px;
+      animation-duration:${0.7 + Math.random() * 0.6}s;
+      border-radius:${Math.random() > 0.4 ? '50%' : '2px'};position:fixed;z-index:9991;`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1400);
+  }
+  // Thêm 3 đợt nổ nữa ở các góc
+  [[0.2,0.25],[0.8,0.25],[0.5,0.15]].forEach(([rx,ry], bi) => {
+    setTimeout(() => {
+      const bx = window.innerWidth*rx, by = window.innerHeight*ry;
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'firework-particle';
+        const angle = Math.random() * 360;
+        const dist = 40 + Math.random() * 120;
+        p.style.cssText = `left:${bx}px;top:${by}px;width:${4+Math.random()*7}px;height:${4+Math.random()*7}px;
+          background:${colors[i%colors.length]};--dx:${Math.cos(angle*Math.PI/180)*dist}px;
+          --dy:${Math.sin(angle*Math.PI/180)*dist}px;animation-duration:${0.6+Math.random()*0.5}s;
+          border-radius:50%;position:fixed;z-index:9991;`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1200);
+      }
+    }, 150 + bi * 120);
+  });
+}
+
+// Hiệu ứng 2: Xoáy ốc (cho hạng 2)
+function _firework_spiral(count, colors) {
+  const cx = window.innerWidth / 2, cy = window.innerHeight * 0.4;
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'firework-particle';
+      const angle = (i / count) * 720; // 2 vòng xoáy
+      const dist = 30 + (i / count) * 160;
+      const dx = Math.cos(angle * Math.PI / 180) * dist;
+      const dy = Math.sin(angle * Math.PI / 180) * dist - 80;
+      const size = 4 + Math.random() * 7;
+      p.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;
+        background:${colors[i%colors.length]};--dx:${dx}px;--dy:${dy}px;
+        animation-duration:${0.8+Math.random()*0.5}s;
+        border-radius:50%;position:fixed;z-index:9991;`;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1500);
+    }, i * 12);
+  }
+}
+
+// Hiệu ứng 3: Mưa sao từ trên xuống (cho hạng 3)
+function _firework_rain(count, colors) {
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'firework-particle';
+      const x = Math.random() * window.innerWidth;
+      const dy = 80 + Math.random() * 200;
+      const dx = (Math.random() - 0.5) * 80;
+      const size = 4 + Math.random() * 8;
+      p.style.cssText = `left:${x}px;top:${-10}px;width:${size}px;height:${size}px;
+        background:${colors[i%colors.length]};--dx:${dx}px;--dy:${dy}px;
+        animation-duration:${0.6+Math.random()*0.7}s;
+        border-radius:${Math.random()>0.5?'50%':'2px'};position:fixed;z-index:9991;`;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1400);
+    }, i * 15);
+  }
+}
+
+
 function renderStudyProgress(answered, total) {
   const pct = total > 0 ? Math.round(answered / total * 100) : 0;
   return `
@@ -441,7 +633,16 @@ function renderHome() {
         </div>
       `).join('')}
     </div>
+
+    <!-- Bảng vinh danh Top 3 -->
+    <div class="home-section-label" style="margin-top:28px;">🏆 Bảng Vinh Danh</div>
+    <div class="honor-board" id="honorBoard">
+      <div class="honor-loading"><div class="spinner"></div></div>
+    </div>
   `;
+
+  // Load top 3 sau khi render xong
+  loadHonorBoard();
 }
 
 // Chọn chủ đề và bắt đầu
