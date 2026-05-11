@@ -139,7 +139,7 @@ async function fetchResults() {
   }
 }
 
-// Upload câu hỏi lên Firestore
+// Upload câu hỏi lên Firestore (legacy - dùng uploadQuestionSet thay thế)
 async function uploadQuestions(questions) {
   if (AppState.useFirebase && AppState.db) {
     const batch = AppState.db.batch();
@@ -149,14 +149,10 @@ async function uploadQuestions(questions) {
     });
     await batch.commit();
   } else {
-    // Lưu vào localStorage
-    const existing = JSON.parse(localStorage.getItem('quiz_questions') || '{}');
-    questions.forEach(q => {
-      const topic = q.topic || 'tong-hop';
-      if (!existing[topic]) existing[topic] = [];
-      existing[topic].push(q);
-    });
-    localStorage.setItem('quiz_questions', JSON.stringify(existing));
+    const allQ = JSON.parse(localStorage.getItem('quiz_questions_v2') || '{}');
+    const setId = `legacy_${Date.now()}`;
+    allQ[setId] = questions;
+    localStorage.setItem('quiz_questions_v2', JSON.stringify(allQ));
   }
 }
 
@@ -175,16 +171,16 @@ async function fetchQuestions(topic) {
     }
   }
 
-  // Thử localStorage
-  const stored = JSON.parse(localStorage.getItem('quiz_questions') || '{}');
-  if (stored[topic] && stored[topic].length > 0) {
-    return stored[topic];
-  }
+  // Thử quiz_questions_v2 (bộ đề mới)
+  const v2 = JSON.parse(localStorage.getItem('quiz_questions_v2') || '{}');
+  const v2Questions = Object.values(v2).flat().filter(q => q.topic === topic);
+  if (v2Questions.length > 0) return v2Questions;
 
-  // Dùng câu hỏi mẫu (trừ khi đã bị ẩn)
-  if (localStorage.getItem('hide_sample_questions') === '1') {
-    return []; // Thầy đã ẩn câu hỏi mẫu
-  }
+  // Thử localStorage cũ
+  const stored = JSON.parse(localStorage.getItem('quiz_questions') || '{}');
+  if (stored[topic] && stored[topic].length > 0) return stored[topic];
+
+  // Câu mẫu
   return SAMPLE_QUESTIONS[topic] || SAMPLE_QUESTIONS['tong-hop'];
 }
 
@@ -574,15 +570,15 @@ function renderHome() {
   const app = document.getElementById('app');
   if (!app) return;
 
-  const topicStyles = [
-    { grad: 'linear-gradient(135deg,#3b82f6,#6366f1)', shadow: 'rgba(99,102,241,0.35)', glyph: '∑' },
-    { grad: 'linear-gradient(135deg,#10b981,#06b6d4)', shadow: 'rgba(16,185,129,0.35)', glyph: '△' },
-    { grad: 'linear-gradient(135deg,#f59e0b,#ef4444)', shadow: 'rgba(239,68,68,0.35)',  glyph: '∞' },
-  ];
-
   app.innerHTML = `
+    <!-- ===== BẢNG VINH DANH TOP 3 (lên đầu) ===== -->
+    <div class="home-section-label" style="margin-top:0;">🏆 Bảng Vinh Danh</div>
+    <div class="honor-board" id="honorBoard">
+      <div class="honor-loading"><div class="spinner"></div></div>
+    </div>
+
     <!-- Hero banner -->
-    <div class="home-hero">
+    <div class="home-hero" style="margin-top:20px;">
       <div class="home-hero-bg"></div>
       <div class="home-hero-content">
         <div class="home-hero-badge">🎓 Luyện thi tuyển sinh lớp 10</div>
@@ -598,8 +594,14 @@ function renderHome() {
       </div>
     </div>
 
+    <!-- ===== TÀI LIỆU ÔN TẬP ===== -->
+    <div class="home-section-label" style="margin-top:24px;">📚 Tài Liệu Ôn Tập</div>
+    <div class="doc-library" id="docLibrary">
+      <div style="display:flex;justify-content:center;padding:20px;"><div class="spinner"></div></div>
+    </div>
+
     <!-- Student info -->
-    <div class="home-info-card">
+    <div class="home-info-card" style="margin-top:24px;">
       <div class="home-info-icon">✏️</div>
       <div class="home-info-fields">
         <div class="home-field">
@@ -616,37 +618,153 @@ function renderHome() {
     </div>
 
     <!-- Topic cards -->
-    <div class="home-section-label">Chọn chủ đề để bắt đầu</div>
-    <div class="home-topics">
-      ${TOPICS.map((t, i) => `
-        <div class="home-topic-card" onclick="selectTopic('${t.id}')"
-             style="--tgrad:${topicStyles[i].grad};--tshadow:${topicStyles[i].shadow}">
-          <div class="htc-glyph">${topicStyles[i].glyph}</div>
-          <div class="htc-body">
-            <div class="htc-icon">${t.icon}</div>
-            <div class="htc-name">${t.name}</div>
-            <div class="htc-desc">${t.desc}</div>
-          </div>
-          <div class="htc-footer">
-            <span class="htc-arrow">→</span>
-</div>
-        </div>
-      `).join('')}
-    </div>
-
-    <!-- Bảng vinh danh Top 3 -->
-    <div class="home-section-label" style="margin-top:28px;">🏆 Bảng Vinh Danh</div>
-    <div class="honor-board" id="honorBoard">
-      <div class="honor-loading"><div class="spinner"></div></div>
+    <div class="home-section-label">Chọn bộ đề để bắt đầu làm bài</div>
+    <div id="setList">
+      <div style="display:flex;justify-content:center;padding:24px;">
+        <div class="spinner"></div>
+      </div>
     </div>
   `;
 
-  // Load top 3 sau khi render xong
-  loadHonorBoard();
+  // Load bộ đề + honor board + tài liệu sau khi DOM sẵn sàng
+  setTimeout(() => { loadSetList(); loadHonorBoard(); loadDocLibrary(); }, 800);
 }
 
-// Chọn chủ đề và bắt đầu
-async function selectTopic(topicId) {
+// ====================================================
+// THƯ VIỆN TÀI LIỆU ÔN TẬP
+// ====================================================
+async function loadDocLibrary() {
+  const el = document.getElementById('docLibrary');
+  if (!el) return;
+
+  // Luon doc tu localStorage vi file base64 khong duoc luu len Firestore
+  let docs = [];
+  try {
+    docs = JSON.parse(localStorage.getItem('study_docs') || '[]');
+  } catch(e) { docs = []; }
+
+  if (docs.length === 0) {
+    el.innerHTML = `
+      <div class="doc-empty">
+        <div style="font-size:2.5rem;margin-bottom:8px;">📂</div>
+        <p>Thầy chưa upload tài liệu nào. Hãy học bài và chờ tài liệu mới nhé! 😊</p>
+      </div>`;
+    return;
+  }
+
+  const topicLabel = { 'dai-so': '🔢 Đại số', 'hinh-hoc': '📐 Hình học', 'tong-hop': '📚 Tổng hợp' };
+  el.innerHTML = `
+    <div class="doc-grid">
+      ${docs.map(doc => `
+        <div class="doc-card">
+          <div class="doc-card-icon">${doc.type === 'pdf' ? '📄' : doc.type === 'image' ? '🖼️' : '📝'}</div>
+          <div class="doc-card-body">
+            <div class="doc-card-title">${doc.title}</div>
+            <div class="doc-card-meta">
+              <span class="doc-tag">${topicLabel[doc.topic] || '📚 Tổng hợp'}</span>
+              ${doc.hasFormula ? '<span class="doc-tag doc-tag-math">∑ Công thức</span>' : ''}
+              ${doc.hasImage ? '<span class="doc-tag doc-tag-img">🖼️ Hình ảnh</span>' : ''}
+            </div>
+            ${doc.description ? `<div class="doc-card-desc">${doc.description}</div>` : ''}
+          </div>
+          <a href="${doc.fileUrl}" download="${doc.title}" class="btn btn-primary btn-sm doc-dl-btn" target="_blank">
+            ⬇️ Tải về
+          </a>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// Màu theo chủ đề
+const TOPIC_STYLES = {
+  'dai-so':   { grad: 'linear-gradient(135deg,#3b82f6,#6366f1)', shadow: 'rgba(99,102,241,0.35)', glyph: '∑', icon: '🔢' },
+  'hinh-hoc': { grad: 'linear-gradient(135deg,#10b981,#06b6d4)', shadow: 'rgba(16,185,129,0.35)', glyph: '△', icon: '📐' },
+  'tong-hop': { grad: 'linear-gradient(135deg,#f59e0b,#ef4444)', shadow: 'rgba(239,68,68,0.35)',  glyph: '∞', icon: '📚' },
+};
+const TOPIC_NAMES = { 'dai-so': 'Đại số', 'hinh-hoc': 'Hình học', 'tong-hop': 'Tổng hợp' };
+
+async function loadSetList() {
+  const el = document.getElementById('setList');
+  if (!el) return;
+
+  let sets = [];
+
+  try {
+    if (AppState.useFirebase && AppState.db) {
+      const snap = await AppState.db.collection('question_sets').orderBy('uploadedAt','desc').get();
+      sets = snap.docs.map(d => ({ ...d.data(), uploadedAt: d.data().uploadedAt?.toDate?.()?.toISOString() || '' }));
+    } else {
+      const stored = JSON.parse(localStorage.getItem('question_sets') || '{}');
+      sets = Object.values(stored).sort((a,b) => b.uploadedAt.localeCompare(a.uploadedAt));
+    }
+  } catch(e) { sets = []; }
+
+  if (sets.length === 0) {
+    // Không có bộ đề nào → hiện topic mẫu như cũ
+    const topicStyles = [
+      { grad: 'linear-gradient(135deg,#3b82f6,#6366f1)', shadow: 'rgba(99,102,241,0.35)', glyph: '∑' },
+      { grad: 'linear-gradient(135deg,#10b981,#06b6d4)', shadow: 'rgba(16,185,129,0.35)', glyph: '△' },
+      { grad: 'linear-gradient(135deg,#f59e0b,#ef4444)', shadow: 'rgba(239,68,68,0.35)',  glyph: '∞' },
+    ];
+    el.innerHTML = `
+      <div class="home-topics">
+        ${TOPICS.map((t, i) => `
+          <div class="home-topic-card" onclick="selectSet(null,'${t.id}')"
+               style="--tgrad:${topicStyles[i].grad};--tshadow:${topicStyles[i].shadow}">
+            <div class="htc-glyph">${topicStyles[i].glyph}</div>
+            <div class="htc-body">
+              <div class="htc-icon">${t.icon}</div>
+              <div class="htc-name">${t.name}</div>
+              <div class="htc-desc">${t.desc}</div>
+            </div>
+            <div class="htc-footer"><span class="htc-arrow">→</span></div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    return;
+  }
+
+  // Nhóm theo chủ đề
+  const byTopic = {};
+  sets.forEach(s => {
+    const t = s.topic || 'tong-hop';
+    if (!byTopic[t]) byTopic[t] = [];
+    byTopic[t].push(s);
+  });
+
+  let html = '';
+  for (const [topic, list] of Object.entries(byTopic)) {
+    const ts = TOPIC_STYLES[topic] || TOPIC_STYLES['tong-hop'];
+    html += `
+      <div style="margin-bottom:20px;">
+        <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+                    color:var(--text-muted);margin-bottom:10px;">
+          ${ts.icon} ${TOPIC_NAMES[topic] || topic}
+        </div>
+        <div class="home-topics">
+          ${list.map(s => `
+            <div class="home-topic-card" onclick="selectSet('${s.setId}','${s.topic}')"
+                 style="--tgrad:${ts.grad};--tshadow:${ts.shadow}">
+              <div class="htc-glyph">${ts.glyph}</div>
+              <div class="htc-body">
+                <div class="htc-icon">${ts.icon}</div>
+                <div class="htc-name" style="font-size:0.95rem;">${s.setName}</div>
+                <div class="htc-desc">${s.count} câu hỏi · ${TOPIC_NAMES[topic] || topic}</div>
+              </div>
+              <div class="htc-footer"><span class="htc-arrow">→</span></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  el.innerHTML = html;
+}
+
+// Chọn bộ đề cụ thể (setId=null → dùng câu mẫu theo topic)
+async function selectSet(setId, topicId) {
   const nameInput = document.getElementById('studentName');
   const classInput = document.getElementById('studentClass');
 
@@ -657,25 +775,21 @@ async function selectTopic(topicId) {
   }
 
   const classVal = (classInput ? classInput.value.trim() : '') || '9?';
-  AppState.student = {
-    name: nameInput.value.trim(),
-    class: classVal,
-  };
-  AppState.currentTopic = TOPICS.find(t => t.id === topicId);
+  AppState.student = { name: nameInput.value.trim(), class: classVal };
+  AppState.currentTopic = TOPICS.find(t => t.id === topicId) || { id: topicId, name: TOPIC_NAMES[topicId] || topicId, icon: '📚' };
 
-  // Hiển thị lời chào động viên
   showWelcomeBanner(AppState.student.name);
-
   showToast('Đang tải câu hỏi...', 'info', 1500);
 
   try {
-    let questions = await fetchQuestions(topicId);
+    let questions = setId
+      ? await fetchQuestionsBySet(setId)
+      : await fetchQuestions(topicId);
 
-    // Trộn toàn bộ câu hỏi (không giới hạn số lượng)
     questions = shuffleArray(questions);
 
     if (questions.length === 0) {
-      showToast('Không có câu hỏi cho chủ đề này!', 'error');
+      showToast('Không có câu hỏi cho bộ đề này!', 'error');
       return;
     }
 
@@ -683,19 +797,35 @@ async function selectTopic(topicId) {
     AppState.currentIndex = 0;
     AppState.answers = {};
     AppState.isSubmitted = false;
-    // 2 phút mỗi câu, tối thiểu 10 phút
     AppState.totalTime = Math.max(questions.length * 120, 600);
     AppState.timeLeft = AppState.totalTime;
     AppState.startTime = Date.now();
 
     renderQuiz();
     startTimer();
-    // Render công thức toán sau khi HTML đã vào DOM
     setTimeout(() => { if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise(); }, 100);
 
   } catch (error) {
     showToast('Lỗi tải câu hỏi: ' + error.message, 'error');
   }
+}
+
+// Đọc câu hỏi theo setId cụ thể
+async function fetchQuestionsBySet(setId) {
+  if (AppState.useFirebase && AppState.db) {
+    try {
+      const snap = await AppState.db.collection('questions').where('setId','==',setId).get();
+      if (!snap.empty) return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch(e) { console.error(e); }
+  }
+  // localStorage fallback
+  const allQ = JSON.parse(localStorage.getItem('quiz_questions_v2') || '{}');
+  return allQ[setId] || [];
+}
+
+// Chọn chủ đề (giữ lại để tương thích)
+async function selectTopic(topicId) {
+  return selectSet(null, topicId);
 }
 
 // ====================================================
@@ -1130,8 +1260,6 @@ function shuffleArray(arr) {
 // ====================================================
 document.addEventListener('DOMContentLoaded', () => {
   initFirebase();
-
-  // Chỉ render trang chủ nếu có phần tử #app
   if (document.getElementById('app')) {
     renderHome();
   }

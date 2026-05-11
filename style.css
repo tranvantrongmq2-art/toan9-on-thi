@@ -1536,3 +1536,152 @@ details[open] > summary { margin-bottom: 0; }
   .overview-row { grid-template-columns: 28px 1fr auto; }
   .overview-source { display: none; }
 }
+
+/* =====================================================
+   THƯ VIỆN TÀI LIỆU ÔN TẬP
+   ===================================================== */
+.doc-library {
+  margin-bottom: 8px;
+}
+
+.doc-empty {
+  text-align: center;
+  padding: 28px 20px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px dashed var(--border);
+  font-size: 0.9rem;
+}
+
+.doc-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.doc-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .2s, transform .15s;
+}
+.doc-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.doc-card-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  width: 44px;
+  text-align: center;
+}
+
+.doc-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.doc-card-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.doc-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--surface3);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.doc-tag-math {
+  background: rgba(59,130,246,.1);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+.doc-tag-img {
+  background: rgba(16,185,129,.1);
+  color: var(--secondary-dark);
+  border-color: #86efac;
+}
+
+.doc-card-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.doc-dl-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  padding: 7px 14px;
+}
+
+/* =====================================================
+   UPLOAD TÀI LIỆU (upload.html)
+   ===================================================== */
+.doc-upload-zone {
+  border: 2px dashed var(--primary-light);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+  background: var(--surface2);
+}
+.doc-upload-zone:hover, .doc-upload-zone.dragover {
+  background: rgba(59,130,246,.07);
+  border-color: var(--primary);
+}
+.doc-upload-zone input[type=file] { display: none; }
+
+.doc-manage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.doc-manage-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.doc-manage-item .doc-info { flex: 1; min-width: 0; }
+.doc-manage-item .doc-info strong {
+  display: block;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.doc-manage-item .doc-info small { color: var(--text-muted); font-size: 0.77rem; }
+
+@media (max-width: 600px) {
+  .doc-card { flex-wrap: wrap; }
+  .doc-dl-btn { width: 100%; text-align: center; }
+}
