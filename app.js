@@ -25,6 +25,7 @@ const AppState = {
   isSubmitted: false,
   db: null,
   useFirebase: false,
+  selectedLevel: null, // 'tb' | 'kha' | 'tot' | 'xs'
 };
 
 // ---- CHỦ ĐỀ ----
@@ -188,13 +189,60 @@ async function fetchQuestions(topic) {
 // HỆ THỐNG DANH HIỆU
 // ====================================================
 const RANK_SYSTEM = [
-  { min: 0,   max: 4.9,  title: 'Tập Sự',               icon: '🥈', cls: 'rank-silver',      emoji: '🥈' },
-  { min: 5,   max: 5.9,  title: 'Chiến Binh Toán Học',  icon: '🥇', cls: 'rank-gold',        emoji: '⚔️' },
-  { min: 6,   max: 6.9,  title: 'Bậc Thầy Toán Học',   icon: '💎', cls: 'rank-diamond',     emoji: '💎' },
-  { min: 7,   max: 7.9,  title: 'Huyền Thoại Toán Học', icon: '🔮', cls: 'rank-legend',      emoji: '🔮' },
-  { min: 8,   max: 8.9,  title: 'Cao Thủ Toán Học',    icon: '🌟', cls: 'rank-master',      emoji: '🌟' },
-  { min: 9,   max: 9.9,  title: 'Đại Cao Thủ Toán Học',icon: '👑', cls: 'rank-grandmaster', emoji: '👑' },
-  { min: 10,  max: 10,   title: 'Thách Đấu Toán Học',  icon: '🔥', cls: 'rank-challenger',  emoji: '🔥' },
+  {
+    min: 0,   max: 4.9,
+    tier: 'silver-gold',
+    title: 'TÂN BINH ĐỘT KÍCH',
+    icon: '🥈', cls: 'rank-silver', emoji: '🥈',
+    tierLabel: 'Bạc / Vàng',
+    privilege: 'Được thầy khen trước lớp vì đã vượt qua "mức liệt".',
+    nextMsg: '📈 Đạt 5.0 để lên cấp CAO THỦ CASIO!',
+  },
+  {
+    min: 5,   max: 6.4,
+    tier: 'platinum',
+    title: 'CAO THỦ CASIO',
+    icon: '🏅', cls: 'rank-platinum', emoji: '🏅',
+    tierLabel: 'Bạch Kim',
+    privilege: 'Được tặng 1 sticker "Chiến binh" vào vở bài tập.',
+    nextMsg: '📈 Đạt 6.5 để lên cấp CHIẾN BINH TINH NHUỆ!',
+  },
+  {
+    min: 6.5, max: 7.9,
+    tier: 'diamond',
+    title: 'CHIẾN BINH TINH NHUỆ',
+    icon: '💎', cls: 'rank-diamond', emoji: '💎',
+    tierLabel: 'Kim Cương',
+    privilege: 'Được quyền nhờ thầy giải đáp 1 câu khó bất kỳ.',
+    nextMsg: '📈 Đạt 8.0 để lên cấp HUYỀN THOẠI TOÁN HỌC!',
+  },
+  {
+    min: 8,   max: 8.9,
+    tier: 'legend',
+    title: 'HUYỀN THOẠI TOÁN HỌC',
+    icon: '🔮', cls: 'rank-legend', emoji: '🔮',
+    tierLabel: 'Huyền Thoại',
+    privilege: 'Tên được in đậm, màu đỏ rực rỡ trên bảng xếp hạng.',
+    nextMsg: '📈 Đạt 9.0 để lên cấp BẬC THẦY CHIẾN THUẬT!',
+  },
+  {
+    min: 9,   max: 9.9,
+    tier: 'grandmaster',
+    title: 'BẬC THẦY CHIẾN THUẬT',
+    icon: '👑', cls: 'rank-grandmaster', emoji: '👑',
+    tierLabel: 'Đại Cao Thủ',
+    privilege: 'Pháo hoa nổ tung trên Web + Tặng 1 cây bút bi xịn.',
+    nextMsg: '📈 Đạt 10 điểm để trở thành TRÙM CUỐI MỸ QUÝ!',
+  },
+  {
+    min: 10,  max: 10,
+    tier: 'challenger',
+    title: 'TRÙM CUỐI MỸ QUÝ',
+    icon: '🔥', cls: 'rank-challenger', emoji: '🔥',
+    tierLabel: 'Thách Đấu',
+    privilege: 'Vinh danh trang chủ + "Phiếu miễn kiểm tra miệng".',
+    nextMsg: '🏆 Em đã đạt đỉnh cao tuyệt đối! Thầy tự hào!',
+  },
 ];
 
 function getRank(score) {
@@ -329,8 +377,101 @@ function launchFullscreenFireworks() {
 
 
 // ====================================================
-// BẢNG VINH DANH TOP 3 - TRANG LÀM BÀI
+// CẤU HÌNH 4 TRÌNH ĐỘ
 // ====================================================
+const LEVELS = {
+  tb:  { id:'tb',  name:'Trung Bình', icon:'📗', color:'#6b7280', scoreRange:'Điểm 0–5',   badge:'slb-tb',  desc:'Ôn kiến thức cơ bản',    minScore: 0   },
+  kha: { id:'kha', name:'Khá',        icon:'📘', color:'#3b82f6', scoreRange:'Điểm 5–6.5', badge:'slb-kha', desc:'Luyện dạng bài trung cấp', minScore: 5   },
+  tot: { id:'tot', name:'Tốt',        icon:'📙', color:'#10b981', scoreRange:'Điểm 6.5–8', badge:'slb-tot', desc:'Chinh phục bài khó',        minScore: 6.5 },
+  xs:  { id:'xs',  name:'Xuất Sắc',   icon:'📕', color:'#f59e0b', scoreRange:'Điểm 8–10',  badge:'slb-xs',  desc:'Thách thức đỉnh cao',       minScore: 8   },
+};
+const LEVEL_ORDER = ['tb','kha','tot','xs'];
+
+// Rank metadata per level for display in tabs
+const LEVEL_RANK_META = {
+  tb:  { rankIcon:'🥈', rankShort:'Tân Binh / Casio',        rankRange:'0–6.4đ' },
+  kha: { rankIcon:'💎', rankShort:'Chiến Binh Tinh Nhuệ',    rankRange:'6.5–7.9đ' },
+  tot: { rankIcon:'🔮', rankShort:'Huyền Thoại',             rankRange:'8–8.9đ' },
+  xs:  { rankIcon:'👑', rankShort:'Đại Cao Thủ / Thách Đấu', rankRange:'9–10đ' },
+};
+
+// ====================================================
+// THÔNG ĐIỆP "LẦY LỘI" CỦA THẦY
+// ====================================================
+const TEACHER_MSGS_CORRECT = [
+  'Chuẩn luôn! Thầy đoán em đã tra Casio trước rồi phải không 😏 Làm tiếp đi nào!',
+  'Ôi trời, em làm đúng! Thầy tưởng câu này sẽ "cua đường" em rồi 😄 Giỏi thật!',
+  'Xuất sắc! Nếu thi thật mà cũng làm vậy, bố mẹ em sẽ khóc vì vui đó 🌟',
+  'Đúng rồi! Bí quyết: học thuộc dạng này là sang câu khác em cũng làm được luôn!',
+  '🎯 Bắn trúng tim rồi! Thầy tự hào lắm, tiếp tục đi chiến binh ơi!',
+  'Này, em làm đúng nhanh vậy là bí quyết gì? Chia sẻ với thầy đi! 😆',
+  'Mẹo Casio bài này thầy để ở file PDF nhé, xem xong đảm bảo thành "trùm" lớp ngay 😎',
+];
+const TEACHER_MSGS_WRONG = [
+  'Hú hồn chưa, câu này suýt nữa là em đúng rồi đó! Nhìn lại đáp án xem thầy chỉ điểm thêm nhé 👆',
+  'Ối, trật rồi! Nhưng không sao — thầy cũng từng sai câu tương tự hồi học cấp 2 đó 😅',
+  'Câu này "bẫy" lắm em ơi! 90% học sinh chọn sai y chang em. Xem kỹ lại để lần sau "né" nhé!',
+  'Sai rồi nhưng mà thầy nhận ra em đang cố đúng hướng rồi! Chỉnh lại một chút là ra thôi!',
+  '❌ Lần này chưa được, nhưng chiến binh không bao giờ bỏ cuộc! Xem đáp án và chinh phục câu sau!',
+  'Kiểu này thầy đoán em chưa đọc kỹ đề phải không? Đọc lại đề trước, rồi nhìn đáp án sau nhé 👀',
+  'Câu này tricky lắm! Mẹo nhỏ: loại trừ đáp án sai trước, còn lại là đúng. Nhớ áp dụng nhé!',
+];
+
+function getTeacherMsg(isCorrect) {
+  const arr = isCorrect ? TEACHER_MSGS_CORRECT : TEACHER_MSGS_WRONG;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ====================================================
+// GIẢI THƯỞNG NỖ LỰC
+// ====================================================
+function checkEffortAwards(studentName, score) {
+  const key = 'effort_' + studentName;
+  let data = JSON.parse(localStorage.getItem(key) || '{}');
+  const today = new Date().toDateString();
+  const awards = [];
+
+  // --- Giải Chiến Binh Bền Bỉ: làm bài đều đặn ---
+  if (!data.dates) data.dates = [];
+  if (!data.dates.includes(today)) data.dates.push(today);
+  // Giữ 30 ngày gần nhất
+  data.dates = data.dates.slice(-30);
+  // Đếm streak (ngày liên tiếp)
+  let streak = 1;
+  for (let i = data.dates.length - 2; i >= 0; i--) {
+    const d1 = new Date(data.dates[i + 1]);
+    const d2 = new Date(data.dates[i]);
+    const diff = (d1 - d2) / 86400000;
+    if (diff <= 1.5) streak++;
+    else break;
+  }
+  data.streak = streak;
+  if (streak >= 3) {
+    awards.push({
+      type: 'streak',
+      icon: '🔥',
+      title: `Chiến Binh Bền Bỉ — ${streak} ngày liên tiếp!`,
+      desc: 'Thầy thấy em đang siêu chăm chỉ rồi! Sự kiên trì này sẽ thắng tất cả! 💪',
+    });
+  }
+
+  // --- Giải Tiến Bộ Vượt Bậc: điểm tăng so với lần trước ---
+  const prevScore = data.lastScore;
+  if (prevScore !== undefined && score > prevScore + 1) {
+    awards.push({
+      type: 'progress',
+      icon: '📈',
+      title: `Tiến Bộ Vượt Bậc! +${(score - prevScore).toFixed(1)} điểm!`,
+      desc: `Lần trước ${prevScore} điểm, lần này ${score} điểm — Thầy đang vinh danh em ngay đây! 🎊`,
+    });
+  }
+  data.lastScore = score;
+
+  localStorage.setItem(key, JSON.stringify(data));
+  return awards;
+}
+
+
 async function loadHonorBoard() {
   const board = document.getElementById('honorBoard');
   if (!board) return;
@@ -571,7 +712,7 @@ function renderHome() {
   if (!app) return;
 
   app.innerHTML = `
-    <!-- ===== BẢNG VINH DANH TOP 3 (lên đầu) ===== -->
+    <!-- ===== BẢNG VINH DANH ===== -->
     <div class="home-section-label" style="margin-top:0;">🏆 Bảng Vinh Danh</div>
     <div class="honor-board" id="honorBoard">
       <div class="honor-loading"><div class="spinner"></div></div>
@@ -600,7 +741,7 @@ function renderHome() {
       <div style="display:flex;justify-content:center;padding:20px;"><div class="spinner"></div></div>
     </div>
 
-    <!-- Student info -->
+    <!-- ===== THÔNG TIN HỌC SINH ===== -->
     <div class="home-info-card" style="margin-top:24px;">
       <div class="home-info-icon">✏️</div>
       <div class="home-info-fields">
@@ -614,21 +755,331 @@ function renderHome() {
           <input class="home-input" id="studentClass" type="text"
                  placeholder="Ví dụ: 9A, 9B2..." maxlength="10" autocomplete="off">
         </div>
+        <div class="home-field">
+          <label>Trình độ của em</label>
+          <select class="home-input" id="studentLevel" onchange="onLevelSelectChange()">
+            <option value="">-- Chọn trình độ --</option>
+            <option value="tb">📗 Trung Bình (0–5 điểm)</option>
+            <option value="kha">📘 Khá (5–6.5 điểm)</option>
+            <option value="tot">📙 Tốt (6.5–8 điểm)</option>
+            <option value="xs">📕 Xuất Sắc (8–10 điểm)</option>
+          </select>
+        </div>
       </div>
     </div>
 
-    <!-- Topic cards -->
-    <div class="home-section-label">Chọn bộ đề để bắt đầu làm bài</div>
-    <div id="setList">
-      <div style="display:flex;justify-content:center;padding:24px;">
-        <div class="spinner"></div>
+    <!-- ===== 4 KHU VỰC TRÌNH ĐỘ ===== -->
+    <div class="home-section-label" style="margin-top:24px;">🎯 Chọn khu vực làm bài</div>
+
+    <!-- Tab chọn khu vực -->
+    <div class="level-tabs" id="levelTabs">
+      ${LEVEL_ORDER.map(lvId => {
+        const lv = LEVELS[lvId];
+        const lvRankInfo = LEVEL_RANK_META[lvId];
+        return `
+          <div class="level-tab" data-level="${lvId}" onclick="switchLevel('${lvId}')">
+            <div class="lv-lock" id="lvLock_${lvId}">🔒</div>
+            <div class="lv-icon">${lv.icon}</div>
+            <div class="lv-name" style="color:${lv.color}">${lv.name}</div>
+            <div class="lv-score">${lv.scoreRange}</div>
+            <div class="lv-rank-mini">${lvRankInfo.rankIcon} <span>${lvRankInfo.rankShort}</span></div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <!-- Banner kích thích cấp Trung Bình -->
+    <div class="tb-motivate-banner" id="tbMotivateBanner" style="display:none;">
+      <div class="tb-motivate-inner">
+        <div class="tb-motivate-title">🚀 Em đang ở khu vực TRUNG BÌNH — Hãy vươn lên!</div>
+        <div class="tb-motivate-path">
+          ${[
+            { icon:'🥈', label:'Trung Bình', sub:'0–4.9đ', cls:'step-current' },
+            { icon:'🏅', label:'Bạch Kim', sub:'5–6.4đ', cls:'step-next' },
+            { icon:'💎', label:'Kim Cương', sub:'6.5–7.9đ', cls:'step-future' },
+            { icon:'🔮', label:'Huyền Thoại', sub:'8–8.9đ', cls:'step-future' },
+            { icon:'👑', label:'Đại Cao Thủ', sub:'9–9.9đ', cls:'step-future' },
+            { icon:'🔥', label:'Thách Đấu', sub:'10đ', cls:'step-future' },
+          ].map((s,i) => `
+            <div class="tb-step ${s.cls}">
+              <div class="tb-step-icon">${s.icon}</div>
+              <div class="tb-step-label">${s.label}</div>
+              <div class="tb-step-sub">${s.sub}</div>
+              ${i < 5 ? '<div class="tb-step-arrow">→</div>' : ''}
+            </div>
+          `).join('')}
+        </div>
+        <div class="tb-motivate-rewards">
+          <div class="tb-reward-item">🏅 <strong>Bạch Kim:</strong> Sticker "Chiến binh" vào vở</div>
+          <div class="tb-reward-item">💎 <strong>Kim Cương:</strong> Được thầy giải 1 câu khó</div>
+          <div class="tb-reward-item">👑 <strong>Đại Cao Thủ:</strong> Pháo hoa + Bút bi xịn</div>
+          <div class="tb-reward-item">🔥 <strong>Thách Đấu:</strong> Phiếu miễn kiểm tra miệng!</div>
+        </div>
+        <div class="tb-motivate-quote">💬 <em>"Mỗi câu đúng hôm nay là một bước lên bục vinh quang ngày mai!"</em> — Thầy Trong</div>
+      </div>
+    </div>
+
+    <!-- Banner kích thích cấp Khá -->
+    <div class="level-motivate-banner kha-banner" id="khaMotivateBanner" style="display:none;">
+      <div class="lmb-inner">
+        <div class="lmb-header">
+          <span class="lmb-icon">📘</span>
+          <div>
+            <div class="lmb-title">💪 Khu vực KHÁ — Em đang bứt phá!</div>
+            <div class="lmb-sub">Điểm mục tiêu: <strong>5.0 – 6.5</strong> · Danh hiệu: 🏅 CAO THỦ CASIO</div>
+          </div>
+        </div>
+        <div class="lmb-path">
+          ${[
+            { icon:'📗', label:'Trung Bình', sub:'✓ Qua rồi!', cls:'step-done' },
+            { icon:'📘', label:'Khá', sub:'5–6.5đ', cls:'step-current' },
+            { icon:'📙', label:'Tốt', sub:'6.5–8đ', cls:'step-next' },
+            { icon:'📕', label:'Xuất Sắc', sub:'8–10đ', cls:'step-future' },
+          ].map((s,i,arr) => `
+            <div class="tb-step ${s.cls}">
+              <div class="tb-step-icon">${s.icon}</div>
+              <div class="tb-step-label">${s.label}</div>
+              <div class="tb-step-sub">${s.sub}</div>
+              ${i < arr.length-1 ? '<div class="tb-step-arrow">→</div>' : ''}
+            </div>
+          `).join('')}
+        </div>
+        <div class="lmb-tips">
+          <div class="lmb-tip">🧩 Luyện bài trung cấp: phương trình bậc 2, tam giác đồng dạng</div>
+          <div class="lmb-tip">⏱️ Tập làm bài trong thời gian quy định để quen với áp lực thi</div>
+          <div class="lmb-tip">🏅 Đạt 6.5+ → Được thầy giải 1 câu khó bất kỳ em muốn!</div>
+        </div>
+        <div class="lmb-quote">💬 <em>"Khá rồi nhưng đừng dừng ở đây — đỉnh cao còn ở phía trước!"</em> — Thầy Trong</div>
+      </div>
+    </div>
+
+    <!-- Banner kích thích cấp Tốt -->
+    <div class="level-motivate-banner tot-banner" id="totMotivateBanner" style="display:none;">
+      <div class="lmb-inner">
+        <div class="lmb-header">
+          <span class="lmb-icon">📙</span>
+          <div>
+            <div class="lmb-title">🔥 Khu vực TỐT — Chiến binh tinh nhuệ!</div>
+            <div class="lmb-sub">Điểm mục tiêu: <strong>6.5 – 8.0</strong> · Danh hiệu: 💎 CHIẾN BINH TINH NHUỆ</div>
+          </div>
+        </div>
+        <div class="lmb-path">
+          ${[
+            { icon:'📗', label:'Trung Bình', sub:'✓', cls:'step-done' },
+            { icon:'📘', label:'Khá', sub:'✓', cls:'step-done' },
+            { icon:'📙', label:'Tốt', sub:'6.5–8đ', cls:'step-current' },
+            { icon:'📕', label:'Xuất Sắc', sub:'8–10đ', cls:'step-next' },
+          ].map((s,i,arr) => `
+            <div class="tb-step ${s.cls}">
+              <div class="tb-step-icon">${s.icon}</div>
+              <div class="tb-step-label">${s.label}</div>
+              <div class="tb-step-sub">${s.sub}</div>
+              ${i < arr.length-1 ? '<div class="tb-step-arrow">→</div>' : ''}
+            </div>
+          `).join('')}
+        </div>
+        <div class="lmb-tips">
+          <div class="lmb-tip">🏆 Thử sức với bài toán tổng hợp, kết hợp nhiều kiến thức</div>
+          <div class="lmb-tip">📐 Rèn kỹ năng vẽ hình và phân tích bài hình học phức tạp</div>
+          <div class="lmb-tip">💎 Đạt 8.0+ → Tên được in đậm, màu đỏ rực rỡ trên bảng xếp hạng!</div>
+        </div>
+        <div class="lmb-quote">💬 <em>"Người giỏi không phải người không sai — mà là người học từ cái sai!"</em> — Thầy Trong</div>
+      </div>
+    </div>
+
+    <!-- Banner kích thích cấp Xuất Sắc -->
+    <div class="level-motivate-banner xs-banner" id="xsMotivateBanner" style="display:none;">
+      <div class="lmb-inner">
+        <div class="lmb-header">
+          <span class="lmb-icon">📕</span>
+          <div>
+            <div class="lmb-title">👑 Khu vực XUẤT SẮC — Đỉnh cao thách đấu!</div>
+            <div class="lmb-sub">Điểm mục tiêu: <strong>8.0 – 10</strong> · Danh hiệu: 👑 BẬC THẦY → 🔥 TRÙM CUỐI</div>
+          </div>
+        </div>
+        <div class="lmb-path">
+          ${[
+            { icon:'📗', label:'TB', sub:'✓', cls:'step-done' },
+            { icon:'📘', label:'Khá', sub:'✓', cls:'step-done' },
+            { icon:'📙', label:'Tốt', sub:'✓', cls:'step-done' },
+            { icon:'📕', label:'Xuất Sắc', sub:'8–10đ', cls:'step-current' },
+            { icon:'🔥', label:'TRÙM CUỐI', sub:'10đ !!', cls:'step-next' },
+          ].map((s,i,arr) => `
+            <div class="tb-step ${s.cls}">
+              <div class="tb-step-icon">${s.icon}</div>
+              <div class="tb-step-label">${s.label}</div>
+              <div class="tb-step-sub">${s.sub}</div>
+              ${i < arr.length-1 ? '<div class="tb-step-arrow">→</div>' : ''}
+            </div>
+          `).join('')}
+        </div>
+        <div class="lmb-tips">
+          <div class="lmb-tip">🧠 Ôn các bài "bẫy" — đề thi lớp 10 luôn có câu phân loại cực khó</div>
+          <div class="lmb-tip">⚡ Luyện tốc độ: hoàn thành bài trong 2/3 thời gian để kiểm tra lại</div>
+          <div class="lmb-tip">🔥 Đạt 10 điểm → Vinh danh trang chủ + Phiếu miễn kiểm tra miệng!</div>
+        </div>
+        <div class="lmb-quote">💬 <em>"Em đã ở đỉnh rồi — nhiệm vụ bây giờ là giữ vững và truyền cảm hứng cho bạn bè!"</em> — Thầy Trong</div>
+      </div>
+    </div>
+
+    <!-- Khu vực bộ đề theo level -->
+    <div class="level-sets-area card" id="levelSetsArea" style="padding:20px;">
+      <div style="text-align:center;color:var(--text-muted);padding:24px 0;">
+        👆 Chọn trình độ của em ở trên trước nhé!
       </div>
     </div>
   `;
 
-  // Load bộ đề + honor board + tài liệu sau khi DOM sẵn sàng
   setTimeout(() => { loadSetList(); loadHonorBoard(); loadDocLibrary(); }, 800);
 }
+
+// Khi học sinh đổi select trình độ
+function onLevelSelectChange() {
+  const val = document.getElementById('studentLevel').value;
+  if (val) switchLevel(val);
+}
+
+// Chuyển tab level
+function switchLevel(lvId) {
+  const lv = LEVELS[lvId];
+  if (!lv) return;
+
+  // Kiểm tra học sinh đã nhập tên chưa
+  const nameInput = document.getElementById('studentName');
+  const name = nameInput ? nameInput.value.trim() : '';
+
+  // Sync select
+  const sel = document.getElementById('studentLevel');
+  if (sel) sel.value = lvId;
+
+  // Highlight tab
+  document.querySelectorAll('.level-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.level === lvId);
+  });
+
+  AppState.selectedLevel = lvId;
+
+  // Update lock icons — học sinh chỉ được vào đúng trình độ của mình
+  updateLockIcons(lvId);
+
+  // Show/hide level motivate banners
+  const tbBanner = document.getElementById('tbMotivateBanner');
+  if (tbBanner) tbBanner.style.display = (lvId === 'tb') ? '' : 'none';
+  const khaBanner = document.getElementById('khaMotivateBanner');
+  if (khaBanner) khaBanner.style.display = (lvId === 'kha') ? '' : 'none';
+  const totBanner = document.getElementById('totMotivateBanner');
+  if (totBanner) totBanner.style.display = (lvId === 'tot') ? '' : 'none';
+  const xsBanner = document.getElementById('xsMotivateBanner');
+  if (xsBanner) xsBanner.style.display = (lvId === 'xs') ? '' : 'none';
+
+  // Hiển thị bộ đề của khu vực đó
+  renderLevelSets(lvId);
+}
+
+function updateLockIcons(selectedLvId) {
+  LEVEL_ORDER.forEach(id => {
+    const el = document.getElementById('lvLock_' + id);
+    if (!el) return;
+    el.textContent = id === selectedLvId ? '✅' : '🔒';
+  });
+}
+
+async function renderLevelSets(lvId) {
+  const area = document.getElementById('levelSetsArea');
+  if (!area) return;
+  const lv = LEVELS[lvId];
+
+  // Học sinh chỉ thấy bộ đề của đúng trình độ mình
+  area.innerHTML = `<div style="display:flex;justify-content:center;padding:20px;"><div class="spinner"></div></div>`;
+
+  let sets = [];
+  try {
+    if (AppState.useFirebase && AppState.db) {
+      const snap = await AppState.db.collection('question_sets')
+        .where('level', '==', lvId)
+        .orderBy('uploadedAt','desc').get();
+      sets = snap.docs.map(d => ({ ...d.data(), uploadedAt: d.data().uploadedAt?.toDate?.()?.toISOString()||'' }));
+    } else {
+      const stored = JSON.parse(localStorage.getItem('question_sets') || '{}');
+      sets = Object.values(stored)
+        .filter(s => (s.level || 'tb') === lvId && !s.locked)
+        .sort((a,b) => b.uploadedAt.localeCompare(a.uploadedAt));
+    }
+  } catch(e) { sets = []; }
+
+  // Lọc thêm: bỏ bộ đề bị khoá
+  sets = sets.filter(s => !s.locked);
+
+  if (sets.length === 0) {
+    // Dùng câu mẫu
+    const ts = TOPIC_STYLES[lvId] || TOPIC_STYLES['tong-hop'];
+    area.innerHTML = `
+      <div style="margin-bottom:12px;">
+        <span class="set-level-badge ${lv.badge}">${lv.icon} ${lv.name}</span>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:6px 0 14px;">
+          ${lv.desc} — Chưa có đề thi riêng, dùng bộ câu mẫu nhé!
+        </p>
+      </div>
+      <div class="home-topics">
+        ${TOPICS.map((t, i) => {
+          const style = Object.values(TOPIC_STYLES)[i] || TOPIC_STYLES['tong-hop'];
+          return `
+            <div class="home-topic-card" onclick="selectSet(null,'${t.id}','${lvId}')"
+                 style="--tgrad:${style.grad};--tshadow:${style.shadow}">
+              <div class="htc-glyph">${style.glyph}</div>
+              <div class="htc-body">
+                <div class="htc-icon">${t.icon}</div>
+                <div class="htc-name">${t.name}</div>
+                <div class="htc-desc">${t.desc}</div>
+              </div>
+              <div class="htc-footer"><span class="htc-arrow">→</span></div>
+            </div>
+          `;
+        }).join('')}
+      </div>`;
+    return;
+  }
+
+  // Hiển thị bộ đề theo level
+  const byTopic = {};
+  sets.forEach(s => {
+    const t = s.topic || 'tong-hop';
+    if (!byTopic[t]) byTopic[t] = [];
+    byTopic[t].push(s);
+  });
+
+  let html = `
+    <div style="margin-bottom:16px;">
+      <span class="set-level-badge ${lv.badge}" style="font-size:0.85rem;padding:4px 14px;">${lv.icon} Khu vực ${lv.name}</span>
+      <span style="font-size:0.82rem;color:var(--text-muted);margin-left:8px;">${lv.scoreRange} · ${lv.desc}</span>
+    </div>`;
+  for (const [topic, list] of Object.entries(byTopic)) {
+    const ts = TOPIC_STYLES[topic] || TOPIC_STYLES['tong-hop'];
+    html += `
+      <div style="margin-bottom:18px;">
+        <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;">
+          ${ts.icon} ${TOPIC_NAMES[topic]||topic}
+        </div>
+        <div class="home-topics">
+          ${list.map(s => `
+            <div class="home-topic-card" onclick="selectSet('${s.setId}','${s.topic}','${lvId}')"
+                 style="--tgrad:${ts.grad};--tshadow:${ts.shadow}">
+              <div class="htc-glyph">${ts.glyph}</div>
+              <div class="htc-body">
+                <div class="htc-icon">${ts.icon}</div>
+                <div class="htc-name" style="font-size:0.9rem;">${s.setName}</div>
+                <div class="htc-desc">${s.count||'?'} câu · ${TOPIC_NAMES[topic]||topic}</div>
+              </div>
+              <div class="htc-footer"><span class="htc-arrow">→</span></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  }
+  area.innerHTML = html;
+}
+
+
 
 // ====================================================
 // THƯ VIỆN TÀI LIỆU ÔN TẬP
@@ -763,10 +1214,11 @@ async function loadSetList() {
   el.innerHTML = html;
 }
 
-// Chọn bộ đề cụ thể (setId=null → dùng câu mẫu theo topic)
-async function selectSet(setId, topicId) {
+// Chọn bộ đề cụ thể
+async function selectSet(setId, topicId, levelId) {
   const nameInput = document.getElementById('studentName');
   const classInput = document.getElementById('studentClass');
+  const levelSelect = document.getElementById('studentLevel');
 
   if (!nameInput || nameInput.value.trim().length < 2) {
     showToast('Vui lòng nhập họ tên (ít nhất 2 ký tự)!', 'warning');
@@ -774,9 +1226,16 @@ async function selectSet(setId, topicId) {
     return;
   }
 
+  const lvId = levelId || AppState.selectedLevel || (levelSelect && levelSelect.value) || 'tb';
+  if (!lvId) {
+    showToast('Vui lòng chọn trình độ của em!', 'warning');
+    return;
+  }
+
   const classVal = (classInput ? classInput.value.trim() : '') || '9?';
-  AppState.student = { name: nameInput.value.trim(), class: classVal };
+  AppState.student = { name: nameInput.value.trim(), class: classVal, level: lvId };
   AppState.currentTopic = TOPICS.find(t => t.id === topicId) || { id: topicId, name: TOPIC_NAMES[topicId] || topicId, icon: '📚' };
+  AppState.selectedLevel = lvId;
 
   showWelcomeBanner(AppState.student.name);
   showToast('Đang tải câu hỏi...', 'info', 1500);
@@ -975,9 +1434,6 @@ function selectAnswer(optionIndex) {
       if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([card]);
     }
     updateDots();
-    setTimeout(() => {
-      if (AppState.currentIndex < AppState.questions.length - 1) nextQuestion();
-    }, 1400);
 
   } else {
     // ❌ SAI: âm tuột + rung + hiện đáp án + giải thích
@@ -997,11 +1453,7 @@ function selectAnswer(optionIndex) {
       });
     }
     updateDots();
-    setTimeout(() => {
-      if (AppState.currentIndex < AppState.questions.length - 1) {
-        setTimeout(nextQuestion, 1200);
-      }
-    }, 400);
+    // Không tự động chuyển câu khi sai — học sinh đọc giải thích rồi tự bấm tiếp
   }
 }
 
@@ -1021,6 +1473,37 @@ function renderQuestionLocked(q, selected, isCorrect) {
     </div>` : `
     <div style="margin-top:12px;padding:10px 16px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:8px;font-size:0.88rem;color:#166534;animation:firework-pop .35s ease;">
       ✅ Chính xác! Tiếp tục phát huy nhé! 🌟
+    </div>`;
+
+  // Lời nhắn của thầy: ưu tiên hiện q.explanation (lời giải thích đáp án đúng do GV soạn),
+  // nếu không có thì dùng lời nhắn tự động "lầy lội".
+  // Khi đúng: bấm "Tiếp tục →" → chuyển câu. Khi sai: bấm "Đóng" → chỉ đóng.
+  const msgId = 'teacherMsg_' + AppState.currentIndex;
+
+  // Nội dung lời nhắn
+  let msgContent;
+  if (q.explanation) {
+    msgContent = `
+      <div class="tmsg-explain-body">
+        <span class="teacher-avatar">👨‍🏫</span>
+        <div>
+          <div class="tmsg-explain-label">💡 Thầy giải thích đáp án ${isCorrect ? 'đúng' : `đúng (${['A','B','C','D'][q.correct]}. ${q.options[q.correct]})`}:</div>
+          <div class="tmsg-explain-text">${q.explanation}</div>
+        </div>
+      </div>`;
+  } else {
+    const autoMsg = getTeacherMsg(isCorrect);
+    msgContent = `
+      <div class="tmsg-auto-body">
+        <span class="teacher-avatar">👨‍🏫</span>
+        <span><strong>Thầy nhắn:</strong> ${autoMsg}</span>
+      </div>`;
+  }
+
+  const teacherHtml = `
+    <div class="teacher-msg-box ${isCorrect ? 'correct-msg' : 'wrong-msg'}" id="${msgId}" style="position:relative;">
+      <button class="tmsg-close-x" onclick="closeTeacherMsgAndAdvance('${msgId}')" title="Đóng và sang câu tiếp">✕</button>
+      ${msgContent}
     </div>`;
 
   return `
@@ -1044,11 +1527,24 @@ function renderQuestionLocked(q, selected, isCorrect) {
         }).join('')}
       </div>
       ${explainHtml}
+      ${teacherHtml}
     </div>
   `;
 }
 
 
+
+// Đóng lời nhắn đúng và chuyển câu tiếp
+function closeTeacherMsgAndAdvance(msgId) {
+  const el = document.getElementById(msgId);
+  if (el) el.style.display = 'none';
+  const idx = msgId.replace('teacherMsg_', '');
+  if (window._teacherMsgTimers && window._teacherMsgTimers[idx]) {
+    clearInterval(window._teacherMsgTimers[idx]);
+    delete window._teacherMsgTimers[idx];
+  }
+  if (AppState.currentIndex < AppState.questions.length - 1) nextQuestion();
+}
 
 function updateDots() {
   const dots = document.getElementById('questionDots');
@@ -1113,6 +1609,7 @@ async function submitQuiz() {
   const resultData = {
     studentName: AppState.student.name,
     studentClass: AppState.student.class,
+    level: AppState.selectedLevel || 'tb',
     topic: AppState.currentTopic.id,
     topicName: AppState.currentTopic.name,
     score,
@@ -1129,8 +1626,139 @@ async function submitQuiz() {
     console.error('Lỗi lưu kết quả:', e);
   }
 
+  // Lưu snapshot câu hỏi vào localStorage để học sinh xem lại trên bảng xếp hạng
+  try {
+    const reviewKey = 'review_' + AppState.student.name + '_' + AppState.student.class;
+    const reviewData = {
+      studentName: AppState.student.name,
+      studentClass: AppState.student.class,
+      score, correct, total, timeTaken,
+      topicName: AppState.currentTopic.name,
+      savedAt: new Date().toISOString(),
+      questions: questions.map(q => ({
+        text: q.text,
+        options: q.options,
+        correct: q.correct,
+        explanation: q.explanation || '',
+        imageUrl: q.imageUrl || '',
+      })),
+      answers: Object.fromEntries(Object.entries(answers).map(([k, v]) => [k, v])),
+    };
+    localStorage.setItem(reviewKey, JSON.stringify(reviewData));
+  } catch(e) {}
+
   renderResult(resultData, questions, answers);
   setTimeout(() => { if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise(); }, 150);
+}
+
+// ====================================================
+// LỜI KHUYÊN THEO KHU VỰC ĐIỂM
+// ====================================================
+function renderLevelAdvice(score) {
+  let cfg;
+  if (score < 5) {
+    cfg = {
+      cls: 'advice-tb',
+      icon: '📗',
+      title: 'Khu vực Trung Bình — Em đang xây nền tảng!',
+      color: '#4b5563',
+      bg: 'linear-gradient(135deg,#f9fafb,#f3f4f6)',
+      border: '#9ca3af',
+      tips: [
+        '📌 Ôn lại công thức cơ bản trước khi làm bài tiếp theo.',
+        '🔁 Làm lại những câu sai để hiểu rõ lỗi sai của mình.',
+        '⏰ Dành ít nhất 20 phút/ngày để luyện tập đều đặn.',
+        '💬 Hỏi thầy ngay khi có câu nào không hiểu — đừng bỏ qua!',
+      ],
+      next: '🎯 Mục tiêu: Đạt 5.0+ để lên Khu vực Khá!',
+    };
+  } else if (score < 6.5) {
+    cfg = {
+      cls: 'advice-kha',
+      icon: '📘',
+      title: 'Khu vực Khá — Em đang tiến bộ rõ rệt!',
+      color: '#1d4ed8',
+      bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)',
+      border: '#3b82f6',
+      tips: [
+        '🧩 Luyện thêm các dạng bài trung cấp: phương trình bậc 2, tam giác đồng dạng.',
+        '⏱️ Tập làm bài nhanh hơn — thi thật không có nhiều thời gian đâu nhé!',
+        '📐 Vẽ hình cẩn thận khi làm bài hình học, tránh nhầm dữ kiện.',
+        '🔍 Kiểm tra lại bài sau khi làm — tránh sai do bất cẩn.',
+      ],
+      next: '🎯 Mục tiêu: Đạt 6.5+ để lên Khu vực Tốt!',
+    };
+  } else if (score < 8) {
+    cfg = {
+      cls: 'advice-tot',
+      icon: '📙',
+      title: 'Khu vực Tốt — Em đang chinh phục bài khó!',
+      color: '#065f46',
+      bg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)',
+      border: '#10b981',
+      tips: [
+        '🏆 Thử thách bản thân với các bài toán có lời văn phức tạp.',
+        '🎯 Rèn kỹ năng phân tích đề — đọc kỹ trước khi chọn đáp án.',
+        '📊 Luyện các dạng bài tổng hợp kết hợp đại số và hình học.',
+        '⚡ Tăng tốc độ làm bài — mục tiêu hoàn thành trong 3/4 thời gian.',
+      ],
+      next: '🎯 Mục tiêu: Đạt 8.0+ để lên Khu vực Xuất Sắc!',
+    };
+  } else {
+    cfg = {
+      cls: 'advice-xs',
+      icon: '📕',
+      title: 'Khu vực Xuất Sắc — Em là chiến binh đỉnh cao!',
+      color: '#92400e',
+      bg: 'linear-gradient(135deg,#fffbeb,#fef3c7)',
+      border: '#f59e0b',
+      tips: [
+        '👑 Ôn tập các dạng bài "bẫy" — đề thi lớp 10 thường có 1-2 câu cực khó.',
+        '🧠 Luyện tư duy phản biện: tại sao đáp án sai lại sai?',
+        '🎓 Hỗ trợ bạn bè cùng lớp — dạy người khác là cách học tốt nhất!',
+        '🔥 Giữ vững phong độ, đừng chủ quan — ôn đều đặn mỗi ngày!',
+      ],
+      next: score >= 10 ? '🏆 Em đã đạt đỉnh cao tuyệt đối — Thầy cực kỳ tự hào!' : '🎯 Mục tiêu: Giữ vững và chinh phục điểm 10 tuyệt đối!',
+    };
+  }
+
+  return `
+    <div class="level-advice-box" style="background:${cfg.bg};border:2px solid ${cfg.border};color:${cfg.color};">
+      <div class="level-advice-title">${cfg.icon} ${cfg.title}</div>
+      <ul class="level-advice-tips">
+        ${cfg.tips.map(t => `<li>${t}</li>`).join('')}
+      </ul>
+      <div class="level-advice-next">${cfg.next}</div>
+    </div>
+  `;
+}
+
+// Toggle xem lại bài làm
+function toggleReview() {
+  const section = document.getElementById('reviewSection');
+  if (!section) return;
+  const isHidden = section.style.display === 'none';
+  section.style.display = isHidden ? '' : 'none';
+  if (isHidden) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => { if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([section]); }, 150);
+  }
+}
+
+// Lọc câu đúng/sai trong phần xem lại
+function filterReview(type) {
+  const items = document.querySelectorAll('.review-item');
+  items.forEach(item => {
+    const isCorrect = item.dataset.correct === 'true';
+    if (type === 'all') item.style.display = '';
+    else if (type === 'wrong') item.style.display = isCorrect ? 'none' : '';
+    else if (type === 'correct') item.style.display = isCorrect ? '' : 'none';
+  });
+  // Highlight active filter btn
+  ['filterAll','filterWrong','filterCorrect'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.style.fontWeight = (id === 'filter' + type.charAt(0).toUpperCase() + type.slice(1)) ? '800' : '';
+  });
 }
 
 function renderResult(result, questions, answers) {
@@ -1138,9 +1766,26 @@ function renderResult(result, questions, answers) {
   if (!app) return;
 
   const rank = getRank(result.score);
-  const grade = result.score >= 8 ? '🥇 Xuất sắc' : result.score >= 6.5 ? '🥈 Khá' : result.score >= 5 ? '🥉 Trung bình' : '❌ Chưa đạt';
+  const grade = result.score >= 9 ? '👑 Đại Cao Thủ' : result.score >= 8 ? '🔮 Huyền Thoại' : result.score >= 6.5 ? '💎 Chiến Binh' : result.score >= 5 ? '🏅 Bạch Kim' : '🥈 Tân Binh';
   const scoreClass = result.score >= 8 ? 'high' : result.score >= 5 ? 'mid' : 'low';
   const time = `${Math.floor(result.timeTaken/60)} phút ${result.timeTaken % 60} giây`;
+
+  // Kiểm tra giải nỗ lực
+  const effortAwards = checkEffortAwards(result.studentName, result.score);
+  const effortHtml = effortAwards.length > 0 ? `
+    <div class="effort-awards">
+      ${effortAwards.map(a => `
+        <div class="effort-award-card ${a.type}">
+          <div class="effort-award-icon">${a.icon}</div>
+          <div class="effort-award-body">
+            <div class="effort-award-title">🏅 ${a.title}</div>
+            <div class="effort-award-desc">${a.desc}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>` : '';
+
+  const lv = LEVELS[result.level || 'tb'] || LEVELS.tb;
 
   app.innerHTML = `
     <div class="card mb-4">
@@ -1151,42 +1796,69 @@ function renderResult(result, questions, answers) {
         <div class="score-big score-${scoreClass}">${result.score}<span style="font-size:1.2rem;">/10</span></div>
         <div style="font-size:1.5rem;margin:8px 0;">${grade}</div>
 
-        <!-- Danh hiệu -->
-        <div style="margin:12px 0 6px;">
+        <!-- Danh hiệu + trình độ -->
+        <div style="margin:12px 0 6px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
           ${renderRankBadge(result.score)}
+          <span class="set-level-badge ${lv.badge}">${lv.icon} Khu vực ${lv.name}</span>
         </div>
         <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">
-          ${rank.emoji} Danh hiệu: <strong>${rank.title}</strong>
+          ${rank.emoji} Danh hiệu: <strong>${rank.title}</strong> — <em>${rank.tierLabel}</em>
         </div>
 
-        <div style="color:var(--text-muted);margin-bottom:24px;font-size:0.88rem;">
+        <!-- Đặc quyền từ thầy -->
+        <div class="rank-privilege-box rank-privilege-${rank.tier}">
+          <div class="rank-privilege-label">🎁 Đặc quyền từ Thầy Trong</div>
+          <div class="rank-privilege-text">${rank.privilege}</div>
+        </div>
+
+        <!-- Kích thích lên cấp -->
+        ${result.score < 10 ? `
+        <div class="rank-nextlevel-box">
+          <div class="rank-nextlevel-text">${rank.nextMsg}</div>
+        </div>` : ''}
+
+        <div style="color:var(--text-muted);margin-bottom:16px;font-size:0.88rem;">
           ${result.studentName} - ${result.studentClass} | ${result.topicName} | ⏱️ ${time}
         </div>
-        <div class="stats-grid mb-4" style="max-width:500px;margin:0 auto;">
+
+        ${effortHtml}
+
+        <div class="stats-grid mb-4" style="max-width:500px;margin:16px auto 0;">
           <div class="stats-card"><span class="icon">✅</span><div class="info"><div class="num">${result.correct}</div><div class="lbl">Câu đúng</div></div></div>
           <div class="stats-card"><span class="icon">❌</span><div class="info"><div class="num">${result.total - result.correct}</div><div class="lbl">Câu sai</div></div></div>
           <div class="stats-card"><span class="icon">📊</span><div class="info"><div class="num">${Math.round(result.correct/result.total*100)}%</div><div class="lbl">Tỉ lệ đúng</div></div></div>
         </div>
-        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <!-- Lời khuyên theo khu vực -->
+        ${renderLevelAdvice(result.score)}
+
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
           <button class="btn btn-primary" onclick="location.reload()">🔄 Làm bài lại</button>
+          <button class="btn btn-review" onclick="toggleReview()">📋 Xem lại bài làm</button>
           <a href="rank.html" class="btn btn-outline">🏆 Xem bảng xếp hạng</a>
         </div>
       </div>
     </div>
 
-    <!-- Chi tiết từng câu -->
-    <div class="card">
-      <div class="card-header"><h2>📝 Chi tiết từng câu</h2></div>
-      <div class="card-body">
+    <!-- Chi tiết từng câu - ẩn mặc định, bấm nút mới mở -->
+    <div class="card" id="reviewSection" style="display:none;">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <h2>📝 Xem lại bài làm</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-outline" onclick="filterReview('all')" id="filterAll">📋 Tất cả (${questions.length})</button>
+          <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:1.5px solid #f87171;" onclick="filterReview('wrong')" id="filterWrong">❌ Câu sai (${questions.filter((q,i)=>answers[i]!==q.correct).length})</button>
+          <button class="btn btn-sm" style="background:#dcfce7;color:#14532d;border:1.5px solid #4ade80;" onclick="filterReview('correct')" id="filterCorrect">✅ Câu đúng (${questions.filter((q,i)=>answers[i]===q.correct).length})</button>
+        </div>
+      </div>
+      <div class="card-body" id="reviewBody">
         ${questions.map((q, i) => {
           const userAns = answers[i];
           const isCorrect = userAns === q.correct;
           const opts = ['A', 'B', 'C', 'D'];
           return `
-            <div class="review-item ${isCorrect ? 'correct' : 'wrong'}">
+            <div class="review-item ${isCorrect ? 'correct' : 'wrong'}" data-correct="${isCorrect}">
               <div class="review-header">
                 <span class="review-num">${i + 1}</span>
-                <span class="review-result">${isCorrect ? '✅ Đúng' : '❌ Sai'}</span>
+                <span class="review-result">${isCorrect ? '✅ Đúng' : '❌ Sai — cần ôn lại!'}</span>
               </div>
               <div class="review-question">${q.text}</div>
               ${q.imageUrl ? `<div style="margin:8px 0;"><img src="${q.imageUrl}" style="max-width:100%;max-height:220px;border-radius:8px;border:1px solid var(--border);"></div>` : ''}
@@ -1194,11 +1866,17 @@ function renderResult(result, questions, answers) {
                 ${q.options.map((opt, j) => `
                   <div class="review-option ${j === q.correct ? 'correct-opt' : ''} ${j === userAns && !isCorrect ? 'wrong-opt' : ''}">
                     <strong>${opts[j]}.</strong> ${opt}
-                    ${j === q.correct ? ' ← Đáp án đúng' : ''}
-                    ${j === userAns && !isCorrect ? ' ← Bạn chọn' : ''}
+                    ${j === q.correct ? ' <span style="color:#059669;font-weight:700;">← Đáp án đúng</span>' : ''}
+                    ${j === userAns && !isCorrect ? ' <span style="color:#dc2626;font-weight:700;">← Em đã chọn</span>' : ''}
                   </div>
                 `).join('')}
               </div>
+              ${!isCorrect && q.explanation ? `
+                <div class="review-explanation">
+                  <span class="review-explain-icon">💡</span>
+                  <div><strong>Thầy giải thích:</strong> ${q.explanation}</div>
+                </div>` : ''}
+              ${!isCorrect ? `<div class="review-wrong-tip">📌 Hãy ôn lại dạng bài này để không bị sai lần sau!</div>` : ''}
             </div>
           `;
         }).join('')}
@@ -1253,6 +1931,122 @@ function shuffleArray(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// ====================================================
+// MODAL XEM LẠI BÀI LÀM (cho bảng xếp hạng)
+// ====================================================
+function showStudentReviewModal(studentName, studentClass) {
+  const reviewKey = 'review_' + studentName + '_' + studentClass;
+  let reviewData = null;
+  try { reviewData = JSON.parse(localStorage.getItem(reviewKey)); } catch(e) {}
+
+  // Xoá modal cũ nếu có
+  const old = document.getElementById('reviewModal');
+  if (old) old.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'reviewModal';
+  modal.className = 'review-modal-overlay';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  if (!reviewData || !reviewData.questions) {
+    modal.innerHTML = `
+      <div class="review-modal-box">
+        <div class="review-modal-header">
+          <h3>📋 Xem lại bài làm — ${studentName}</h3>
+          <button class="review-modal-close" onclick="document.getElementById('reviewModal').remove()">✕</button>
+        </div>
+        <div class="review-modal-body" style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+          <div style="font-size:3rem;margin-bottom:12px;">📂</div>
+          <p>Chưa có dữ liệu bài làm của <strong>${studentName}</strong> trên thiết bị này.</p>
+          <p style="font-size:0.85rem;">Dữ liệu xem lại chỉ lưu trên thiết bị học sinh đã làm bài.</p>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    return;
+  }
+
+  const opts = ['A','B','C','D'];
+  const wrongCount = reviewData.questions.filter((q,i) => reviewData.answers[i] !== q.correct).length;
+
+  const questionsHtml = reviewData.questions.map((q, i) => {
+    const userAns = reviewData.answers[i];
+    const isCorrect = parseInt(userAns) === q.correct;
+    return `
+      <div class="review-item ${isCorrect ? 'correct' : 'wrong'}" data-correct="${isCorrect}" style="margin-bottom:16px;">
+        <div class="review-header">
+          <span class="review-num">${i + 1}</span>
+          <span class="review-result">${isCorrect ? '✅ Đúng' : '❌ Sai — cần ôn lại!'}</span>
+        </div>
+        <div class="review-question">${q.text}</div>
+        ${q.imageUrl ? `<div style="margin:8px 0;"><img src="${q.imageUrl}" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid var(--border);"></div>` : ''}
+        <div class="review-options">
+          ${q.options.map((opt, j) => `
+            <div class="review-option ${j === q.correct ? 'correct-opt' : ''} ${j == userAns && !isCorrect ? 'wrong-opt' : ''}">
+              <strong>${opts[j]}.</strong> ${opt}
+              ${j === q.correct ? ' <span style="color:#059669;font-weight:700;">← Đáp án đúng</span>' : ''}
+              ${j == userAns && !isCorrect ? ' <span style="color:#dc2626;font-weight:700;">← Em đã chọn</span>' : ''}
+            </div>
+          `).join('')}
+        </div>
+        ${!isCorrect && q.explanation ? `
+          <div class="review-explanation">
+            <span class="review-explain-icon">💡</span>
+            <div><strong>Thầy giải thích:</strong> ${q.explanation}</div>
+          </div>` : ''}
+        ${!isCorrect ? `<div class="review-wrong-tip">📌 Hãy ôn lại dạng bài này để không bị sai lần sau!</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  modal.innerHTML = `
+    <div class="review-modal-box">
+      <div class="review-modal-header">
+        <div>
+          <h3>📋 Bài làm của <strong>${studentName}</strong> — ${reviewData.studentClass}</h3>
+          <div style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">
+            ${reviewData.topicName} · ⏱️ ${Math.floor(reviewData.timeTaken/60)} phút ${reviewData.timeTaken%60} giây ·
+            Điểm: <strong style="color:${reviewData.score>=8?'#059669':reviewData.score>=5?'#f59e0b':'#dc2626'}">${reviewData.score}/10</strong>
+          </div>
+        </div>
+        <button class="review-modal-close" onclick="document.getElementById('reviewModal').remove()">✕</button>
+      </div>
+      <div class="review-modal-stats">
+        <div class="rms-item rms-correct">✅ ${reviewData.correct} câu đúng</div>
+        <div class="rms-item rms-wrong">❌ ${wrongCount} câu sai</div>
+        <div class="rms-item rms-pct">📊 ${Math.round(reviewData.correct/reviewData.total*100)}% chính xác</div>
+      </div>
+      ${wrongCount > 0 ? `
+        <div class="review-modal-warn">
+          ⚠️ Em có <strong>${wrongCount} câu sai</strong> — hãy đọc kỹ phần giải thích và ôn lại nhé!
+        </div>` : `
+        <div class="review-modal-perfect">
+          🎉 Hoàn hảo! Em trả lời đúng tất cả các câu! Thầy rất tự hào!
+        </div>`}
+      <div class="review-modal-filter-btns">
+        <button class="btn btn-sm btn-outline" onclick="modalFilterReview('all')">📋 Tất cả (${reviewData.total})</button>
+        <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:1.5px solid #f87171;" onclick="modalFilterReview('wrong')">❌ Câu sai (${wrongCount})</button>
+        <button class="btn btn-sm" style="background:#dcfce7;color:#14532d;border:1.5px solid #4ade80;" onclick="modalFilterReview('correct')">✅ Câu đúng (${reviewData.correct})</button>
+      </div>
+      <div class="review-modal-body" id="reviewModalBody">
+        ${questionsHtml}
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+  // MathJax render nếu có
+  setTimeout(() => { if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([modal]); }, 100);
+}
+
+function modalFilterReview(type) {
+  const items = document.querySelectorAll('#reviewModalBody .review-item');
+  items.forEach(item => {
+    const isCorrect = item.dataset.correct === 'true';
+    if (type === 'all') item.style.display = '';
+    else if (type === 'wrong') item.style.display = isCorrect ? 'none' : '';
+    else if (type === 'correct') item.style.display = isCorrect ? '' : 'none';
+  });
 }
 
 // ====================================================
