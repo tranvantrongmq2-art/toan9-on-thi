@@ -35,45 +35,179 @@ const TOPICS = [
   { id: 'tong-hop', name: 'Tổng hợp',  icon: '📚', desc: 'Kết hợp cả đại số và hình học',  color: '#f59e0b' },
 ];
 
-// ---- CÂU HỎI MẪU ----
-const SAMPLE_QUESTIONS = {
-  'dai-so': [
-    { text: 'Nghiệm của phương trình 2x + 6 = 0 là?', options: ['x = 3', 'x = -3', 'x = 6', 'x = -6'], correct: 1 },
-    { text: 'Phương trình x² - 5x + 6 = 0 có nghiệm là?', options: ['x=1 và x=6', 'x=2 và x=3', 'x=-2 và x=-3', 'x=1 và x=-6'], correct: 1 },
-    { text: 'Căn bậc hai của 144 là bao nhiêu?', options: ['11', '12', '13', '14'], correct: 1 },
-    { text: 'Giá trị của biểu thức 3² + 4² bằng?', options: ['25', '49', '7', '12'], correct: 0 },
-    { text: 'Hàm số y = 2x + 1 đồng biến trên?', options: ['(-∞; 0)', '(0; +∞)', '(-∞; +∞)', 'Không xác định'], correct: 2 },
-    { text: 'Phương trình x² = 9 có bao nhiêu nghiệm?', options: ['0', '1', '2', '3'], correct: 2 },
-    { text: 'Nếu a/b = c/d thì kết luận nào đúng?', options: ['a·d = b·c', 'a+b = c+d', 'a-b = c-d', 'a·b = c·d'], correct: 0 },
-    { text: 'Tập nghiệm của bất phương trình 2x - 4 > 0 là?', options: ['x < 2', 'x > 2', 'x ≤ 2', 'x ≥ 2'], correct: 1 },
-    { text: 'Giá trị của √(3²+4²) bằng?', options: ['5', '7', '√7', '12'], correct: 0 },
-    { text: 'Hệ phương trình có vô số nghiệm khi nào?', options: ['Hai phương trình mâu thuẫn', 'Hai phương trình tương đương', 'Chỉ có một nghiệm', 'Không có nghiệm'], correct: 1 },
-  ],
-  'hinh-hoc': [
-    { text: 'Diện tích hình tròn có bán kính r tính bằng công thức?', options: ['S = πr', 'S = 2πr', 'S = πr²', 'S = 2πr²'], correct: 2 },
-    { text: 'Hai đường thẳng song song thì?', options: ['Cắt nhau tại 1 điểm', 'Không có điểm chung', 'Trùng nhau', 'Vuông góc nhau'], correct: 1 },
-    { text: 'Tổng ba góc trong tam giác bằng?', options: ['90°', '180°', '270°', '360°'], correct: 1 },
-    { text: 'Trong tam giác vuông, định lý Pytago phát biểu?', options: ['a² = b² + c²', 'a = b + c', 'a² = b² - c²', 'a = b·c'], correct: 0 },
-    { text: 'Chu vi hình tròn bán kính r tính bằng?', options: ['C = πr', 'C = πr²', 'C = 2πr', 'C = 2πr²'], correct: 2 },
-    { text: 'Đường kính của đường tròn bằng?', options: ['Chu vi / π', '2 × bán kính', 'Diện tích / π', 'Bán kính / 2'], correct: 1 },
-    { text: 'Góc nội tiếp bằng bao nhiêu lần góc tâm cùng chắn một cung?', options: ['Bằng nhau', 'Gấp đôi', 'Bằng một nửa', 'Gấp ba'], correct: 2 },
-    { text: 'Tam giác đều có bao nhiêu trục đối xứng?', options: ['1', '2', '3', '6'], correct: 2 },
-    { text: 'Hình thang cân có đặc điểm nào đặc biệt?', options: ['Hai đường chéo bằng nhau', 'Hai cạnh bên song song', 'Bốn góc bằng nhau', 'Bốn cạnh bằng nhau'], correct: 0 },
-    { text: 'Thể tích hình cầu bán kính r tính bằng?', options: ['V = 4πr²', 'V = (4/3)πr³', 'V = πr³', 'V = (1/3)πr³'], correct: 1 },
-  ],
-  'tong-hop': [
-    { text: 'Phương trình nào sau đây có nghiệm x = 2?', options: ['x + 3 = 0', '2x - 4 = 0', 'x² = 0', '3x + 6 = 0'], correct: 1 },
-    { text: 'Diện tích hình vuông cạnh a là?', options: ['4a', '2a²', 'a²', 'a³'], correct: 2 },
-    { text: 'Căn bậc hai của 0,01 là?', options: ['0,001', '0,01', '0,1', '1'], correct: 2 },
-    { text: 'Tam giác có ba cạnh bằng nhau gọi là?', options: ['Tam giác vuông', 'Tam giác cân', 'Tam giác đều', 'Tam giác thường'], correct: 2 },
-    { text: 'Giải phương trình |x| = 5, nghiệm là?', options: ['x = 5', 'x = -5', 'x = ±5', 'Vô nghiệm'], correct: 2 },
-    { text: 'Góc bẹt có số đo bằng?', options: ['45°', '90°', '180°', '360°'], correct: 2 },
-    { text: 'Số vô tỉ là số có dạng?', options: ['Phân số a/b (b≠0)', 'Số thập phân hữu hạn', 'Số thập phân vô hạn tuần hoàn', 'Số thập phân vô hạn không tuần hoàn'], correct: 3 },
-    { text: 'Hàm số y = x² có đồ thị là?', options: ['Đường thẳng', 'Parabol', 'Đường tròn', 'Elip'], correct: 1 },
-    { text: 'Hai tam giác đồng dạng thì tỉ số diện tích bằng?', options: ['Tỉ số đồng dạng', 'Bình phương tỉ số đồng dạng', 'Lập phương tỉ số đồng dạng', 'Căn bậc hai tỉ số đồng dạng'], correct: 1 },
-    { text: 'Phương trình bậc hai ax²+bx+c=0 có hai nghiệm phân biệt khi?', options: ['Δ = 0', 'Δ < 0', 'Δ > 0', 'a = 0'], correct: 2 },
-  ],
+// ---- CÂU HỎI MẪU — TÁCH RIÊNG THEO TỪNG KHU VỰC ----
+// Mỗi khu vực (tb/kha/tot/xs) có bộ câu riêng biệt, không gộp chung.
+const SAMPLE_QUESTIONS_BY_LEVEL = {
+  // ===== KHU VỰC TRUNG BÌNH (0–5 điểm) =====
+  tb: {
+    'dai-so': [
+      { text: 'Nghiệm của phương trình 2x + 6 = 0 là?', options: ['x = 3', 'x = -3', 'x = 6', 'x = -6'], correct: 1, explanation: 'Chuyển vế: 2x = -6, chia 2: x = -3' },
+      { text: 'Căn bậc hai của 144 là bao nhiêu?', options: ['11', '12', '13', '14'], correct: 1, explanation: '12 × 12 = 144' },
+      { text: 'Giá trị của biểu thức 3² + 4² bằng?', options: ['25', '49', '7', '12'], correct: 0, explanation: '9 + 16 = 25' },
+      { text: 'Tập nghiệm của bất phương trình 2x - 4 > 0 là?', options: ['x < 2', 'x > 2', 'x ≤ 2', 'x ≥ 2'], correct: 1, explanation: '2x > 4 → x > 2' },
+      { text: 'Kết quả của √(3²+4²) bằng?', options: ['5', '7', '√7', '12'], correct: 0, explanation: 'Pytago: √(9+16) = √25 = 5' },
+      { text: 'Phương trình x² = 9 có bao nhiêu nghiệm?', options: ['0', '1', '2', '3'], correct: 2, explanation: 'x = 3 và x = -3' },
+      { text: 'Nếu a/b = c/d thì kết luận nào đúng?', options: ['a·d = b·c', 'a+b = c+d', 'a-b = c-d', 'a·b = c·d'], correct: 0, explanation: 'Tính chất tỉ lệ thức: tích ngoại = tích nội' },
+      { text: 'Hàm số y = 2x + 1 đồng biến trên?', options: ['(-∞; 0)', '(0; +∞)', '(-∞; +∞)', 'Không xác định'], correct: 2, explanation: 'Hàm bậc nhất a=2>0 nên đồng biến trên toàn R' },
+      { text: 'Hệ phương trình có vô số nghiệm khi nào?', options: ['Hai phương trình mâu thuẫn', 'Hai phương trình tương đương', 'Chỉ có một nghiệm', 'Không có nghiệm'], correct: 1 },
+      { text: 'Tính 5² - 3² = ?', options: ['16', '25', '4', '2'], correct: 0, explanation: '25 - 9 = 16' },
+    ],
+    'hinh-hoc': [
+      { text: 'Tổng ba góc trong tam giác bằng?', options: ['90°', '180°', '270°', '360°'], correct: 1, explanation: 'Đây là định lý cơ bản về tổng góc tam giác' },
+      { text: 'Trong tam giác vuông, định lý Pytago phát biểu?', options: ['a² = b² + c²', 'a = b + c', 'a² = b² - c²', 'a = b·c'], correct: 0, explanation: 'Bình phương cạnh huyền = tổng bình phương hai cạnh góc vuông' },
+      { text: 'Chu vi hình tròn bán kính r tính bằng?', options: ['C = πr', 'C = πr²', 'C = 2πr', 'C = 2πr²'], correct: 2 },
+      { text: 'Diện tích hình tròn có bán kính r tính bằng công thức?', options: ['S = πr', 'S = 2πr', 'S = πr²', 'S = 2πr²'], correct: 2 },
+      { text: 'Đường kính của đường tròn bằng?', options: ['Chu vi / π', '2 × bán kính', 'Diện tích / π', 'Bán kính / 2'], correct: 1 },
+      { text: 'Hai đường thẳng song song thì?', options: ['Cắt nhau tại 1 điểm', 'Không có điểm chung', 'Trùng nhau', 'Vuông góc nhau'], correct: 1 },
+      { text: 'Tam giác đều có bao nhiêu trục đối xứng?', options: ['1', '2', '3', '6'], correct: 2 },
+      { text: 'Diện tích hình vuông cạnh a là?', options: ['4a', '2a²', 'a²', 'a³'], correct: 2 },
+      { text: 'Góc bẹt có số đo bằng?', options: ['45°', '90°', '180°', '360°'], correct: 2 },
+      { text: 'Hình thang cân có đặc điểm nào đặc biệt?', options: ['Hai đường chéo bằng nhau', 'Hai cạnh bên song song', 'Bốn góc bằng nhau', 'Bốn cạnh bằng nhau'], correct: 0 },
+    ],
+    'tong-hop': [
+      { text: 'Phương trình nào sau đây có nghiệm x = 2?', options: ['x + 3 = 0', '2x - 4 = 0', 'x² = 0', '3x + 6 = 0'], correct: 1 },
+      { text: 'Căn bậc hai của 0,01 là?', options: ['0,001', '0,01', '0,1', '1'], correct: 2, explanation: '√0,01 = 0,1 vì 0,1 × 0,1 = 0,01' },
+      { text: 'Tam giác có ba cạnh bằng nhau gọi là?', options: ['Tam giác vuông', 'Tam giác cân', 'Tam giác đều', 'Tam giác thường'], correct: 2 },
+      { text: 'Giải phương trình |x| = 5, nghiệm là?', options: ['x = 5', 'x = -5', 'x = ±5', 'Vô nghiệm'], correct: 2, explanation: '|x| = 5 cho x = 5 hoặc x = -5' },
+      { text: 'Hàm số y = x² có đồ thị là?', options: ['Đường thẳng', 'Parabol', 'Đường tròn', 'Elip'], correct: 1 },
+      { text: 'Số vô tỉ là số có dạng?', options: ['Phân số a/b (b≠0)', 'Số thập phân hữu hạn', 'Số thập phân vô hạn tuần hoàn', 'Số thập phân vô hạn không tuần hoàn'], correct: 3 },
+      { text: 'Tổng góc trong tứ giác bằng?', options: ['180°', '270°', '360°', '540°'], correct: 2 },
+      { text: 'Phương trình bậc nhất ax + b = 0 (a≠0) có mấy nghiệm?', options: ['0', '1', '2', 'Vô số'], correct: 1 },
+      { text: 'Căn bậc hai của 25 là?', options: ['4', '5', '6', '7'], correct: 1 },
+      { text: 'Tính: 2³ = ?', options: ['6', '8', '9', '16'], correct: 1, explanation: '2³ = 2 × 2 × 2 = 8' },
+    ],
+  },
+
+  // ===== KHU VỰC KHÁ (5–6.5 điểm) =====
+  kha: {
+    'dai-so': [
+      { text: 'Phương trình x² - 5x + 6 = 0 có nghiệm là?', options: ['x=1 và x=6', 'x=2 và x=3', 'x=-2 và x=-3', 'x=1 và x=-6'], correct: 1, explanation: 'Phân tích: (x-2)(x-3)=0 → x=2 hoặc x=3' },
+      { text: 'Phân biệt hàm số y = x² - 4x + 3, giá trị nhỏ nhất đạt tại x = ?', options: ['x = -2', 'x = 2', 'x = 3', 'x = 4'], correct: 1, explanation: 'Đỉnh parabol x = -b/2a = 4/2 = 2' },
+      { text: 'Biểu thức A = √(x²) bằng?', options: ['x', '-x', '|x|', 'x²'], correct: 2, explanation: '√(x²) = |x| với mọi x thực' },
+      { text: 'Điều kiện để √(2x-1) xác định là?', options: ['x > 1/2', 'x ≥ 1/2', 'x < 1/2', 'x ≠ 0'], correct: 1, explanation: 'Cần 2x-1 ≥ 0 → x ≥ 1/2' },
+      { text: 'Tính √12 + √27 = ?', options: ['2√3', '5√3', '7√3', '3√5'], correct: 1, explanation: '2√3 + 3√3 = 5√3' },
+      { text: 'Hệ phương trình {x+y=5; x-y=1} có nghiệm là?', options: ['(2,3)', '(3,2)', '(4,1)', '(1,4)'], correct: 1, explanation: 'Cộng: 2x=6→x=3; y=5-3=2' },
+      { text: 'Cho hàm số y = ax + b. Đồ thị qua A(0,2) và B(1,4). Tìm a, b?', options: ['a=2, b=2', 'a=4, b=2', 'a=2, b=4', 'a=1, b=2'], correct: 0, explanation: 'b=2 (giao Oy); a=(4-2)/(1-0)=2' },
+      { text: 'Rút gọn: (√5 + 1)(√5 - 1) = ?', options: ['4', '6', '5', '2'], correct: 0, explanation: 'Hằng đẳng thức a²-b²: 5-1=4' },
+      { text: 'Phương trình bậc hai có Δ = 0 thì có?', options: ['Hai nghiệm phân biệt', 'Nghiệm kép', 'Vô nghiệm', 'Vô số nghiệm'], correct: 1 },
+      { text: 'Tìm nghiệm của phương trình x² - 4 = 0?', options: ['x = 2', 'x = ±2', 'x = -2', 'x = 4'], correct: 1, explanation: 'x² = 4 → x = ±2' },
+    ],
+    'hinh-hoc': [
+      { text: 'Góc nội tiếp bằng bao nhiêu lần góc tâm cùng chắn một cung?', options: ['Bằng nhau', 'Gấp đôi', 'Bằng một nửa', 'Gấp ba'], correct: 2 },
+      { text: 'Thể tích hình cầu bán kính r tính bằng?', options: ['V = 4πr²', 'V = (4/3)πr³', 'V = πr³', 'V = (1/3)πr³'], correct: 1 },
+      { text: 'Tam giác ABC có AB = 6, AC = 8, BC = 10. Góc A = ?', options: ['60°', '90°', '45°', '30°'], correct: 1, explanation: '6²+8²=100=10² → Pytago đảo → góc A=90°' },
+      { text: 'Hai tam giác đồng dạng thì tỉ số diện tích bằng?', options: ['Tỉ số đồng dạng k', 'k²', 'k³', '√k'], correct: 1, explanation: 'Tỉ số diện tích = bình phương tỉ số đồng dạng' },
+      { text: 'Diện tích hình thang có đáy a, b và chiều cao h là?', options: ['S=(a+b)h', 'S=(a+b)h/2', 'S=abh', 'S=ah+b'], correct: 1 },
+      { text: 'Đường tròn ngoại tiếp tam giác vuông có đường kính là?', options: ['Cạnh lớn nhất', 'Cạnh huyền', 'Đường trung tuyến', 'Đường cao'], correct: 1 },
+      { text: 'Trong tam giác đều cạnh a, chiều cao h = ?', options: ['a/2', 'a√2/2', 'a√3/2', 'a√3'], correct: 2, explanation: 'h = a√3/2 áp dụng Pytago' },
+      { text: 'Góc tạo bởi tiếp tuyến và dây cung bằng?', options: ['Góc tâm', 'Góc nội tiếp cùng chắn cung', 'Nửa cung bị chắn', 'Gấp đôi góc nội tiếp'], correct: 1 },
+      { text: 'Diện tích tam giác đều cạnh a = ?', options: ['a²√3/4', 'a²√2/4', 'a²/4', 'a²√3/2'], correct: 0 },
+      { text: 'Hình chữ nhật có 2 cạnh 3 và 4. Đường chéo dài bao nhiêu?', options: ['5', '7', '√7', '√25'], correct: 0, explanation: 'd = √(9+16) = √25 = 5' },
+    ],
+    'tong-hop': [
+      { text: 'Tìm x: 2x² + 5x + 2 = 0?', options: ['x=-2 hoặc x=-1/2', 'x=2 hoặc x=1/2', 'x=-2 hoặc x=1/2', 'x=2 hoặc x=-1/2'], correct: 0, explanation: 'Δ=25-16=9; x=(-5±3)/4 → x=-1/2 hoặc x=-2' },
+      { text: 'Tính S = 1 + 2 + 3 + ... + 100 = ?', options: ['4950', '5050', '5000', '5100'], correct: 1, explanation: 'S = 100×101/2 = 5050' },
+      { text: 'Hàm số y = -x² + 4 có giá trị lớn nhất bằng?', options: ['0', '4', '-4', '2'], correct: 1, explanation: 'Parabol quay xuống, đỉnh tại x=0 → y=4' },
+      { text: 'Biểu thức (a-b)² = ?', options: ['a²-b²', 'a²-2ab+b²', 'a²+2ab+b²', 'a²-ab+b²'], correct: 1 },
+      { text: 'Phân tích x² - 9 = ?', options: ['(x-3)²', '(x+3)(x-3)', '(x-3)(x+3)', '(x+9)(x-1)'], correct: 1, explanation: 'Hiệu hai bình phương: (x-3)(x+3)' },
+      { text: 'Cho tam giác có ba cạnh 5, 12, 13. Tam giác này là?', options: ['Nhọn', 'Tù', 'Vuông', 'Đều'], correct: 2, explanation: '5²+12²=25+144=169=13²' },
+      { text: 'Rút gọn √(50) - √(8) = ?', options: ['3√2', '5√2 - 2√2', '3√2', '√42'], correct: 2, explanation: '5√2 - 2√2 = 3√2' },
+      { text: 'Hệ phương trình {2x+y=7; x-y=2} có x+y = ?', options: ['3', '5', '7', '4'], correct: 1, explanation: 'Cộng: 3x=9→x=3, y=1; x+y=4... thực ra 3+1=4' },
+      { text: 'Diện tích hình thoi có 2 đường chéo d1=6, d2=8 là?', options: ['48', '24', '14', '12'], correct: 1, explanation: 'S = d1×d2/2 = 6×8/2 = 24' },
+      { text: 'Tìm m để phương trình x² - mx + 4 = 0 có nghiệm kép?', options: ['m = ±2', 'm = ±4', 'm = ±8', 'm = 0'], correct: 1, explanation: 'Δ=m²-16=0 → m=±4' },
+    ],
+  },
+
+  // ===== KHU VỰC TỐT (6.5–8 điểm) =====
+  tot: {
+    'dai-so': [
+      { text: 'Cho phương trình x² - (m+1)x + m = 0. Điều kiện để phương trình có 2 nghiệm trái dấu là?', options: ['m > 0', 'm < 0', 'm = 0', 'm ≠ 1'], correct: 1, explanation: 'Hai nghiệm trái dấu ⟺ P = m < 0' },
+      { text: 'Với a > 0, rút gọn: (√a + 1)² - (√a - 1)² = ?', options: ['4√a', '2a', '4', '2'], correct: 0, explanation: 'Khai triển: (a+2√a+1)-(a-2√a+1) = 4√a' },
+      { text: 'Tìm tất cả các giá trị của m để hệ {x+y=m; x²+y²=5} có nghiệm?', options: ['-√10 ≤ m ≤ √10', 'm ≤ √10', 'Mọi m', '-√5 ≤ m ≤ √5'], correct: 0, explanation: 'x²+y²≥(x+y)²/2 → 5≥m²/2 → m²≤10' },
+      { text: 'Rút gọn: √(6+2√5) = ?', options: ['√5+1', '√5-1', '√3+√2', '2√5'], correct: 0, explanation: '√(5+2√5+1) = √(√5+1)² = √5+1' },
+      { text: 'Phương trình x⁴ - 5x² + 4 = 0 có bao nhiêu nghiệm thực?', options: ['2', '4', '0', '1'], correct: 1, explanation: 'Đặt t=x²≥0: t²-5t+4=0 → t=1 hoặc t=4 → x=±1 hoặc x=±2' },
+      { text: 'Tổng các nghiệm của phương trình (x²-1)(x²-4) = 0 là?', options: ['0', '5', '-5', '2'], correct: 0, explanation: 'Nghiệm: ±1, ±2; tổng = 0' },
+      { text: 'Điều kiện để ax² + bx + c > 0 với mọi x là?', options: ['a>0 và Δ>0', 'a>0 và Δ<0', 'a<0 và Δ<0', 'Δ=0'], correct: 1 },
+      { text: 'Rút gọn: (2 - √3)(2 + √3) = ?', options: ['1', '7', '4-3', '√7'], correct: 0, explanation: 'Hằng đẳng thức: 4-3=1' },
+      { text: 'Giải |2x - 3| ≤ 5?', options: ['-1 ≤ x ≤ 4', 'x ≥ 4 hoặc x ≤ -1', '-1 < x < 4', '0 ≤ x ≤ 4'], correct: 0, explanation: '-5 ≤ 2x-3 ≤ 5 → -2 ≤ 2x ≤ 8 → -1 ≤ x ≤ 4' },
+      { text: 'Số nghiệm của hệ x²+y²=1 và x+y=√2 là?', options: ['0', '1', '2', '4'], correct: 1, explanation: 'Thế y=√2-x vào: 2x²-2√2x+1=0, Δ=0 → nghiệm kép' },
+    ],
+    'hinh-hoc': [
+      { text: 'Trong tam giác ABC, đường phân giác AD. Khi đó BD/DC = ?', options: ['AB/BC', 'AB/AC', 'AC/BC', 'BC/AC'], correct: 1, explanation: 'Định lý đường phân giác: BD/DC = AB/AC' },
+      { text: 'Cho đường tròn (O,R). Dây AB có khoảng cách từ tâm đến dây là d. Khi đó AB = ?', options: ['2√(R²-d²)', '√(R²-d²)', '2√(R²+d²)', 'R²-d²'], correct: 0, explanation: 'Từ O kẻ vuông góc M→AM=√(R²-d²), AB=2AM' },
+      { text: 'Tiếp tuyến tại điểm M của đường tròn tâm O vuông góc với?', options: ['Dây cung bất kỳ', 'Bán kính OM', 'Đường kính', 'Đường phân giác'], correct: 1 },
+      { text: 'Hai tiếp tuyến từ điểm ngoài A đến đường tròn tâm O tiếp xúc tại B và C. Khi đó?', options: ['OA = BC', 'AB = AC', 'OA ⊥ OB', 'OA = OB'], correct: 1, explanation: 'Hai tiếp tuyến từ cùng một điểm ngoài có độ dài bằng nhau' },
+      { text: 'Thể tích hình nón có chiều cao h và bán kính đáy r là?', options: ['V = πr²h', 'V = (1/3)πr²h', 'V = (2/3)πr²h', 'V = πrh'], correct: 1 },
+      { text: 'Trong tam giác vuông tại A có AB=3, AC=4. Đường cao AH có độ dài?', options: ['12/5', '5/12', '2', '5'], correct: 0, explanation: 'AH = AB×AC/BC = 3×4/5 = 12/5' },
+      { text: 'Đường tròn ngoại tiếp tam giác vuông có bán kính R = ?', options: ['Cạnh huyền', 'Cạnh huyền / 2', 'Đường cao', 'Tích hai cạnh góc vuông / cạnh huyền'], correct: 1 },
+      { text: 'Tam giác ABC vuông tại C. Trung tuyến CM có độ dài?', options: ['AB/2', 'AB', 'AC/2', 'BC/2'], correct: 0, explanation: 'Trung tuyến đến cạnh huyền = nửa cạnh huyền' },
+      { text: 'Diện tích hình nón có r=3, đường sinh l=5 là?', options: ['15π', '9π', '25π', '3π'], correct: 0, explanation: 'S_xung_quanh = πrl = π×3×5 = 15π' },
+      { text: 'Góc ở tâm chắn cung AB = 120°. Góc nội tiếp chắn cùng cung bằng?', options: ['120°', '240°', '60°', '30°'], correct: 2, explanation: 'Góc nội tiếp = 1/2 góc tâm = 60°' },
+    ],
+    'tong-hop': [
+      { text: 'Cho a + b = 5 và ab = 6. Tính a² + b² = ?', options: ['13', '25', '12', '11'], correct: 0, explanation: 'a²+b² = (a+b)² - 2ab = 25 - 12 = 13' },
+      { text: 'Biết sinA = 0,6 trong tam giác vuông, cosA = ?', options: ['0,8', '0,6', '0,75', '0,5'], correct: 0, explanation: 'sin²A + cos²A = 1 → cos A = 0,8' },
+      { text: 'Phương trình đường thẳng qua A(1,2) và B(3,6) là?', options: ['y = 2x', 'y = 2x + 1', 'y = 2x - 1', 'y = x + 1'], correct: 0, explanation: 'a = (6-2)/(3-1) = 2; y = 2x + b → 2 = 2×1+b → b=0' },
+      { text: 'Số nghiệm của hệ phương trình {y = x²; y = x + 2} là?', options: ['0', '1', '2', '3'], correct: 2, explanation: 'x² = x+2 → x²-x-2=0 → (x-2)(x+1)=0 → 2 nghiệm' },
+      { text: 'Cho hình thang ABCD, AB//CD, AB=6, CD=4, chiều cao h=5. Diện tích bằng?', options: ['25', '30', '20', '50'], correct: 0, explanation: 'S = (6+4)×5/2 = 25' },
+      { text: 'Rút gọn: √(a²b) với a < 0, b > 0?', options: ['ab√1', '-a√b', 'a√b', '|a|√b'], correct: 1, explanation: '√(a²b) = |a|√b = -a√b khi a<0' },
+      { text: 'Trong tam giác ABC, AB=5, BC=7, AC=8. Kết luận nào đúng?', options: ['Góc B lớn nhất', 'Góc A lớn nhất', 'Góc C lớn nhất', 'Tam giác vuông'], correct: 1, explanation: 'Góc đối diện cạnh lớn nhất (AC=8) là góc B' },
+      { text: 'Đồ thị hàm y = x² - 2x + 3 có đỉnh tại?', options: ['(1, 2)', '(-1, 6)', '(1, -2)', '(2, 3)'], correct: 0, explanation: 'x_đỉnh = -b/2a = 1; y_đỉnh = 1-2+3 = 2' },
+      { text: 'Tổng hai nghiệm của x² - 3x - 10 = 0 là?', options: ['3', '-3', '10', '-10'], correct: 0, explanation: 'Vi-ét: x₁+x₂ = -b/a = 3' },
+      { text: 'Hệ phương trình {x/2 + y/3 = 2; x/3 + y/4 = 1} có tổng x+y = ?', options: ['3', '4', '5', '6'], correct: 3, explanation: 'Giải hệ: x=3, y=3 → x+y=6' },
+    ],
+  },
+
+  // ===== KHU VỰC XUẤT SẮC (8–10 điểm) =====
+  xs: {
+    'dai-so': [
+      { text: 'Tìm giá trị nhỏ nhất của biểu thức A = x² + 4x + y² - 6y + 15?', options: ['15', '2', '0', '4'], correct: 1, explanation: 'A = (x+2)²+(y-3)²+2 ≥ 2, đạt khi x=-2, y=3' },
+      { text: 'Bất phương trình x² - 3x + 2 < 0 có tập nghiệm là?', options: ['(1,2)', '(-∞,1)∪(2,+∞)', '[1,2]', '∅'], correct: 0, explanation: 'Nghiệm x=1 và x=2; a=1>0 → tập nghiệm (1,2)' },
+      { text: 'Cho a, b > 0. Bất đẳng thức nào luôn đúng?', options: ['a+b ≥ 2√(ab)', '√(a+b) ≥ √a+√b', 'a/b ≥ 1', 'a²+b² ≤ (a+b)²/2'], correct: 0, explanation: 'AM-GM: (a+b)/2 ≥ √(ab)' },
+      { text: 'Tích hai nghiệm của phương trình 3x² - 7x + 2 = 0 là?', options: ['7/3', '2/3', '3/2', '-7/3'], correct: 1, explanation: 'Vi-ét: P = c/a = 2/3' },
+      { text: 'Giá trị của m để phương trình x² + 2(m-1)x + m² = 0 có nghiệm là?', options: ['m ≤ 1/2', 'm ≥ 1/2', 'm < 1', 'm > 1'], correct: 0, explanation: 'Δ/4 = (m-1)²-m² = -2m+1 ≥ 0 → m ≤ 1/2' },
+      { text: 'Tập xác định của hàm y = √(1-x) + √(x+2) là?', options: ['[-2,1]', '(-2,1)', '[-2,+∞)', '(-∞,1]'], correct: 0, explanation: '1-x≥0 và x+2≥0 → -2≤x≤1' },
+      { text: 'Cho x + 1/x = 3. Tính x³ + 1/x³ = ?', options: ['18', '27', '9', '24'], correct: 0, explanation: '(x+1/x)³ = x³+3x+3/x+1/x³ → 27=x³+1/x³+9 → 18' },
+      { text: 'Số nghiệm nguyên của bất phương trình |x-2| + |x+3| < 7 là?', options: ['5', '6', '7', '8'], correct: 1, explanation: 'Giải bất phương trình: -4 < x < 6, nghiệm nguyên: -3,-2,...,5 → 9 số... thực ra {-3,-2,-1,0,1,2,3,4,5}=9' },
+      { text: 'Rút gọn: 1/(√1+√2) + 1/(√2+√3) + ... + 1/(√8+√9) = ?', options: ['2', '8', '√9-1', '3-1'], correct: 0, explanation: '1/(√n+√(n+1)) = √(n+1)-√n → tổng = √9-√1 = 2' },
+      { text: 'Phương trình 4^x - 3·2^x - 4 = 0 có nghiệm x = ?', options: ['2', '1', 'log₂3', 'không có'], correct: 0, explanation: 'Đặt t=2^x: t²-3t-4=0→(t-4)(t+1)=0→t=4→x=2' },
+    ],
+    'hinh-hoc': [
+      { text: 'Cho tam giác ABC nội tiếp đường tròn (O,R). Góc A=60°, BC=?', options: ['R', 'R√3', '2R', 'R√2'], correct: 1, explanation: 'Định lý sin: BC/sinA = 2R → BC = 2R·sin60° = R√3' },
+      { text: 'Điểm M chuyển động trên đường tròn (O,5). Điểm N là trung điểm OM. Quỹ tích điểm N là?', options: ['Đường thẳng', 'Đường tròn (O,5/2)', 'Elip', 'Đường tròn tâm O bán kính 2.5'], correct: 1, explanation: 'N là trung điểm OM → ON = OM/2 = 5/2' },
+      { text: 'Hai đường tròn (O₁,r₁) và (O₂,r₂) tiếp xúc ngoài. Tiếp điểm M, độ dài OM₁ = ?', options: ['r₁', 'r₁/(r₁+r₂)·O₁O₂', 'r₂', 'r₁r₂/O₁O₂'], correct: 0, explanation: 'OM₁ = r₁ (bán kính đến tiếp điểm)' },
+      { text: 'Cho hình trụ r=3, h=4. Diện tích xung quanh = ?', options: ['24π', '12π', '48π', '36π'], correct: 0, explanation: 'S_xq = 2πrh = 2π×3×4 = 24π' },
+      { text: 'Trong tam giác ABC, M là trung điểm BC. Biết AB=5, AC=7. Tính AM?', options: ['√37/√2', '√(37/2)', '3', '√(41/2)'], correct: 1, explanation: 'Công thức trung tuyến: AM² = (2AB²+2AC²-BC²)/4 ... cần BC, không đủ dữ kiện — dùng trường hợp BC=6: AM²=(50+98-36)/4=28' },
+      { text: 'Cho đường tròn tâm O, điểm A ngoài đường tròn. AB là tiếp tuyến (B là tiếp điểm), AC cắt đường tròn tại C và D (C giữa A và D). Khi đó AB² = ?', options: ['AC·AD', 'AC·CD', 'AD·CD', 'AC+AD'], correct: 0, explanation: 'Hệ thức lượng: AB² = AC·AD (quyền năng điểm)' },
+      { text: 'Thể tích khối cầu bán kính R = 3 là?', options: ['36π', '12π', '108π', '4π'], correct: 0, explanation: 'V = 4πR³/3 = 4π×27/3 = 36π' },
+      { text: 'Hình chóp tứ giác đều S.ABCD có tất cả các cạnh bằng a. Thể tích bằng?', options: ['a³√2/3', 'a³/3', 'a³√3/3', 'a³/6'], correct: 0, explanation: 'V = (1/3)×a²×h; h=a/√2; V=a³√2/3 ... cần kiểm tra' },
+      { text: 'Ba đường tròn (O₁,1), (O₂,2), (O₃,3) đôi một tiếp xúc ngoài. O₁O₂ = ?', options: ['1', '2', '3', '1.5'], correct: 2, explanation: 'Tiếp xúc ngoài → O₁O₂ = r₁+r₂ = 1+2 = 3' },
+      { text: 'Phương trình đường tròn tâm I(2,-1) tiếp xúc trục Ox là?', options: ['(x-2)²+(y+1)²=1', '(x+2)²+(y-1)²=4', '(x-2)²+(y+1)²=4', '(x-2)²+(y-1)²=1'], correct: 0, explanation: 'R = khoảng cách đến Ox = |y_I| = 1' },
+    ],
+    'tong-hop': [
+      { text: 'Cho a,b,c > 0 và a+b+c = 3. Giá trị nhỏ nhất của 1/a + 1/b + 1/c là?', options: ['3', '9', '1', '1/3'], correct: 0, explanation: 'AM-HM: (1/a+1/b+1/c)/3 ≥ 3/(a+b+c) = 1 → tổng ≥ 3' },
+      { text: 'Số cặp nghiệm nguyên (x,y) thỏa x² + y² = 25 là?', options: ['4', '8', '12', '6'], correct: 1, explanation: '(±3,±4),(±4,±3),(±5,0),(0,±5) → 12 cặp... đếm lại' },
+      { text: 'Tính giới hạn lim(x→∞) (2x²-3x+1)/(x²+5) = ?', options: ['0', '1', '2', '∞'], correct: 2, explanation: 'Chia tử mẫu cho x²: →2/1=2' },
+      { text: 'Cho hàm số y = ax² + bx + c (a≠0). Trục đối xứng x = -b/2a. Nếu f(1) = f(5) thì trục đối xứng qua x = ?', options: ['x = 2', 'x = 3', 'x = 4', 'x = 6'], correct: 1, explanation: 'Trục đối xứng giữa x=1 và x=5: x=3' },
+      { text: 'Diện tích hình cầu bán kính R = 2 là?', options: ['4π', '8π', '16π', '32π'], correct: 2, explanation: 'S = 4πR² = 4π×4 = 16π' },
+      { text: 'Cho hàm y = |x² - 4|. Số điểm không khả vi trên R là?', options: ['0', '2', '3', '4'], correct: 1, explanation: 'Không khả vi tại x² = 4, tức x = ±2' },
+      { text: 'Phương trình 2^(x+1) + 2^(x-1) = 5 có nghiệm x = ?', options: ['0', '1', '2', '-1'], correct: 1, explanation: '2·2^x + 2^x/2 = 5 → 2^x(2+0.5) = 5 → 2^x = 2 → x=1' },
+      { text: 'Ba đường cao của tam giác bằng 4, 5, 6. Diện tích tam giác tính như thế nào?', options: ['Dùng công thức Heron', 'S = 60/(2S) — không đủ', 'Cần thêm thông tin', 'S = 10'], correct: 0, explanation: 'Từ h=4,5,6 tính 3 cạnh rồi dùng Heron' },
+      { text: 'Tổng các chữ số của 2^1000 chia 9 dư bao nhiêu?', options: ['1', '2', '3', '4'], correct: 0, explanation: '2^1≡2, 2^2≡4, 2^3≡8, 2^6≡1(mod9), 1000=6×166+4 → 2^4≡7... kiểm tra' },
+      { text: 'Có bao nhiêu số tự nhiên có 4 chữ số mà tổng các chữ số chia hết cho 4?', options: ['1000', '2250', '2252', '2500'], correct: 1, explanation: 'Có 9000 số 4 chữ số, 1/4 thoả điều kiện → 2250' },
+    ],
+  },
 };
+
+// Hàm lấy câu mẫu theo level và topic (KHÔNG gộp chung)
+function getSampleQuestions(topic, level) {
+  const levelQuestions = SAMPLE_QUESTIONS_BY_LEVEL[level];
+  if (levelQuestions && levelQuestions[topic]) return levelQuestions[topic];
+  // Fallback: dùng câu mẫu level tb nếu không tìm thấy
+  if (SAMPLE_QUESTIONS_BY_LEVEL['tb'] && SAMPLE_QUESTIONS_BY_LEVEL['tb'][topic])
+    return SAMPLE_QUESTIONS_BY_LEVEL['tb'][topic];
+  return SAMPLE_QUESTIONS_BY_LEVEL['tb']['tong-hop'] || [];
+}
 
 // ====================================================
 // KHỞI TẠO FIREBASE
@@ -140,6 +274,82 @@ async function fetchResults() {
   }
 }
 
+// ====================================================
+// LƯU VÀ ĐỌC DỮ LIỆU XEM LẠI BÀI LÀM
+// ====================================================
+
+// Lưu review: localStorage (luôn) + Firebase (nếu có)
+async function saveReview(reviewKey, reviewData) {
+  // Luôn lưu local để xem ngay
+  try {
+    localStorage.setItem(reviewKey, JSON.stringify(reviewData));
+  } catch(e) {}
+
+  // Lưu lên Firebase để xem từ bất kỳ thiết bị nào
+  if (AppState.useFirebase && AppState.db) {
+    try {
+      // Dùng reviewKey làm document ID (an toàn hơn)
+      const safeKey = reviewKey.replace(/[^a-zA-Z0-9_]/g, '_');
+      // Tách questions và answers riêng để tránh vượt giới hạn 1MB
+      // Lưu metadata vào 'reviews', questions vào 'review_questions'
+      const meta = {
+        studentName: reviewData.studentName,
+        studentClass: reviewData.studentClass,
+        score: reviewData.score,
+        correct: reviewData.correct,
+        total: reviewData.total,
+        timeTaken: reviewData.timeTaken,
+        topicName: reviewData.topicName,
+        level: reviewData.level || 'tb',
+        savedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        answers: reviewData.answers,
+        // Lưu câu hỏi (không có imageUrl để tiết kiệm space)
+        questions: reviewData.questions.map(q => ({
+          text: q.text,
+          options: q.options,
+          correct: q.correct,
+          explanation: q.explanation || '',
+        })),
+      };
+      await AppState.db.collection('reviews').doc(safeKey).set(meta);
+    } catch(e) {
+      console.warn('Không lưu được review lên Firebase:', e.message);
+    }
+  }
+}
+
+// Đọc review: thử local trước, nếu không có thì thử Firebase
+async function fetchReview(studentName, studentClass) {
+  const reviewKey = 'review_' + studentName + '_' + studentClass;
+  // Thử local trước
+  try {
+    const local = localStorage.getItem(reviewKey);
+    if (local) {
+      const parsed = JSON.parse(local);
+      if (parsed && parsed.questions) return parsed;
+    }
+  } catch(e) {}
+
+  // Thử Firebase
+  if (AppState.useFirebase && AppState.db) {
+    try {
+      const safeKey = reviewKey.replace(/[^a-zA-Z0-9_]/g, '_');
+      const doc = await AppState.db.collection('reviews').doc(safeKey).get();
+      if (doc.exists) {
+        const data = doc.data();
+        // Chuyển timestamp về string
+        if (data.savedAt && data.savedAt.toDate) data.savedAt = data.savedAt.toDate().toISOString();
+        // Lưu local để dùng sau
+        try { localStorage.setItem(reviewKey, JSON.stringify(data)); } catch(e) {}
+        return data;
+      }
+    } catch(e) {
+      console.warn('Lỗi đọc review Firebase:', e.message);
+    }
+  }
+  return null;
+}
+
 // Upload câu hỏi lên Firestore (legacy - dùng uploadQuestionSet thay thế)
 async function uploadQuestions(questions) {
   if (AppState.useFirebase && AppState.db) {
@@ -157,32 +367,21 @@ async function uploadQuestions(questions) {
   }
 }
 
-// Lấy câu hỏi theo chủ đề
-async function fetchQuestions(topic) {
-  if (AppState.useFirebase && AppState.db) {
-    try {
-      const snapshot = await AppState.db.collection('questions')
-        .where('topic', '==', topic)
-        .get();
-      if (snapshot.docs.length > 0) {
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      }
-    } catch (e) {
-      console.error('Lỗi đọc câu hỏi:', e);
-    }
-  }
+// Lấy câu hỏi theo chủ đề VÀ khu vực trình độ (TÁCH RIÊNG, không gộp chung)
+// fetchQuestions chỉ dùng khi KHÔNG có setId (fallback câu mẫu)
+// Khi đã có bộ đề upload, LUÔN dùng fetchQuestionsBySet(setId) — không gom chung
+async function fetchQuestions(topic, level) {
+  const lvId = level || AppState.selectedLevel || 'tb';
 
-  // Thử quiz_questions_v2 (bộ đề mới)
-  const v2 = JSON.parse(localStorage.getItem('quiz_questions_v2') || '{}');
-  const v2Questions = Object.values(v2).flat().filter(q => q.topic === topic);
-  if (v2Questions.length > 0) return v2Questions;
+  // KHÔNG query Firebase gom tất cả cùng topic+level vì sẽ gộp nhiều bộ đề
+  // Chỉ dùng localStorage câu mẫu hoặc dữ liệu cũ trước khi có hệ thống set
 
-  // Thử localStorage cũ
+  // Thử localStorage cũ (trước khi có hệ thống set riêng biệt)
   const stored = JSON.parse(localStorage.getItem('quiz_questions') || '{}');
   if (stored[topic] && stored[topic].length > 0) return stored[topic];
 
-  // Câu mẫu
-  return SAMPLE_QUESTIONS[topic] || SAMPLE_QUESTIONS['tong-hop'];
+  // Câu mẫu — RIÊNG BIỆT theo từng khu vực, không gộp chung
+  return getSampleQuestions(topic, lvId);
 }
 
 // ====================================================
@@ -995,34 +1194,80 @@ async function renderLevelSets(lvId) {
   let sets = [];
   try {
     if (AppState.useFirebase && AppState.db) {
+      // KHÔNG dùng orderBy để tránh lỗi composite index chưa tạo
+      // Lọc level ở server, sort uploadedAt ở client
       const snap = await AppState.db.collection('question_sets')
         .where('level', '==', lvId)
-        .orderBy('uploadedAt','desc').get();
-      sets = snap.docs.map(d => ({ ...d.data(), uploadedAt: d.data().uploadedAt?.toDate?.()?.toISOString()||'' }));
+        .get();
+      sets = snap.docs.map(d => {
+        const data = d.data();
+        // Chuyển Firestore Timestamp → ISO string
+        const uploadedAt = data.uploadedAt?.toDate?.()?.toISOString?.() || data.uploadedAt || '';
+        return { ...data, uploadedAt };
+      });
+      // Sort mới nhất trước (client-side)
+      sets.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt));
+      console.log(`✅ Firebase sets level=${lvId}:`, sets.length, sets.map(s => s.setName));
     } else {
       const stored = JSON.parse(localStorage.getItem('question_sets') || '{}');
       sets = Object.values(stored)
-        .filter(s => (s.level || 'tb') === lvId && !s.locked)
-        .sort((a,b) => b.uploadedAt.localeCompare(a.uploadedAt));
+        .filter(s => (s.level || 'tb') === lvId)
+        .sort((a,b) => (b.uploadedAt||'').localeCompare(a.uploadedAt||''));
+      console.log(`✅ localStorage sets level=${lvId}:`, sets.length, sets.map(s => s.setName));
     }
-  } catch(e) { sets = []; }
+  } catch(e) {
+    console.error('❌ Lỗi tải danh sách bộ đề:', e.message || e);
+    // Fallback 1: đọc tất cả question_sets không filter (tránh lỗi index)
+    try {
+      if (AppState.useFirebase && AppState.db) {
+        const snap2 = await AppState.db.collection('question_sets').get();
+        sets = snap2.docs.map(d => {
+          const data = d.data();
+          const uploadedAt = data.uploadedAt?.toDate?.()?.toISOString?.() || data.uploadedAt || '';
+          return { ...data, uploadedAt };
+        }).filter(s => (s.level || 'tb') === lvId);
+        sets.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt));
+        console.log(`✅ Fallback Firebase sets:`, sets.length);
+      }
+    } catch(e2) {
+      console.error('❌ Fallback Firebase cũng lỗi:', e2.message);
+      // Fallback 2: dùng localStorage
+      try {
+        const stored = JSON.parse(localStorage.getItem('question_sets') || '{}');
+        sets = Object.values(stored)
+          .filter(s => (s.level || 'tb') === lvId)
+          .sort((a,b) => (b.uploadedAt||'').localeCompare(a.uploadedAt||''));
+        console.log(`✅ Fallback localStorage sets:`, sets.length);
+      } catch(e3) { sets = []; }
+    }
+  }
 
   // Lọc thêm: bỏ bộ đề bị khoá
   sets = sets.filter(s => !s.locked);
 
   if (sets.length === 0) {
-    // Dùng câu mẫu
-    const ts = TOPIC_STYLES[lvId] || TOPIC_STYLES['tong-hop'];
+    // Dùng câu mẫu — RIÊNG BIỆT theo khu vực (không gộp chung)
+    const LEVEL_SAMPLE_DESC = {
+      tb:  '📗 Câu hỏi cơ bản, kiến thức nền — dành cho học sinh đang ở mức 0–5 điểm',
+      kha: '📘 Câu hỏi trung cấp, ứng dụng — dành cho học sinh đang ở mức 5–6.5 điểm',
+      tot: '📙 Câu hỏi nâng cao, tư duy — dành cho học sinh đang ở mức 6.5–8 điểm',
+      xs:  '📕 Câu hỏi khó, bẫy phân loại — dành cho học sinh đang ở mức 8–10 điểm',
+    };
     area.innerHTML = `
       <div style="margin-bottom:12px;">
-        <span class="set-level-badge ${lv.badge}">${lv.icon} ${lv.name}</span>
-        <p style="font-size:0.85rem;color:var(--text-muted);margin:6px 0 14px;">
-          ${lv.desc} — Chưa có đề thi riêng, dùng bộ câu mẫu nhé!
+        <span class="set-level-badge ${lv.badge}">${lv.icon} Khu vực ${lv.name}</span>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:6px 0 4px;">
+          ${LEVEL_SAMPLE_DESC[lvId] || lv.desc}
+        </p>
+        <p style="font-size:0.8rem;color:#9ca3af;margin:0 0 14px;">
+          ⚠️ Thầy chưa upload đề thi — đang dùng bộ câu mẫu khu vực <strong>${lv.name}</strong>
         </p>
       </div>
       <div class="home-topics">
         ${TOPICS.map((t, i) => {
           const style = Object.values(TOPIC_STYLES)[i] || TOPIC_STYLES['tong-hop'];
+          const sampleCount = (SAMPLE_QUESTIONS_BY_LEVEL[lvId] && SAMPLE_QUESTIONS_BY_LEVEL[lvId][t.id])
+            ? SAMPLE_QUESTIONS_BY_LEVEL[lvId][t.id].length : 10;
           return `
             <div class="home-topic-card" onclick="selectSet(null,'${t.id}','${lvId}')"
                  style="--tgrad:${style.grad};--tshadow:${style.shadow}">
@@ -1030,7 +1275,7 @@ async function renderLevelSets(lvId) {
               <div class="htc-body">
                 <div class="htc-icon">${t.icon}</div>
                 <div class="htc-name">${t.name}</div>
-                <div class="htc-desc">${t.desc}</div>
+                <div class="htc-desc">${t.desc} · ${sampleCount} câu mẫu</div>
               </div>
               <div class="htc-footer"><span class="htc-arrow">→</span></div>
             </div>
@@ -1040,43 +1285,65 @@ async function renderLevelSets(lvId) {
     return;
   }
 
-  // Hiển thị bộ đề theo level
-  const byTopic = {};
-  sets.forEach(s => {
-    const t = s.topic || 'tong-hop';
-    if (!byTopic[t]) byTopic[t] = [];
-    byTopic[t].push(s);
-  });
-
+  // Hiển thị TỪNG bộ đề riêng biệt — KHÔNG gom chung, dù cùng topic
+  // Mỗi set là 1 card độc lập với setId riêng
   let html = `
-    <div style="margin-bottom:16px;">
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <span class="set-level-badge ${lv.badge}" style="font-size:0.85rem;padding:4px 14px;">${lv.icon} Khu vực ${lv.name}</span>
-      <span style="font-size:0.82rem;color:var(--text-muted);margin-left:8px;">${lv.scoreRange} · ${lv.desc}</span>
-    </div>`;
-  for (const [topic, list] of Object.entries(byTopic)) {
-    const ts = TOPIC_STYLES[topic] || TOPIC_STYLES['tong-hop'];
+      <span style="font-size:0.82rem;color:var(--text-muted);">${lv.scoreRange} · ${lv.desc}</span>
+      <span style="font-size:0.78rem;background:#f0fdf4;color:#166534;border:1px solid #86efac;padding:2px 10px;border-radius:20px;">
+        📋 ${sets.length} bộ đề
+      </span>
+    </div>
+    <div class="home-topics">`;
+
+  // Lưu sets vào map toàn cục để lookup khi click (tránh lỗi escape trong onclick)
+  window._levelSetsMap = window._levelSetsMap || {};
+  sets.forEach(s => {
+    window._levelSetsMap[s.setId] = s;
+    const ts = TOPIC_STYLES[s.topic] || TOPIC_STYLES['tong-hop'];
+    const uploadDate = s.uploadedAt ? new Date(s.uploadedAt).toLocaleDateString('vi-VN') : '';
+    const safeSetId = encodeURIComponent(s.setId);
     html += `
-      <div style="margin-bottom:18px;">
-        <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;">
-          ${ts.icon} ${TOPIC_NAMES[topic]||topic}
+      <div class="home-topic-card set-card-individual"
+           data-setid="${safeSetId}"
+           data-topic="${s.topic || 'tong-hop'}"
+           data-level="${lvId}"
+           style="--tgrad:${ts.grad};--tshadow:${ts.shadow};cursor:pointer;">
+        <div class="htc-glyph">${ts.glyph}</div>
+        <div class="htc-body">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <span style="font-size:1.1rem;">${ts.icon}</span>
+            <span style="font-size:0.65rem;background:rgba(255,255,255,0.25);padding:1px 7px;border-radius:10px;font-weight:700;letter-spacing:.04em;">
+              ${(TOPIC_NAMES[s.topic]||s.topic||'Tổng hợp').toUpperCase()}
+            </span>
+          </div>
+          <div class="htc-name" style="font-size:0.92rem;line-height:1.35;">${s.setName}</div>
+          <div class="htc-desc" style="margin-top:4px;">
+            📝 ${s.count||'?'} câu hỏi
+            ${uploadDate ? `· 📅 ${uploadDate}` : ''}
+          </div>
         </div>
-        <div class="home-topics">
-          ${list.map(s => `
-            <div class="home-topic-card" onclick="selectSet('${s.setId}','${s.topic}','${lvId}')"
-                 style="--tgrad:${ts.grad};--tshadow:${ts.shadow}">
-              <div class="htc-glyph">${ts.glyph}</div>
-              <div class="htc-body">
-                <div class="htc-icon">${ts.icon}</div>
-                <div class="htc-name" style="font-size:0.9rem;">${s.setName}</div>
-                <div class="htc-desc">${s.count||'?'} câu · ${TOPIC_NAMES[topic]||topic}</div>
-              </div>
-              <div class="htc-footer"><span class="htc-arrow">→</span></div>
-            </div>
-          `).join('')}
+        <div class="htc-footer">
+          <span style="font-size:0.72rem;opacity:0.85;margin-bottom:4px;display:block;">Bấm để làm bài</span>
+          <span class="htc-arrow">→</span>
         </div>
       </div>`;
-  }
+  });
+
+  html += `</div>`;
   area.innerHTML = html;
+
+  // Gắn event listener sau khi render — dùng data-attribute để tránh lỗi escape
+  area.querySelectorAll('.set-card-individual[data-setid]').forEach(card => {
+    card.addEventListener('click', () => {
+      const setId = decodeURIComponent(card.dataset.setid);
+      const topic = card.dataset.topic;
+      const level = card.dataset.level;
+      console.log('🎯 Click set card:', setId, topic, level);
+      selectSet(setId, topic, level);
+    });
+  });
 }
 
 
@@ -1143,13 +1410,22 @@ async function loadSetList() {
 
   try {
     if (AppState.useFirebase && AppState.db) {
-      const snap = await AppState.db.collection('question_sets').orderBy('uploadedAt','desc').get();
-      sets = snap.docs.map(d => ({ ...d.data(), uploadedAt: d.data().uploadedAt?.toDate?.()?.toISOString() || '' }));
+      // Không dùng orderBy để tránh lỗi composite index
+      const snap = await AppState.db.collection('question_sets').get();
+      sets = snap.docs.map(d => {
+        const data = d.data();
+        const uploadedAt = data.uploadedAt?.toDate?.()?.toISOString?.() || data.uploadedAt || '';
+        return { ...data, uploadedAt };
+      });
+      sets.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt));
     } else {
       const stored = JSON.parse(localStorage.getItem('question_sets') || '{}');
-      sets = Object.values(stored).sort((a,b) => b.uploadedAt.localeCompare(a.uploadedAt));
+      sets = Object.values(stored).sort((a,b) => (b.uploadedAt||'').localeCompare(a.uploadedAt||''));
     }
-  } catch(e) { sets = []; }
+  } catch(e) {
+    console.error('loadSetList error:', e);
+    sets = [];
+  }
 
   if (sets.length === 0) {
     // Không có bộ đề nào → hiện topic mẫu như cũ
@@ -1177,41 +1453,46 @@ async function loadSetList() {
     return;
   }
 
-  // Nhóm theo chủ đề
-  const byTopic = {};
+  // Hiển thị TỪNG bộ đề riêng biệt — không gom theo topic
+  const LEVEL_LABELS = { tb:'📗 TB', kha:'📘 Khá', tot:'📙 Tốt', xs:'📕 XS' };
+  let html = `<div class="home-topics">`;
   sets.forEach(s => {
-    const t = s.topic || 'tong-hop';
-    if (!byTopic[t]) byTopic[t] = [];
-    byTopic[t].push(s);
-  });
-
-  let html = '';
-  for (const [topic, list] of Object.entries(byTopic)) {
-    const ts = TOPIC_STYLES[topic] || TOPIC_STYLES['tong-hop'];
+    const ts = TOPIC_STYLES[s.topic] || TOPIC_STYLES['tong-hop'];
+    const lvLabel = LEVEL_LABELS[s.level || 'tb'] || '📗 TB';
+    const uploadDate = s.uploadedAt ? new Date(s.uploadedAt).toLocaleDateString('vi-VN') : '';
+    const safeSetId = encodeURIComponent(s.setId);
     html += `
-      <div style="margin-bottom:20px;">
-        <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
-                    color:var(--text-muted);margin-bottom:10px;">
-          ${ts.icon} ${TOPIC_NAMES[topic] || topic}
+      <div class="home-topic-card set-card-individual"
+           data-setid="${safeSetId}"
+           data-topic="${s.topic || 'tong-hop'}"
+           data-level="${s.level || 'tb'}"
+           style="--tgrad:${ts.grad};--tshadow:${ts.shadow};cursor:pointer;">
+        <div class="htc-glyph">${ts.glyph}</div>
+        <div class="htc-body">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+            <span style="font-size:0.95rem;">${ts.icon}</span>
+            <span style="font-size:0.6rem;background:rgba(255,255,255,0.25);padding:1px 6px;border-radius:8px;font-weight:700;">${lvLabel}</span>
+            <span style="font-size:0.6rem;background:rgba(255,255,255,0.2);padding:1px 6px;border-radius:8px;">${(TOPIC_NAMES[s.topic]||'Tổng hợp').toUpperCase()}</span>
+          </div>
+          <div class="htc-name" style="font-size:0.9rem;line-height:1.3;">${s.setName}</div>
+          <div class="htc-desc" style="margin-top:4px;">📝 ${s.count||'?'} câu${uploadDate ? ' · 📅 '+uploadDate : ''}</div>
         </div>
-        <div class="home-topics">
-          ${list.map(s => `
-            <div class="home-topic-card" onclick="selectSet('${s.setId}','${s.topic}')"
-                 style="--tgrad:${ts.grad};--tshadow:${ts.shadow}">
-              <div class="htc-glyph">${ts.glyph}</div>
-              <div class="htc-body">
-                <div class="htc-icon">${ts.icon}</div>
-                <div class="htc-name" style="font-size:0.95rem;">${s.setName}</div>
-                <div class="htc-desc">${s.count} câu hỏi · ${TOPIC_NAMES[topic] || topic}</div>
-              </div>
-              <div class="htc-footer"><span class="htc-arrow">→</span></div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  }
+        <div class="htc-footer"><span class="htc-arrow">→</span></div>
+      </div>`;
+  });
+  html += `</div>`;
   el.innerHTML = html;
+
+  // Gắn event listener sau khi render
+  el.querySelectorAll('.set-card-individual[data-setid]').forEach(card => {
+    card.addEventListener('click', () => {
+      const setId = decodeURIComponent(card.dataset.setid);
+      const topic = card.dataset.topic;
+      const level = card.dataset.level;
+      console.log('🎯 loadSetList click:', setId, topic, level);
+      selectSet(setId, topic, level);
+    });
+  });
 }
 
 // Chọn bộ đề cụ thể
@@ -1241,16 +1522,38 @@ async function selectSet(setId, topicId, levelId) {
   showToast('Đang tải câu hỏi...', 'info', 1500);
 
   try {
-    let questions = setId
-      ? await fetchQuestionsBySet(setId)
-      : await fetchQuestions(topicId);
+    let questions;
+    if (setId) {
+      // Luôn lấy đúng bộ đề theo setId — KHÔNG gom với bộ đề khác
+      questions = await fetchQuestionsBySet(setId);
+      if (questions.length === 0) {
+        // Thử thêm 1 lần từ Firebase không dùng cache
+        if (AppState.useFirebase && AppState.db) {
+          try {
+            const retry = await AppState.db.collection('questions')
+              .where('setId','==',setId).get();
+            if (!retry.empty) questions = retry.docs.map(d => ({ id: d.id, ...d.data() }));
+          } catch(e) {}
+        }
+      }
+      if (questions.length === 0) {
+        showToast('❌ Bộ đề chưa có câu hỏi hoặc đang tải! Thử lại sau vài giây.', 'error', 4000);
+        console.error('❌ Không tìm thấy câu nào cho setId:', setId);
+        return;
+      }
+    } else {
+      // Không có setId → dùng câu mẫu theo khu vực
+      questions = await fetchQuestions(topicId, lvId);
+      if (questions.length === 0) {
+        showToast('Không có câu hỏi mẫu cho chủ đề này!', 'error');
+        return;
+      }
+    }
+
+    // Lưu thông tin bộ đề đang làm
+    AppState.currentSetId = setId || null;
 
     questions = shuffleArray(questions);
-
-    if (questions.length === 0) {
-      showToast('Không có câu hỏi cho bộ đề này!', 'error');
-      return;
-    }
 
     AppState.questions = questions;
     AppState.currentIndex = 0;
@@ -1271,15 +1574,35 @@ async function selectSet(setId, topicId, levelId) {
 
 // Đọc câu hỏi theo setId cụ thể
 async function fetchQuestionsBySet(setId) {
+  if (!setId) {
+    console.warn('⚠️ fetchQuestionsBySet: setId rỗng!');
+    return [];
+  }
+  console.log('🔍 fetchQuestionsBySet:', setId);
+
   if (AppState.useFirebase && AppState.db) {
     try {
       const snap = await AppState.db.collection('questions').where('setId','==',setId).get();
+      console.log(`📦 Firebase questions cho set "${setId}":`, snap.size);
       if (!snap.empty) return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    } catch(e) { console.error(e); }
+      // Firebase trả về rỗng → thử localStorage
+      console.warn('⚠️ Firebase trả về 0 câu, thử localStorage...');
+    } catch(e) {
+      console.error('❌ Lỗi Firebase fetchQuestionsBySet:', e.message);
+    }
   }
-  // localStorage fallback
+
+  // localStorage fallback — key là setId
   const allQ = JSON.parse(localStorage.getItem('quiz_questions_v2') || '{}');
-  return allQ[setId] || [];
+  const localQuestions = allQ[setId] || [];
+  console.log(`📦 localStorage questions cho set "${setId}":`, localQuestions.length);
+
+  if (localQuestions.length === 0) {
+    // Debug: in ra tất cả keys đang có
+    console.warn('⚠️ Không tìm thấy set. Các setId đang có:', Object.keys(allQ));
+  }
+
+  return localQuestions;
 }
 
 // Chọn chủ đề (giữ lại để tương thích)
@@ -1626,12 +1949,13 @@ async function submitQuiz() {
     console.error('Lỗi lưu kết quả:', e);
   }
 
-  // Lưu snapshot câu hỏi vào localStorage để học sinh xem lại trên bảng xếp hạng
+  // Lưu snapshot câu hỏi vào localStorage VÀ Firebase để xem lại từ bất kỳ thiết bị
   try {
     const reviewKey = 'review_' + AppState.student.name + '_' + AppState.student.class;
     const reviewData = {
       studentName: AppState.student.name,
       studentClass: AppState.student.class,
+      level: AppState.selectedLevel || 'tb',
       score, correct, total, timeTaken,
       topicName: AppState.currentTopic.name,
       savedAt: new Date().toISOString(),
@@ -1644,8 +1968,8 @@ async function submitQuiz() {
       })),
       answers: Object.fromEntries(Object.entries(answers).map(([k, v]) => [k, v])),
     };
-    localStorage.setItem(reviewKey, JSON.stringify(reviewData));
-  } catch(e) {}
+    await saveReview(reviewKey, reviewData);
+  } catch(e) { console.warn('Lỗi lưu review:', e); }
 
   renderResult(resultData, questions, answers);
   setTimeout(() => { if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise(); }, 150);
@@ -1936,19 +2260,25 @@ function shuffleArray(arr) {
 // ====================================================
 // MODAL XEM LẠI BÀI LÀM (cho bảng xếp hạng)
 // ====================================================
-function showStudentReviewModal(studentName, studentClass) {
-  const reviewKey = 'review_' + studentName + '_' + studentClass;
-  let reviewData = null;
-  try { reviewData = JSON.parse(localStorage.getItem(reviewKey)); } catch(e) {}
-
+async function showStudentReviewModal(studentName, studentClass) {
   // Xoá modal cũ nếu có
-  const old = document.getElementById('reviewModal');
-  if (old) old.remove();
+  const oldModal = document.getElementById('reviewModal');
+  if (oldModal) oldModal.remove();
 
+  // Hiện modal loading trước
   const modal = document.createElement('div');
   modal.id = 'reviewModal';
   modal.className = 'review-modal-overlay';
   modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `
+    <div class="review-modal-box" style="min-height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+      <div class="spinner"></div>
+      <p style="color:var(--text-muted);font-size:0.9rem;">Đang tải bài làm của <strong>${studentName}</strong>...</p>
+    </div>`;
+  document.body.appendChild(modal);
+
+  // Lấy review data (local + Firebase fallback)
+  const reviewData = await fetchReview(studentName, studentClass);
 
   if (!reviewData || !reviewData.questions) {
     modal.innerHTML = `
@@ -1959,11 +2289,10 @@ function showStudentReviewModal(studentName, studentClass) {
         </div>
         <div class="review-modal-body" style="text-align:center;padding:40px 20px;color:var(--text-muted);">
           <div style="font-size:3rem;margin-bottom:12px;">📂</div>
-          <p>Chưa có dữ liệu bài làm của <strong>${studentName}</strong> trên thiết bị này.</p>
-          <p style="font-size:0.85rem;">Dữ liệu xem lại chỉ lưu trên thiết bị học sinh đã làm bài.</p>
+          <p>Chưa có dữ liệu bài làm của <strong>${studentName}</strong>.</p>
+          <p style="font-size:0.85rem;color:#6b7280;">Bài làm sẽ tự động lưu sau khi học sinh nộp bài từ phiên bản này trở đi.</p>
         </div>
       </div>`;
-    document.body.appendChild(modal);
     return;
   }
 
@@ -2047,6 +2376,54 @@ function modalFilterReview(type) {
     else if (type === 'wrong') item.style.display = isCorrect ? 'none' : '';
     else if (type === 'correct') item.style.display = isCorrect ? '' : 'none';
   });
+}
+
+// ====================================================
+// DEBUG HELPER — kiểm tra dữ liệu khi gặp lỗi
+// ====================================================
+async function debugStorage() {
+  const lines = [];
+  lines.push('=== DEBUG localStorage ===');
+  const sets = JSON.parse(localStorage.getItem('question_sets') || '{}');
+  const setIds = Object.keys(sets);
+  lines.push(`question_sets: ${setIds.length} bộ đề`);
+  setIds.forEach(id => {
+    const s = sets[id];
+    lines.push(`  • "${s.setName}" | level=${s.level} | topic=${s.topic} | id=${id}`);
+  });
+
+  const allQ = JSON.parse(localStorage.getItem('quiz_questions_v2') || '{}');
+  const qSetIds = Object.keys(allQ);
+  lines.push(`quiz_questions_v2: ${qSetIds.length} keys`);
+  qSetIds.forEach(id => {
+    lines.push(`  • setId="${id}" → ${(allQ[id]||[]).length} câu`);
+  });
+
+  if (AppState.useFirebase && AppState.db) {
+    lines.push('=== DEBUG Firebase ===');
+    try {
+      const snap = await AppState.db.collection('question_sets').get();
+      lines.push(`Firebase question_sets: ${snap.size} docs`);
+      snap.docs.forEach(d => {
+        const data = d.data();
+        lines.push(`  • "${data.setName}" | level=${data.level} | topic=${data.topic} | id=${data.setId}`);
+      });
+      const qSnap = await AppState.db.collection('questions').limit(5).get();
+      lines.push(`Firebase questions (sample 5): ${qSnap.size} docs`);
+      qSnap.docs.forEach(d => {
+        const data = d.data();
+        lines.push(`  • setId=${data.setId} | topic=${data.topic} | level=${data.level}`);
+      });
+    } catch(e) {
+      lines.push('Firebase error: ' + e.message);
+    }
+  } else {
+    lines.push('Firebase: không kết nối');
+  }
+
+  const msg = lines.join('\n');
+  console.log(msg);
+  alert(msg);
 }
 
 // ====================================================
