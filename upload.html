@@ -90,41 +90,60 @@
   <!-- HƯỚNG DẪN ĐỊNH DẠNG -->
   <div class="card mb-4">
     <div class="card-header">
-      <h2>📋 Hướng dẫn định dạng file</h2>
+      <h2>📋 Hướng dẫn định dạng file — Nhiều bộ đề trong 1 file</h2>
     </div>
     <div class="card-body">
       <div class="alert alert-info">
-        ℹ️ File hỗ trợ <strong>không giới hạn số câu hỏi</strong>. Công thức toán dùng ký hiệu LaTeX bao trong <code>$...$</code> sẽ hiển thị đúng. Bạn có thể thêm ảnh cho từng câu sau khi upload.
+        🆕 <strong>Tính năng mới:</strong> Thầy có thể đưa <strong>nhiều bộ đề vào 1 file duy nhất</strong> — mỗi bộ đề được tách bằng dòng tiêu đề đặc biệt. Hệ thống sẽ tự động tách ra thành từng bộ đề riêng biệt, không bị gộp chung!
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;flex-wrap:wrap;">
         <div>
-          <h4 style="font-weight:800;margin-bottom:12px;">✅ Định dạng đúng:</h4>
-          <div style="background:#1e293b;color:#e2e8f0;padding:18px;border-radius:10px;font-family:monospace;font-size:0.88rem;line-height:1.8;">
+          <h4 style="font-weight:800;margin-bottom:8px;">✅ Định dạng nhiều bộ đề:</h4>
+          <div style="background:#1e293b;color:#e2e8f0;padding:16px;border-radius:10px;font-family:monospace;font-size:0.82rem;line-height:1.9;">
+            <span style="color:#f472b6;font-weight:700;">=== Bộ đề 1: Đại số cơ bản ===</span><br>
+            <span style="color:#a78bfa;">chủ đề: dai-so | trình độ: tb</span><br>
+            <br>
             <span style="color:#60a5fa;">Câu 1:</span> Nghiệm của $2x + 6 = 0$ là?<br>
-            <span style="color:#86efac;">A.</span> $x = 3$<br>
-            <span style="color:#86efac;">B.</span> $x = -3$<br>
-            <span style="color:#86efac;">C.</span> $x = 6$<br>
-            <span style="color:#86efac;">D.</span> $x = -6$<br>
+            <span style="color:#86efac;">A.</span> $x = 3$&nbsp;&nbsp;<span style="color:#86efac;">B.</span> $x = -3$<br>
+            <span style="color:#86efac;">C.</span> $x = 6$&nbsp;&nbsp;<span style="color:#86efac;">D.</span> $x = -6$<br>
             <span style="color:#fbbf24;">Đáp án:</span> B<br>
             <br>
-            <span style="color:#60a5fa;">Câu 2:</span> Cho $x^2 - 5x + 6 = 0$, nghiệm là?<br>
+            <span style="color:#f472b6;font-weight:700;">=== Bộ đề 2: Hình học nâng cao ===</span><br>
+            <span style="color:#a78bfa;">chủ đề: hinh-hoc | trình độ: kha</span><br>
+            <br>
+            <span style="color:#60a5fa;">Câu 1:</span> Diện tích hình tròn bán kính $r$?<br>
             ...
+          </div>
+          <div style="margin-top:10px;padding:10px 14px;border-radius:8px;background:#fef3c7;border:1px solid #fcd34d;font-size:0.82rem;">
+            💡 <strong>Dòng tiêu đề bộ đề</strong> bắt đầu bằng <code>===</code> và kết thúc bằng <code>===</code><br>
+            💡 <strong>Dòng meta</strong> (tuỳ chọn): <code>chủ đề: dai-so | trình độ: kha</code><br>
+            Nếu không có dòng tiêu đề → toàn bộ file là 1 bộ đề duy nhất.
           </div>
         </div>
         <div>
-          <h4 style="font-weight:800;margin-bottom:12px;">📌 Lưu ý quan trọng:</h4>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
-            <li>✅ Bắt đầu bằng <code>Câu 1:</code>, <code>Câu 2:</code>... (không giới hạn số câu)</li>
+          <h4 style="font-weight:800;margin-bottom:8px;">📌 Quy tắc từng câu hỏi:</h4>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;font-size:0.9rem;">
+            <li>✅ Bắt đầu bằng <code>Câu 1:</code>, <code>Câu 2:</code>... (đánh lại từ 1 ở mỗi bộ đề)</li>
             <li>✅ Mỗi đáp án một dòng: <code>A.</code>, <code>B.</code>, <code>C.</code>, <code>D.</code></li>
             <li>✅ Ghi đáp án: <code>Đáp án: B</code></li>
-            <li>✅ Công thức toán bọc trong <code>$...$</code> ví dụ: <code>$x^2 + 1 = 0$</code></li>
-            <li>✅ Sau khi upload, thêm ảnh hình học cho từng câu bên dưới</li>
-            <li>❌ Không dùng bảng, không để trống giữa A, B, C, D và nội dung</li>
+            <li>✅ Công thức toán bọc trong <code>$...$</code></li>
+            <li>✅ Giải thích: <code>Giải thích: ...</code> (sau dòng Đáp án)</li>
+            <li>❌ Không dùng bảng, không để trống giữa A, B, C, D</li>
           </ul>
-          <div class="mt-3">
+          <div style="margin-top:12px;padding:10px 14px;border-radius:8px;background:#f0fdf4;border:1px solid #86efac;font-size:0.82rem;">
+            🎯 <strong>Dòng meta hỗ trợ:</strong><br>
+            <code>chủ đề: dai-so</code> → Đại số<br>
+            <code>chủ đề: hinh-hoc</code> → Hình học<br>
+            <code>chủ đề: tong-hop</code> → Tổng hợp<br>
+            <code>trình độ: tb / kha / tot / xs</code>
+          </div>
+          <div class="mt-3" style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-outline btn-sm" onclick="downloadSampleDoc()">
-              📄 Tải file mẫu (txt)
+              📄 Tải file mẫu 1 bộ đề
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="downloadMultiSetSample()">
+              📦 Tải file mẫu nhiều bộ đề
             </button>
           </div>
         </div>
@@ -141,47 +160,53 @@
 
       <!-- Upload zone -->
       <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-        <div class="upload-icon">📂</div>
+        <div class="upload-icon">📦</div>
         <h3>Kéo thả file vào đây hoặc click để chọn</h3>
-        <p>Hỗ trợ: .docx, .txt | Tối đa 10MB</p>
+        <p>Hỗ trợ: .docx, .txt | Tối đa 10MB | Có thể chứa nhiều bộ đề</p>
         <input type="file" id="fileInput" accept=".docx,.txt" onchange="handleFileSelect(event)">
       </div>
 
-      <!-- Chọn chủ đề cho file upload -->
-      <div class="form-group mt-3">
-        <label>📚 Chủ đề của bộ câu hỏi này:</label>
-        <select class="form-control" id="uploadTopic">
-          <option value="dai-so">Đại số</option>
-          <option value="hinh-hoc">Hình học</option>
-          <option value="tong-hop">Đề tổng hợp</option>
-        </select>
-      </div>
-
-      <!-- CHỌN KHU VỰC TRÌNH ĐỘ -->
-      <div class="form-group mt-3">
-        <label>🎯 Khu vực trình độ (học sinh nào được làm bài này):</label>
-        <div class="upload-level-tabs" id="uploadLevelTabs">
-          <div class="upload-level-tab active" data-ulv="tb"  onclick="selectUploadLevel('tb')">📗 Trung Bình<br><small style="font-weight:400;color:var(--text-muted)">0–5 điểm</small></div>
-          <div class="upload-level-tab"        data-ulv="kha" onclick="selectUploadLevel('kha')">📘 Khá<br><small style="font-weight:400;color:var(--text-muted)">5–6.5 điểm</small></div>
-          <div class="upload-level-tab"        data-ulv="tot" onclick="selectUploadLevel('tot')">📙 Tốt<br><small style="font-weight:400;color:var(--text-muted)">6.5–8 điểm</small></div>
-          <div class="upload-level-tab"        data-ulv="xs"  onclick="selectUploadLevel('xs')">📕 Xuất Sắc<br><small style="font-weight:400;color:var(--text-muted)">8–10 điểm</small></div>
+      <!-- Cài đặt mặc định khi file KHÔNG có dòng tiêu đề === -->
+      <div id="defaultSettingsBox" style="margin-top:16px;padding:16px;border-radius:12px;border:2px dashed var(--border);background:var(--surface2);">
+        <div style="font-size:0.85rem;font-weight:700;margin-bottom:10px;color:var(--text-muted);">
+          ⚙️ Cài đặt mặc định (dùng khi file <strong>không có</strong> dòng tiêu đề <code>=== Bộ đề ===</code>)
         </div>
-        <input type="hidden" id="uploadLevel" value="tb">
-      </div>
-
-      <!-- Tên bộ đề -->
-      <div class="form-group mt-2">
-        <label>🏷️ Tên bộ đề (để phân biệt các lần upload):</label>
-        <input type="text" class="form-control" id="uploadSetName"
-          placeholder="VD: Đề kiểm tra HK1, Đề luyện tập số 3..."
-          style="max-width:420px;">
-        <small style="color:var(--text-muted);font-size:0.78rem;">
-          ⚠️ Mỗi bộ đề lưu riêng biệt, không bị gộp với bộ cũ.
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">
+          <!-- Chọn chủ đề mặc định -->
+          <div class="form-group" style="margin-bottom:0;flex:1;min-width:150px;">
+            <label style="font-size:0.82rem;">📚 Chủ đề mặc định:</label>
+            <select class="form-control" id="uploadTopic">
+              <option value="dai-so">Đại số</option>
+              <option value="hinh-hoc">Hình học</option>
+              <option value="tong-hop">Tổng hợp</option>
+            </select>
+          </div>
+          <!-- Tên bộ đề mặc định -->
+          <div class="form-group" style="margin-bottom:0;flex:2;min-width:220px;">
+            <label style="font-size:0.82rem;">🏷️ Tên bộ đề mặc định:</label>
+            <input type="text" class="form-control" id="uploadSetName"
+              placeholder="VD: Đề luyện tập số 3..."
+              style="">
+          </div>
+        </div>
+        <!-- CHỌN KHU VỰC TRÌNH ĐỘ mặc định -->
+        <div class="form-group mt-3" style="margin-bottom:0;">
+          <label style="font-size:0.82rem;">🎯 Trình độ mặc định:</label>
+          <div class="upload-level-tabs" id="uploadLevelTabs">
+            <div class="upload-level-tab active" data-ulv="tb"  onclick="selectUploadLevel('tb')">📗 Trung Bình<br><small style="font-weight:400;color:var(--text-muted)">0–5 điểm</small></div>
+            <div class="upload-level-tab"        data-ulv="kha" onclick="selectUploadLevel('kha')">📘 Khá<br><small style="font-weight:400;color:var(--text-muted)">5–6.5 điểm</small></div>
+            <div class="upload-level-tab"        data-ulv="tot" onclick="selectUploadLevel('tot')">📙 Tốt<br><small style="font-weight:400;color:var(--text-muted)">6.5–8 điểm</small></div>
+            <div class="upload-level-tab"        data-ulv="xs"  onclick="selectUploadLevel('xs')">📕 Xuất Sắc<br><small style="font-weight:400;color:var(--text-muted)">8–10 điểm</small></div>
+          </div>
+          <input type="hidden" id="uploadLevel" value="tb">
+        </div>
+        <small style="color:var(--text-muted);font-size:0.77rem;display:block;margin-top:8px;">
+          ℹ️ Nếu file đã có dòng <code>=== Bộ đề X ===</code> kèm meta, các cài đặt trên sẽ bị bỏ qua — thông tin trong file được ưu tiên.
         </small>
       </div>
 
       <!-- Trạng thái file -->
-      <div id="fileStatus" class="hidden"></div>
+      <div id="fileStatus" class="hidden" style="margin-top:12px;"></div>
 
     </div>
   </div>
@@ -189,21 +214,22 @@
   <!-- PREVIEW -->
   <div id="previewSection" class="card hidden">
     <div class="card-header">
-      <h2>👁️ Xem trước & Thêm ảnh hình học</h2>
+      <h2>👁️ Xem trước từng bộ đề & Thêm ảnh</h2>
     </div>
     <div class="card-body">
       <div id="parseStatus" class="mb-3"></div>
 
       <!-- MathJax preview note -->
       <div class="alert alert-info mb-3" style="font-size:0.88rem;">
-        📐 Công thức toán trong dấu <code>$...$</code> sẽ hiển thị đúng khi làm bài. Cột <strong>Ảnh</strong>: click 📎 để thêm hình minh họa cho câu hình học (lưu dưới dạng base64 trong trình duyệt).
+        📐 Công thức toán trong dấu <code>$...$</code> sẽ hiển thị đúng khi làm bài. Click 📎 để thêm hình minh họa cho câu hình học.
+        <br>Mỗi bộ đề dưới đây sẽ được lưu thành 1 card riêng biệt trên trang chủ — <strong>không bị gộp chung</strong>.
       </div>
 
       <div id="previewCards"></div>
 
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;">
-        <button class="btn btn-primary" id="btnSave" onclick="saveQuestions()">
-          💾 Lưu vào hệ thống
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px dashed var(--border);">
+        <button class="btn btn-primary" id="btnSave" onclick="saveAllSets()">
+          💾 Lưu tất cả bộ đề vào hệ thống
         </button>
         <button class="btn btn-outline" onclick="resetUpload()">
           🔄 Upload lại
@@ -325,35 +351,30 @@
 // UPLOAD PAGE LOGIC
 // ====================================================
 
-let parsedQuestions = [];
+// ====================================================
+// TRẠNG THÁI UPLOAD - NHIỀU BỘ ĐỀ
+// ====================================================
+// parsedSets = [ { setName, topic, level, questions: [...] }, ... ]
+let parsedSets = [];
 
 // Setup drag & drop
 const uploadZone = document.getElementById('uploadZone');
-uploadZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  uploadZone.classList.add('dragover');
-});
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
 uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('dragover');
+  e.preventDefault(); uploadZone.classList.remove('dragover');
   const file = e.dataTransfer.files[0];
   if (file) processFile(file);
 });
 
-// Chọn file
 function handleFileSelect(event) {
   const file = event.target.files[0];
   if (file) processFile(file);
 }
 
-// Xử lý file
 async function processFile(file) {
-  const maxSize = 10 * 1024 * 1024; // 10MB
-  if (file.size > maxSize) {
-    showToast('File quá lớn! Tối đa 10MB.', 'error');
-    return;
-  }
+  const maxSize = 10 * 1024 * 1024;
+  if (file.size > maxSize) { showToast('File quá lớn! Tối đa 10MB.', 'error'); return; }
 
   const fileStatus = document.getElementById('fileStatus');
   fileStatus.className = 'alert alert-info';
@@ -362,33 +383,30 @@ async function processFile(file) {
 
   try {
     let text = '';
-
     if (file.name.endsWith('.docx')) {
-      // Đọc file .docx bằng Mammoth
       const arrayBuffer = await file.arrayBuffer();
       const result = await mammoth.extractRawText({ arrayBuffer });
       text = result.value;
     } else if (file.name.endsWith('.txt')) {
-      // Đọc file .txt
       text = await file.text();
     } else {
       throw new Error('Chỉ hỗ trợ file .docx và .txt!');
     }
 
-    // Parse nội dung thành câu hỏi
-    parsedQuestions = parseQuestions(text);
+    // ---- TÁCH NHIỀU BỘ ĐỀ ----
+    parsedSets = parseMultipleSets(text);
 
-    if (parsedQuestions.length === 0) {
+    const totalQ = parsedSets.reduce((s, x) => s + x.questions.length, 0);
+    if (totalQ === 0) {
       fileStatus.className = 'alert alert-danger';
       fileStatus.innerHTML = `❌ Không tìm thấy câu hỏi nào! Kiểm tra lại định dạng file.`;
       return;
     }
 
     fileStatus.className = 'alert alert-success';
-    fileStatus.innerHTML = `✅ Đọc thành công! Tìm thấy <strong>${parsedQuestions.length} câu hỏi</strong> từ file <strong>${file.name}</strong>`;
+    fileStatus.innerHTML = `✅ Đọc thành công! Tìm thấy <strong>${parsedSets.length} bộ đề</strong>, tổng <strong>${totalQ} câu hỏi</strong> từ file <strong>${file.name}</strong>`;
 
-    // Hiển thị preview
-    renderPreview(parsedQuestions);
+    renderMultiPreview(parsedSets);
 
   } catch (error) {
     console.error(error);
@@ -398,7 +416,7 @@ async function processFile(file) {
 }
 
 // ====================================================
-// PARSER - Chuyển text thành câu hỏi (v3)
+// PARSER V4 — NHẬN DẠNG NHIỀU BỘ ĐỀ TRONG 1 FILE
 // ====================================================
 function normalizeText(str) {
   return str
@@ -406,33 +424,81 @@ function normalizeText(str) {
     .replace(/\u2013|\u2014/g, '-')
     .replace(/[\u201C\u201D\u201E]/g, '"')
     .replace(/[\u2018\u2019]/g, "'")
-    .replace(/\*\*/g, '')      // Xóa ** bold markdown từ Word
-    .replace(/\*/g, '')        // Xóa * italic
-    .replace(/\t/g, ' ')
-    .replace(/ {2,}/g, ' ')
+    .replace(/\*\*/g, '').replace(/\*/g, '')
+    .replace(/\t/g, ' ').replace(/ {2,}/g, ' ')
     .trim();
 }
 
-function parseQuestions(text) {
+// Nhận dạng dòng tiêu đề bộ đề: === ... === hoặc --- Bộ đề ... ---
+const RE_SET_HEADER = /^(?:={2,}|-{2,})\s*(?:bộ\s*đề\s*\d*[:.]*\s*)?(.+?)\s*(?:={2,}|-{2,})$/i;
+// Nhận dạng dòng meta: chủ đề: dai-so | trình độ: kha
+const RE_META_TOPIC = /ch[uủ]\s*đề\s*[:.]\s*(dai-so|hinh-hoc|tong-hop)/i;
+const RE_META_LEVEL = /tr[iì]nh\s*đ[oộ]\s*[:.]\s*(tb|kha|tot|xs)/i;
+
+function parseMultipleSets(rawText) {
+  const text = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = text.split('\n').map(l => normalizeText(l)).filter(l => l.length > 0);
+
+  // Kiểm tra có dòng tiêu đề bộ đề không
+  const hasSetHeaders = lines.some(l => RE_SET_HEADER.test(l));
+
+  if (!hasSetHeaders) {
+    // Không có tiêu đề → toàn bộ file là 1 bộ đề, dùng cài đặt mặc định
+    const defaultTopic = document.getElementById('uploadTopic')?.value || 'tong-hop';
+    const defaultLevel = document.getElementById('uploadLevel')?.value || 'tb';
+    const defaultName  = document.getElementById('uploadSetName')?.value.trim() || 'Bộ đề mới';
+    const questions = parseQuestionsFromLines(lines, defaultTopic);
+    if (questions.length === 0) return [];
+    return [{ setName: defaultName, topic: defaultTopic, level: defaultLevel, questions }];
+  }
+
+  // Có tiêu đề → tách thành nhiều nhóm
+  const groups = []; // [ { headerName, metaLines: [], bodyLines: [] } ]
+  let current = null;
+
+  for (const line of lines) {
+    const hMatch = line.match(RE_SET_HEADER);
+    if (hMatch) {
+      if (current) groups.push(current);
+      current = { headerName: hMatch[1].trim(), metaLines: [], bodyLines: [], metaDone: false };
+    } else if (current) {
+      // Dòng đầu ngay sau header — kiểm tra meta
+      if (!current.metaDone) {
+        if (RE_META_TOPIC.test(line) || RE_META_LEVEL.test(line)) {
+          current.metaLines.push(line);
+        } else {
+          current.metaDone = true;
+          current.bodyLines.push(line);
+        }
+      } else {
+        current.bodyLines.push(line);
+      }
+    }
+  }
+  if (current) groups.push(current);
+
+  const defaultTopic = document.getElementById('uploadTopic')?.value || 'tong-hop';
+  const defaultLevel = document.getElementById('uploadLevel')?.value || 'tb';
+
+  return groups.map(g => {
+    // Đọc meta topic & level từ metaLines
+    let topic = defaultTopic, level = defaultLevel;
+    for (const ml of g.metaLines) {
+      const tm = ml.match(RE_META_TOPIC); if (tm) topic = tm[1].toLowerCase();
+      const lm = ml.match(RE_META_LEVEL); if (lm) level = lm[1].toLowerCase();
+    }
+    const questions = parseQuestionsFromLines(g.bodyLines, topic);
+    return { setName: g.headerName, topic, level, questions };
+  }).filter(s => s.questions.length > 0);
+}
+
+function parseQuestionsFromLines(lines, topic) {
   const questions = [];
 
-  // Bước 1: Tách các đáp án nằm cùng dòng thành dòng riêng
-  // VD: "A. $3x^2$ B. $0x$ C. $2x$ D. $5$" → tách ra 4 dòng
-  let processedText = text
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n');
-
-  // Tách "B. " / "C. " / "D. " nằm giữa dòng thành dòng mới
-  // (chỉ tách B,C,D vì A đôi khi là đầu dòng hợp lệ)
-  processedText = processedText.replace(/([^\n])\s+([B-Db-d])\s*[.):]\s*/g, '$1\n$2. ');
-
-  const lines = processedText
-    .split('\n')
-    .map(l => normalizeText(l))
-    .filter(l => l.length > 0);
-
-  console.log('\u{1F4C4} Tổng dòng:', lines.length);
-  console.log('\u{1F50D} Mẫu:', lines.slice(0, 6));
+  // Tách B/C/D cùng dòng thành dòng riêng
+  const joined = lines.join('\n');
+  const split  = joined.replace(/([^\n])\s+([B-Db-d])\s*[.):]\s*/g, '$1\n$2. ');
+  const flines = split.split('\n').map(l => normalizeText(l)).filter(l => l.length > 0);
 
   const reQuestion = /^(?:c[aâ]u[.\s]*)?\s*(\d+)\s*[.:)]\s*(.+)/i;
   const reOption   = /^([A-Da-d])\s*[.):]\s*(.+)/;
@@ -440,8 +506,8 @@ function parseQuestions(text) {
   const reExplain  = /^(?:giải\s*thích|ghi\s*chú|note)[.:\s]*(.+)/i;
 
   let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
+  while (i < flines.length) {
+    const line = flines[i];
     const qMatch = line.match(reQuestion);
     if (!qMatch) { i++; continue; }
 
@@ -451,32 +517,26 @@ function parseQuestions(text) {
     let explanation = '';
     i++;
 
-    // Đọc A, B, C, D
-    while (i < lines.length && options.length < 4) {
-      const optLine = lines[i];
+    while (i < flines.length && options.length < 4) {
+      const optLine = flines[i];
       if (reAnswer.test(optLine)) break;
       if (reQuestion.test(optLine) && options.length > 0) break;
       const optMatch = optLine.match(reOption);
-      if (optMatch) {
-        options.push(optMatch[2].trim());
-        i++;
-        continue;
-      }
+      if (optMatch) { options.push(optMatch[2].trim()); i++; continue; }
       if (options.length > 0) break;
       i++;
     }
 
-    // Đọc đáp án
     let safety = 0;
-    while (i < lines.length && safety++ < 8) {
-      const ansLine = lines[i];
+    while (i < flines.length && safety++ < 8) {
+      const ansLine = flines[i];
       if (reQuestion.test(ansLine) && options.length === 4) break;
       const ansMatch = ansLine.match(reAnswer);
       if (ansMatch) {
         correctAnswer = 'ABCD'.indexOf(ansMatch[1].toUpperCase());
         i++;
-        if (i < lines.length && reExplain.test(lines[i])) {
-          explanation = lines[i].replace(reExplain, '$1').trim();
+        if (i < flines.length && reExplain.test(flines[i])) {
+          explanation = flines[i].replace(reExplain, '$1').trim();
           i++;
         }
         break;
@@ -485,189 +545,275 @@ function parseQuestions(text) {
     }
 
     if (options.length === 4 && correctAnswer >= 0 && questionText.length > 2) {
-      questions.push({
-        text: questionText,
-        options,
-        correct: correctAnswer,
-        explanation: explanation || '',
-        topic: document.getElementById('uploadTopic')?.value || 'tong-hop'
-      });
-    } else {
-      console.warn('\u26A0\uFE0F Bỏ qua:', { opts: options.length, ans: correctAnswer, q: questionText.substring(0,60) });
+      questions.push({ text: questionText, options, correct: correctAnswer, explanation: explanation || '', topic });
     }
   }
-
-  console.log('\u2705', questions.length, 'câu hợp lệ');
   return questions;
 }
 
-// Render preview - dạng card, mỗi câu có ô upload ảnh
-function renderPreview(questions) {
-  const previewSection = document.getElementById('previewSection');
-  const parseStatus = document.getElementById('parseStatus');
+// ====================================================
+// RENDER PREVIEW — NHIỀU BỘ ĐỀ
+// ====================================================
+const LEVEL_INFO_PREVIEW = {
+  tb:  { name: 'Trung Bình', color: '#6b7280', bg: '#f3f4f6', icon: '📗' },
+  kha: { name: 'Khá',        color: '#3b82f6', bg: '#eff6ff', icon: '📘' },
+  tot: { name: 'Tốt',        color: '#10b981', bg: '#f0fdf4', icon: '📙' },
+  xs:  { name: 'Xuất Sắc',   color: '#f59e0b', bg: '#fffbeb', icon: '📕' },
+};
+const TOPIC_INFO_PREVIEW = {
+  'dai-so':   { name: 'Đại số',   icon: '🔢' },
+  'hinh-hoc': { name: 'Hình học', icon: '📐' },
+  'tong-hop': { name: 'Tổng hợp', icon: '📚' },
+};
 
+function renderMultiPreview(sets) {
+  const previewSection = document.getElementById('previewSection');
+  const parseStatus    = document.getElementById('parseStatus');
   previewSection.classList.remove('hidden');
 
+  const totalQ = sets.reduce((s, x) => s + x.questions.length, 0);
   parseStatus.innerHTML = `
-    <div class="alert alert-success">
-      ✅ Tổng: <strong>${questions.length} câu hỏi</strong> hợp lệ — không giới hạn số câu khi làm bài, hệ thống sẽ trộn ngẫu nhiên.
+    <div class="alert alert-success" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span>✅ Đọc thành công: <strong>${sets.length} bộ đề</strong>, tổng <strong>${totalQ} câu hỏi</strong></span>
+      <span style="font-size:0.82rem;color:#065f46;">Mỗi bộ đề sẽ được lưu riêng biệt — không gộp chung!</span>
     </div>
   `;
 
   const opts = ['A','B','C','D'];
-  const cards = questions.map((q, i) => `
-    <div class="preview-q-card" id="pqc-${i}" style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;background:var(--surface);">
-      <div style="display:flex;align-items:flex-start;gap:12px;">
-        <span style="min-width:32px;height:32px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;">${i+1}</span>
-        <div style="flex:1;">
-          <div style="font-weight:600;margin-bottom:8px;line-height:1.6;">${q.text}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
-            ${q.options.map((o,j) => `
-              <div style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);font-size:0.88rem;
-                          background:${j===q.correct ? 'rgba(16,185,129,0.12)' : 'var(--surface2)'};
-                          border-color:${j===q.correct ? 'var(--success)' : 'var(--border)'};">
-                <strong style="color:${j===q.correct?'var(--success)':'var(--text-muted)'};">${opts[j]}.</strong> ${o}
-                ${j===q.correct ? ' <span style="color:var(--success);font-size:0.8rem;">✓</span>' : ''}
+  let globalQIdx = 0; // chỉ số câu toàn cục để truy cập parsedSets
+
+  const html = sets.map((set, si) => {
+    const lv = LEVEL_INFO_PREVIEW[set.level] || LEVEL_INFO_PREVIEW.tb;
+    const tp = TOPIC_INFO_PREVIEW[set.topic] || TOPIC_INFO_PREVIEW['tong-hop'];
+    const startIdx = globalQIdx;
+    globalQIdx += set.questions.length;
+
+    const qCards = set.questions.map((q, qi) => {
+      const absIdx = startIdx + qi;
+      return `
+        <div class="preview-q-card" id="pqc-${absIdx}"
+             style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;background:var(--surface);">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <span style="min-width:28px;height:28px;background:var(--primary);color:#fff;border-radius:50%;
+                         display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.82rem;flex-shrink:0;">${qi+1}</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;margin-bottom:8px;line-height:1.6;font-size:0.92rem;">${q.text}</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;">
+                ${q.options.map((o,j) => `
+                  <div style="padding:5px 8px;border-radius:7px;border:1px solid var(--border);font-size:0.85rem;
+                              background:${j===q.correct ? 'rgba(16,185,129,0.1)' : 'var(--surface2)'};
+                              border-color:${j===q.correct ? 'var(--success)' : 'var(--border)'};">
+                    <strong style="color:${j===q.correct?'var(--success)':'var(--text-muted)'};">${opts[j]}.</strong> ${o}
+                    ${j===q.correct ? ' <span style="color:var(--success);font-size:0.78rem;">✓</span>' : ''}
+                  </div>
+                `).join('')}
               </div>
-            `).join('')}
-          </div>
-          <!-- Ô upload ảnh -->
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--primary);font-weight:600;">
-              <input type="file" accept="image/*" style="display:none;" onchange="handleQuestionImage(event, ${i})">
-              📎 Thêm ảnh hình học
-            </label>
-            <div id="imgPreview-${i}" style="display:none;">
-              <img id="imgThumb-${i}" style="max-height:80px;border-radius:6px;border:1px solid var(--border);">
-              <button onclick="removeQuestionImage(${i})" style="margin-left:6px;background:none;border:none;cursor:pointer;color:var(--danger);font-size:0.85rem;">✕ Xóa</button>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                <label style="cursor:pointer;display:flex;align-items:center;gap:5px;font-size:0.83rem;color:var(--primary);font-weight:600;">
+                  <input type="file" accept="image/*" style="display:none;" onchange="handleQuestionImage(event,${si},${qi})">
+                  📎 Thêm ảnh
+                </label>
+                <div id="imgPreview-${si}-${qi}" style="display:none;align-items:center;gap:6px;">
+                  <img id="imgThumb-${si}-${qi}" style="max-height:70px;border-radius:6px;border:1px solid var(--border);">
+                  <button onclick="removeQuestionImage(${si},${qi})"
+                          style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:0.82rem;">✕ Xóa</button>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:0.8rem;font-weight:700;color:#7c3aed;display:block;margin-bottom:4px;">
+                  💡 Giải thích đáp án:
+                </label>
+                <textarea rows="2"
+                  placeholder="Nhập giải thích... (tuỳ chọn)"
+                  oninput="handleExplanation(${si},${qi},this.value)"
+                  style="width:100%;padding:7px 10px;border-radius:7px;border:1.5px solid #c4b5fd;
+                         font-size:0.83rem;font-family:inherit;resize:vertical;background:#faf5ff;
+                         color:#4c1d95;outline:none;line-height:1.5;box-sizing:border-box;"
+                >${q.explanation||''}</textarea>
+              </div>
             </div>
           </div>
-          <!-- Ô giải thích đáp án của thầy -->
-          <div style="margin-top:12px;">
-            <label style="font-size:0.82rem;font-weight:700;color:#7c3aed;display:flex;align-items:center;gap:5px;margin-bottom:5px;">
-              💡 Giải thích đáp án (hiện khi học sinh chọn sai):
-            </label>
-            <textarea
-              id="explain-${i}"
-              rows="2"
-              placeholder="Nhập giải thích để học sinh hiểu tại sao đáp án đúng... (có thể để trống)"
-              oninput="handleExplanation(${i}, this.value)"
-              style="width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid #c4b5fd;font-size:0.85rem;font-family:inherit;resize:vertical;background:#faf5ff;color:#4c1d95;outline:none;line-height:1.5;"
-            >${q.explanation || ''}</textarea>
+        </div>`;
+    }).join('');
+
+    return `
+      <div style="margin-bottom:28px;border:2px solid var(--border);border-radius:14px;overflow:hidden;"
+           id="set-block-${si}">
+        <!-- Header bộ đề -->
+        <div style="background:linear-gradient(135deg,${lv.bg},#fff);padding:14px 18px;
+                    border-bottom:2px solid var(--border);display:flex;align-items:center;
+                    justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:800;font-size:1rem;margin-bottom:4px;">
+              📦 Bộ đề ${si+1}: ${set.setName}
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <span style="background:${lv.bg};color:${lv.color};padding:2px 10px;border-radius:99px;
+                           font-size:0.8rem;font-weight:700;border:1px solid ${lv.color}30;">
+                ${lv.icon} ${lv.name}
+              </span>
+              <span style="background:var(--surface2);color:var(--text-muted);padding:2px 10px;
+                           border-radius:99px;font-size:0.8rem;border:1px solid var(--border);">
+                ${tp.icon} ${tp.name}
+              </span>
+              <span style="color:var(--text-muted);font-size:0.8rem;">${set.questions.length} câu hỏi</span>
+            </div>
+          </div>
+          <!-- Chỉnh sửa meta inline -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <select onchange="updateSetMeta(${si},'topic',this.value)"
+                    style="padding:4px 8px;border-radius:7px;border:1px solid var(--border);
+                           font-size:0.8rem;background:var(--surface);color:var(--text);">
+              <option value="dai-so"   ${set.topic==='dai-so'  ?'selected':''}>🔢 Đại số</option>
+              <option value="hinh-hoc" ${set.topic==='hinh-hoc'?'selected':''}>📐 Hình học</option>
+              <option value="tong-hop" ${set.topic==='tong-hop'?'selected':''}>📚 Tổng hợp</option>
+            </select>
+            <select onchange="updateSetMeta(${si},'level',this.value)"
+                    style="padding:4px 8px;border-radius:7px;border:1px solid var(--border);
+                           font-size:0.8rem;background:var(--surface);color:var(--text);">
+              <option value="tb"  ${set.level==='tb' ?'selected':''}>📗 Trung Bình</option>
+              <option value="kha" ${set.level==='kha'?'selected':''}>📘 Khá</option>
+              <option value="tot" ${set.level==='tot'?'selected':''}>📙 Tốt</option>
+              <option value="xs"  ${set.level==='xs' ?'selected':''}>📕 Xuất Sắc</option>
+            </select>
+            <input type="text" value="${set.setName}"
+                   oninput="updateSetMeta(${si},'setName',this.value)"
+                   style="padding:4px 10px;border-radius:7px;border:1px solid var(--border);
+                          font-size:0.8rem;background:var(--surface);color:var(--text);width:160px;">
           </div>
         </div>
-      </div>
-    </div>
-  `).join('');
+        <!-- Danh sách câu hỏi -->
+        <div style="padding:14px 16px;">
+          ${qCards}
+        </div>
+      </div>`;
+  }).join('');
 
-  document.getElementById('previewCards').innerHTML = cards;
-
+  document.getElementById('previewCards').innerHTML = html;
   previewSection.scrollIntoView({ behavior: 'smooth' });
-
-  // Re-render công thức toán trong preview
   if (window.MathJax && MathJax.typesetPromise) {
     MathJax.typesetPromise([document.getElementById('previewCards')]);
   }
 }
 
-// Xử lý ảnh cho câu hỏi
-function handleQuestionImage(event, index) {
+// Cập nhật meta khi thầy chỉnh inline
+function updateSetMeta(si, field, value) {
+  if (parsedSets[si]) parsedSets[si][field] = value;
+}
+
+// Xử lý ảnh — dùng si (set index) + qi (question index)
+function handleQuestionImage(event, si, qi) {
   const file = event.target.files[0];
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) {
-    showToast('Ảnh quá lớn! Tối đa 5MB.', 'warning');
-    return;
-  }
+  if (file.size > 5 * 1024 * 1024) { showToast('Ảnh quá lớn! Tối đa 5MB.', 'warning'); return; }
   const reader = new FileReader();
   reader.onload = (e) => {
     const dataUrl = e.target.result;
-    // Lưu vào parsedQuestions
-    parsedQuestions[index].imageUrl = dataUrl;
-    // Hiển thị thumbnail
-    const thumb = document.getElementById(`imgThumb-${index}`);
-    const preview = document.getElementById(`imgPreview-${index}`);
-    if (thumb && preview) {
-      thumb.src = dataUrl;
-      preview.style.display = 'flex';
-      preview.style.alignItems = 'center';
-    }
-    showToast(`✅ Đã thêm ảnh cho câu ${index+1}`, 'success', 2000);
+    parsedSets[si].questions[qi].imageUrl = dataUrl;
+    const thumb   = document.getElementById(`imgThumb-${si}-${qi}`);
+    const preview = document.getElementById(`imgPreview-${si}-${qi}`);
+    if (thumb && preview) { thumb.src = dataUrl; preview.style.display = 'flex'; }
+    showToast(`✅ Đã thêm ảnh cho câu ${qi+1} (bộ đề ${si+1})`, 'success', 2000);
   };
   reader.readAsDataURL(file);
 }
 
-// Xóa ảnh câu hỏi
-function removeQuestionImage(index) {
-  parsedQuestions[index].imageUrl = null;
-  const preview = document.getElementById(`imgPreview-${index}`);
+function removeQuestionImage(si, qi) {
+  if (parsedSets[si]) parsedSets[si].questions[qi].imageUrl = null;
+  const preview = document.getElementById(`imgPreview-${si}-${qi}`);
   if (preview) preview.style.display = 'none';
-  showToast(`Đã xóa ảnh câu ${index+1}`, 'info', 1500);
+  showToast(`Đã xóa ảnh câu ${qi+1}`, 'info', 1500);
 }
 
-// Lưu giải thích đáp án của thầy
-function handleExplanation(index, value) {
-  if (parsedQuestions[index] !== undefined) {
-    parsedQuestions[index].explanation = value.trim();
+function handleExplanation(si, qi, value) {
+  if (parsedSets[si] && parsedSets[si].questions[qi] !== undefined) {
+    parsedSets[si].questions[qi].explanation = value.trim();
   }
 }
 
-// Lưu câu hỏi vào hệ thống
-async function saveQuestions() {
-  if (parsedQuestions.length === 0) {
-    showToast('Không có câu hỏi để lưu!', 'warning');
-    return;
-  }
+// ====================================================
+// LƯU TẤT CẢ BỘ ĐỀ — MỖI BỘ ĐỀ = 1 QUESTION_SET RIÊNG
+// ====================================================
+async function saveAllSets() {
+  if (parsedSets.length === 0) { showToast('Không có bộ đề để lưu!', 'warning'); return; }
 
-  const setName = document.getElementById('uploadSetName').value.trim();
-  if (!setName) {
-    showToast('⚠️ Vui lòng nhập tên bộ đề trước khi lưu!', 'warning');
-    document.getElementById('uploadSetName').focus();
-    return;
+  // Kiểm tra tên bộ đề
+  for (let i = 0; i < parsedSets.length; i++) {
+    if (!parsedSets[i].setName.trim()) {
+      showToast(`⚠️ Bộ đề ${i+1} chưa có tên! Hãy nhập tên vào ô bên trên.`, 'warning'); return;
+    }
   }
 
   const btnSave = document.getElementById('btnSave');
   btnSave.disabled = true;
-  btnSave.textContent = '⏳ Đang lưu...';
+  btnSave.textContent = `⏳ Đang lưu ${parsedSets.length} bộ đề...`;
 
-  try {
-    const topic = document.getElementById('uploadTopic').value;
-    const level = document.getElementById('uploadLevel').value || 'tb';
-    const setId = `${topic}__${level}__${Date.now()}`;
-    const questionsWithMeta = parsedQuestions.map(q => ({
-      ...q,
-      topic,
-      level,
-      setId,
-      setName,
-      uploadedAt: new Date().toISOString()
-    }));
+  let savedCount = 0;
+  const errors = [];
 
-    await uploadQuestionSet(setId, setName, topic, level, questionsWithMeta);
+  for (let i = 0; i < parsedSets.length; i++) {
+    const set = parsedSets[i];
+    try {
+      const setId = `${set.topic}__${set.level}__${Date.now()}_${i}`;
+      const questionsWithMeta = set.questions.map(q => ({
+        ...q,
+        topic: set.topic,
+        level: set.level,
+        setId,
+        setName: set.setName,
+        uploadedAt: new Date().toISOString(),
+      }));
+      await uploadQuestionSet(setId, set.setName, set.topic, set.level, questionsWithMeta);
+      savedCount++;
 
-    showToast(`✅ Đã lưu bộ đề "${setName}" gồm ${parsedQuestions.length} câu!`, 'success', 5000);
-    btnSave.textContent = `✅ Đã lưu ${parsedQuestions.length} câu`;
-    setTimeout(loadDataOverview, 800);
-
-  } catch (error) {
-    console.error(error);
-    showToast('❌ Lỗi khi lưu: ' + error.message, 'error');
-    btnSave.disabled = false;
-    btnSave.textContent = '💾 Lưu vào hệ thống';
+      // Đánh dấu block đã lưu
+      const block = document.getElementById(`set-block-${i}`);
+      if (block) {
+        block.style.borderColor = '#10b981';
+        const header = block.querySelector('div');
+        if (header) {
+          const badge = document.createElement('span');
+          badge.textContent = '✅ Đã lưu';
+          badge.style.cssText = 'background:#dcfce7;color:#065f46;padding:3px 10px;border-radius:99px;font-size:0.8rem;font-weight:700;margin-left:8px;';
+          const title = header.querySelector('div');
+          if (title) title.appendChild(badge);
+        }
+      }
+    } catch (e) {
+      errors.push(`Bộ đề ${i+1} "${set.setName}": ${e.message}`);
+    }
   }
+
+  if (errors.length === 0) {
+    const totalQ = parsedSets.reduce((s,x) => s + x.questions.length, 0);
+    showToast(`✅ Đã lưu thành công ${savedCount} bộ đề — ${totalQ} câu hỏi!`, 'success', 6000);
+    btnSave.textContent = `✅ Đã lưu ${savedCount} bộ đề`;
+  } else {
+    showToast(`⚠️ Lưu ${savedCount}/${parsedSets.length} bộ đề. Lỗi: ${errors.join('; ')}`, 'warning', 8000);
+    btnSave.disabled = false;
+    btnSave.textContent = `💾 Thử lại (${parsedSets.length - savedCount} lỗi)`;
+  }
+
+  setTimeout(loadDataOverview, 1000);
 }
+
+// Giữ lại hàm cũ để tương thích nếu có nơi nào gọi
+async function saveQuestions() { return saveAllSets(); }
 
 // Reset upload
 function resetUpload() {
-  parsedQuestions = [];
+  parsedSets = [];
   document.getElementById('fileInput').value = '';
   document.getElementById('fileStatus').classList.add('hidden');
   document.getElementById('previewSection').classList.add('hidden');
   document.getElementById('previewCards').innerHTML = '';
+  const btn = document.getElementById('btnSave');
+  if (btn) { btn.disabled = false; btn.textContent = '💾 Lưu tất cả bộ đề vào hệ thống'; }
 }
 
-// Tải file mẫu
+// Tải file mẫu — 1 bộ đề
 function downloadSampleDoc() {
-  const sampleContent = `Câu 1: Nghiệm của phương trình $2x + 6 = 0$ là?
+  const content = `Câu 1: Nghiệm của phương trình $2x + 6 = 0$ là?
 A. $x = 3$
 B. $x = -3$
 C. $x = 6$
@@ -681,7 +827,7 @@ B. $x = 2$ và $x = 3$
 C. $x = -2$ và $x = -3$
 D. $x = 1$ và $x = -6$
 Đáp án: B
-Giải thích: Phân tích: (x-2)(x-3)=0 → x=2 hoặc x=3.
+Giải thích: Phân tích: (x-2)(x-3)=0 suy ra x=2 hoặc x=3.
 
 Câu 3: Diện tích hình tròn bán kính $r$ tính bằng công thức?
 A. $S = \\pi r$
@@ -690,13 +836,13 @@ C. $S = \\pi r^2$
 D. $S = 2\\pi r^2$
 Đáp án: C
 
-Câu 4: Cho tam giác vuông có hai cạnh góc vuông $a = 3$, $b = 4$. Cạnh huyền $c$ bằng?
+Câu 4: Cho tam giác vuông có hai cạnh góc vuông $a=3$, $b=4$. Cạnh huyền $c$ bằng?
 A. $c = 6$
 B. $c = 5$
 C. $c = 7$
 D. $c = \\sqrt{7}$
 Đáp án: B
-Giải thích: Áp dụng định lý Pytago: c² = 3² + 4² = 9 + 16 = 25, suy ra c = 5.
+Giải thích: Áp dụng định lý Pytago: c^2 = 9 + 16 = 25, suy ra c = 5.
 
 Câu 5: Căn bậc hai của $144$ là bao nhiêu?
 A. 11
@@ -704,13 +850,166 @@ B. 12
 C. 13
 D. 14
 Đáp án: B`;
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'de_thi_mau_1_bo.txt'; a.click();
+  showToast('Đã tải file mẫu 1 bộ đề!', 'success');
+}
 
-  const blob = new Blob([sampleContent], { type: 'text/plain;charset=utf-8' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'de_thi_mau.txt';
-  link.click();
-  showToast('Đã tải file mẫu!', 'success');
+// Tải file mẫu — nhiều bộ đề trong 1 file
+function downloadMultiSetSample() {
+  const content = `=== Bộ đề 1: Đại số cơ bản ===
+chủ đề: dai-so | trình độ: tb
+
+Câu 1: Nghiệm của phương trình $2x + 6 = 0$ là?
+A. $x = 3$
+B. $x = -3$
+C. $x = 6$
+D. $x = -6$
+Đáp án: B
+Giải thích: Chuyển vế ta được x = -3.
+
+Câu 2: Phương trình $x^2 - 5x + 6 = 0$ có nghiệm là?
+A. $x=1$ và $x=6$
+B. $x=2$ và $x=3$
+C. $x=-2$ và $x=-3$
+D. $x=1$ và $x=-6$
+Đáp án: B
+
+Câu 3: Căn bậc hai của $225$ là?
+A. 13
+B. 14
+C. 15
+D. 16
+Đáp án: C
+
+=== Bộ đề 2: Đại số nâng cao ===
+chủ đề: dai-so | trình độ: kha
+
+Câu 1: Phương trình $x^2 - 2x - 3 = 0$ có hai nghiệm là?
+A. $x=1$ và $x=-3$
+B. $x=-1$ và $x=3$
+C. $x=2$ và $x=-3$
+D. $x=-2$ và $x=3$
+Đáp án: B
+Giải thích: Delta = 4+12=16, nghiệm x=(2±4)/2 cho x=3 và x=-1.
+
+Câu 2: Hàm số $y = -2x + 3$ nghịch biến khi?
+A. $x > 0$
+B. $x < 0$
+C. Với mọi $x$
+D. $x = 0$
+Đáp án: C
+
+Câu 3: Tổng hai nghiệm của $3x^2 - 7x + 2 = 0$ bằng?
+A. $\\frac{2}{3}$
+B. $\\frac{7}{3}$
+C. $-\\frac{7}{3}$
+D. $3$
+Đáp án: B
+
+=== Bộ đề 3: Hình học cơ bản ===
+chủ đề: hinh-hoc | trình độ: tb
+
+Câu 1: Tổng ba góc trong một tam giác bằng?
+A. 90°
+B. 180°
+C. 270°
+D. 360°
+Đáp án: B
+
+Câu 2: Chu vi hình tròn bán kính $r$ tính bằng?
+A. $C = \\pi r$
+B. $C = \\pi r^2$
+C. $C = 2\\pi r$
+D. $C = 2\\pi r^2$
+Đáp án: C
+
+Câu 3: Diện tích hình vuông cạnh $a$ tính bằng?
+A. $4a$
+B. $2a^2$
+C. $a^2$
+D. $a^3$
+Đáp án: C
+
+=== Bộ đề 4: Hình học nâng cao ===
+chủ đề: hinh-hoc | trình độ: kha
+
+Câu 1: Góc nội tiếp bằng bao nhiêu lần góc tâm cùng chắn một cung?
+A. Bằng nhau
+B. Gấp đôi
+C. Bằng một nửa
+D. Gấp ba
+Đáp án: C
+Giải thích: Định lý: góc nội tiếp = 1/2 góc tâm cùng chắn cung đó.
+
+Câu 2: Trong tam giác vuông, sin của một góc nhọn bằng?
+A. Cạnh kề / Cạnh huyền
+B. Cạnh đối / Cạnh huyền
+C. Cạnh kề / Cạnh đối
+D. Cạnh đối / Cạnh kề
+Đáp án: B
+
+Câu 3: Hai tam giác đồng dạng có tỉ số đồng dạng $k=2$, tỉ số diện tích bằng?
+A. 2
+B. 3
+C. 4
+D. 8
+Đáp án: C
+Giải thích: Tỉ số diện tích = k^2 = 4.
+
+=== Bộ đề 5: Tổng hợp cơ bản ===
+chủ đề: tong-hop | trình độ: tb
+
+Câu 1: Phương trình $|x| = 5$ có nghiệm là?
+A. $x = 5$
+B. $x = -5$
+C. $x = \\pm 5$
+D. Vô nghiệm
+Đáp án: C
+
+Câu 2: Góc bẹt có số đo bằng?
+A. 45°
+B. 90°
+C. 180°
+D. 360°
+Đáp án: C
+
+Câu 3: Số vô tỉ là số có dạng?
+A. Phân số $a/b$ với $b\\neq 0$
+B. Số thập phân hữu hạn
+C. Số thập phân vô hạn tuần hoàn
+D. Số thập phân vô hạn không tuần hoàn
+Đáp án: D
+
+=== Bộ đề 6: Tổng hợp nâng cao ===
+chủ đề: tong-hop | trình độ: tot
+
+Câu 1: Phương trình bậc hai $ax^2+bx+c=0$ có hai nghiệm phân biệt khi?
+A. $\\Delta = 0$
+B. $\\Delta < 0$
+C. $\\Delta > 0$
+D. $a = 0$
+Đáp án: C
+
+Câu 2: Hai tam giác đồng dạng thì tỉ số diện tích bằng?
+A. Tỉ số đồng dạng
+B. Bình phương tỉ số đồng dạng
+C. Lập phương tỉ số đồng dạng
+D. Căn bậc hai tỉ số đồng dạng
+Đáp án: B
+
+Câu 3: Hàm số $y = x^2$ có đồ thị là?
+A. Đường thẳng
+B. Parabol
+C. Đường tròn
+D. Elip
+Đáp án: B`;
+
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'de_thi_mau_nhieu_bo.txt'; a.click();
+  showToast('Đã tải file mẫu nhiều bộ đề!', 'success');
 }
 
 // Áp dụng Firebase config từ input
@@ -780,7 +1079,7 @@ async function toggleLockSet(setId, currentLocked) {
       if (sets[setId]) { sets[setId].locked = newLocked; localStorage.setItem('question_sets', JSON.stringify(sets)); }
     }
     showToast(newLocked ? '🔒 Đã khoá bộ đề!' : '🔓 Đã mở bộ đề!', 'success', 2000);
-    loadManageSets();
+    loadDataOverview();
   } catch(e) { showToast('Lỗi: ' + e.message, 'error'); }
 }
 
