@@ -274,12 +274,13 @@
         &#128204; Upload tài liệu PDF hoặc ảnh để học sinh đọc trước khi làm bài. Tài liệu hỗ trợ
         <strong>công thức toán</strong> (PDF có LaTeX) và <strong>hình ảnh hình học</strong>.
         Tài liệu sẽ hiển thị ngay trên trang chủ cho học sinh tải về.
+        <br><strong style="color:#dc2626;">⚠️ Giới hạn file: tối đa ~3MB</strong> (lưu trên trình duyệt). Nếu PDF nặng, hãy nén tại <a href="https://smallpdf.com/compress-pdf" target="_blank" style="color:#3b82f6;">smallpdf.com</a> trước khi upload.
       </div>
 
       <div class="doc-upload-zone" id="docUploadZone" onclick="document.getElementById('docFileInput').click()">
         <div style="font-size:2.5rem;margin-bottom:8px;">&#128194;</div>
         <h3 style="font-size:1rem;margin-bottom:4px;">Kéo thả hoặc click để chọn file tài liệu</h3>
-        <p style="font-size:0.82rem;color:var(--text-muted);">Hỗ trợ: PDF, PNG, JPG · Tối đa 20MB</p>
+        <p style="font-size:0.82rem;color:var(--text-muted);">Hỗ trợ: PDF, PNG, JPG · Tối đa 3MB (do lưu trên trình duyệt)</p>
         <input type="file" id="docFileInput" accept=".pdf,image/*" onchange="handleDocFileSelect(event)">
       </div>
 
@@ -366,6 +367,18 @@ uploadZone.addEventListener('drop', e => {
   const file = e.dataTransfer.files[0];
   if (file) processFile(file);
 });
+
+// Drag & drop cho vùng upload tài liệu
+const docUploadZone = document.getElementById('docUploadZone');
+if (docUploadZone) {
+  docUploadZone.addEventListener('dragover', e => { e.preventDefault(); docUploadZone.classList.add('dragover'); });
+  docUploadZone.addEventListener('dragleave', () => docUploadZone.classList.remove('dragover'));
+  docUploadZone.addEventListener('drop', e => {
+    e.preventDefault(); docUploadZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleDocFile(file);
+  });
+}
 
 function handleFileSelect(event) {
   const file = event.target.files[0];
@@ -1290,6 +1303,7 @@ function handleDocFileSelect(event) {
 
 function handleDocFile(file) {
   const maxSize = 20 * 1024 * 1024;
+  const warnSize = 3 * 1024 * 1024; // cảnh báo file > 3MB có thể vượt localStorage
   const statusEl = document.getElementById('docFileStatus');
   if (file.size > maxSize) {
     statusEl.className = 'alert alert-danger';
@@ -1304,6 +1318,17 @@ function handleDocFile(file) {
   }
 
   currentDocFile = file;
+
+  // Cảnh báo sớm nếu file lớn hơn 3MB — dễ bị lỗi localStorage
+  if (file.size > warnSize) {
+    const mb = (file.size / 1024 / 1024).toFixed(1);
+    statusEl.className = 'alert alert-danger';
+    statusEl.innerHTML = `⚠️ File <strong>${file.name}</strong> nặng <strong>${mb}MB</strong> — quá lớn để lưu trên trình duyệt (giới hạn ~3MB). Hãy nén PDF trước hoặc chọn ảnh nhỏ hơn!`;
+    statusEl.classList.remove('hidden');
+    document.getElementById('btnSaveDoc').disabled = true;
+    return;
+  }
+
   statusEl.className = 'alert alert-info';
   statusEl.innerHTML = `⏳ Đang đọc <strong>${file.name}</strong>...`;
   statusEl.classList.remove('hidden');
@@ -1375,7 +1400,20 @@ async function saveStudyDoc() {
     // File tài liệu (PDF/ảnh) quá lớn để lưu Firestore
     const docs = JSON.parse(localStorage.getItem('study_docs') || '[]');
     docs.unshift(docData);
-    localStorage.setItem('study_docs', JSON.stringify(docs));
+
+    // Thử lưu — bắt lỗi vượt quota localStorage (~5MB)
+    try {
+      localStorage.setItem('study_docs', JSON.stringify(docs));
+    } catch(quotaErr) {
+      btn.disabled = false;
+      btn.textContent = '💾 Lưu tài liệu';
+      const sizeMB = (currentDocFile.size / 1024 / 1024).toFixed(1);
+      showToast(
+        `❌ File quá lớn để lưu trên trình duyệt (${sizeMB}MB). Vui lòng dùng file nhỏ hơn 3MB hoặc nén PDF trước!`,
+        'error', 6000
+      );
+      return;
+    }
 
     // Nếu dùng Firebase: lưu metadata (không có fileUrl) lên Firestore để đồng bộ tên
     if (AppState.useFirebase && AppState.db) {

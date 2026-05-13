@@ -231,10 +231,8 @@ function renderLeaderboard(data) {
         ${slots.map(s => `
           <div class="podium-slot ${s.blockClass}" onclick="rankFirework(${s.pos},'${s.data.studentName.replace(/'/g,"\\'")}')" style="cursor:pointer;" title="Chạm để chúc mừng!">
             <div class="podium-avatar">${s.data.studentName.charAt(0).toUpperCase()}</div>
-            <div class="podium-name"
-                 onclick="event.stopPropagation();showStudentReviewModal('${s.data.studentName.replace(/'/g,"\\'")}','${s.data.studentClass ? s.data.studentClass.replace(/'/g,"\\'") : ""}')">
+            <div class="podium-name">
               ${s.data.studentName}
-              <span style="font-size:0.62rem;display:block;color:#6366f1;font-weight:600;">📋 xem bài làm</span>
             </div>
             <div class="podium-score">${s.data.score}</div>
             <div class="podium-block">${s.icon}</div>
@@ -261,8 +259,8 @@ function renderLeaderboard(data) {
       <div class="top10-item" ${clickAttr} style="position:relative;">
         <div class="top10-rank">${rank <= 3 ? medals[rank-1] : rank}</div>
         <div style="flex:1;">
-          <div class="top10-name" style="cursor:pointer;" onclick="event.stopPropagation();showStudentReviewModal('${r.studentName.replace(/'/g,"\\'")}','${r.studentClass.replace(/'/g,"\\'")}')">
-            ${r.studentName} <span style="font-size:0.65rem;color:#6366f1;vertical-align:middle;">📋</span>
+          <div class="top10-name">
+            ${r.studentName}
           </div>
           <div class="top10-class">${r.studentClass} · ${renderRankBadge(r.score)}</div>
         </div>
@@ -498,7 +496,6 @@ function renderTable(data) {
         <td style="font-size:0.85rem;color:var(--text-muted)">${r.correct}/${r.total} câu</td>
         <td style="font-size:0.85rem;color:var(--text-muted)">⏱️ ${time}</td>
         <td style="font-size:0.8rem;color:var(--text-muted)">${date}</td>
-        <td><button class="btn-review-compact" onclick="showStudentReviewModal('${r.studentName.replace(/'/g,"\\'")}','${r.studentClass.replace(/'/g,"\\'")}'))" title="Xem lại bài làm của ${r.studentName}">📋</button></td>
         <td><button onclick="deleteResult('${rid}','${safeName}')" class="btn-delete-result" title="Xóa">🗑️</button></td>
       </tr>
     `;
@@ -520,7 +517,6 @@ function renderTable(data) {
             <th>Câu đúng</th>
             <th>Thời gian</th>
             <th>Ngày</th>
-            <th title="Xem lại bài làm">📋</th>
             <th>Xóa</th>
           </tr>
         </thead>
