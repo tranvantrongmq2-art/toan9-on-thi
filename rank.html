@@ -231,9 +231,9 @@ function renderLeaderboard(data) {
         ${slots.map(s => `
           <div class="podium-slot ${s.blockClass}" onclick="rankFirework(${s.pos},'${s.data.studentName.replace(/'/g,"\\'")}')" style="cursor:pointer;" title="Chạm để chúc mừng!">
             <div class="podium-avatar">${s.data.studentName.charAt(0).toUpperCase()}</div>
-            <div class="podium-name">
+            <div class="podium-name"
               ${s.data.studentName}
-            </div>
+              </div>
             <div class="podium-score">${s.data.score}</div>
             <div class="podium-block">${s.icon}</div>
             <div style="font-size:0.6rem;color:#6366f1;animation:hint-pulse 1.8s ease-in-out infinite;margin-top:4px;">👆 Chạm!</div>
@@ -252,14 +252,11 @@ function renderLeaderboard(data) {
       : '';
     const rid = r.id || `__idx__${allResults.indexOf(r)}`;
     const safeName = r.studentName.replace(/'/g,"\\'");
-    const deleteBtn = isTeacher
-      ? `<button onclick="event.stopPropagation();deleteResult('${rid}','${safeName}')" class="btn-delete-result" title="Xóa">🗑️</button>`
-      : '';
+    const deleteBtn = '';
     return `
       <div class="top10-item" ${clickAttr} style="position:relative;">
         <div class="top10-rank">${rank <= 3 ? medals[rank-1] : rank}</div>
         <div style="flex:1;">
-          <div class="top10-name">
             ${r.studentName}
           </div>
           <div class="top10-class">${r.studentClass} · ${renderRankBadge(r.score)}</div>
@@ -305,33 +302,7 @@ function populateClassFilter(data) {
     classes.map(c => `<option value="${c}">Lớp ${c}</option>`).join('');
 }
 
-// Xóa 1 kết quả
-async function deleteResult(id, name) {
-  if (!confirm(`Xóa kết quả của "${name}"?`)) return;
-
-  if (AppState.useFirebase && AppState.db && !id.startsWith('__idx__')) {
-    // Xóa trên Firebase bằng document id
-    try {
-      await AppState.db.collection('results').doc(id).delete();
-      showToast(`Đã xóa kết quả của ${name}`, 'success');
-      loadRankings();
-    } catch(e) {
-      showToast('Lỗi khi xóa: ' + e.message, 'error');
-    }
-  } else {
-    // Xóa trong localStorage bằng index
-    let results = JSON.parse(localStorage.getItem('quiz_results') || '[]');
-    if (id.startsWith('__idx__')) {
-      const idx = parseInt(id.replace('__idx__',''));
-      results.splice(idx, 1);
-    } else {
-      results = results.filter(r => r.id !== id);
-    }
-    localStorage.setItem('quiz_results', JSON.stringify(results));
-    showToast(`Đã xóa kết quả của ${name}`, 'success');
-    loadRankings();
-  }
-}
+// deleteResult đã bị xóa
 
 // Tạo dữ liệu mẫu demo
 function generateSampleResults() {
@@ -496,7 +467,6 @@ function renderTable(data) {
         <td style="font-size:0.85rem;color:var(--text-muted)">${r.correct}/${r.total} câu</td>
         <td style="font-size:0.85rem;color:var(--text-muted)">⏱️ ${time}</td>
         <td style="font-size:0.8rem;color:var(--text-muted)">${date}</td>
-        <td><button onclick="deleteResult('${rid}','${safeName}')" class="btn-delete-result" title="Xóa">🗑️</button></td>
       </tr>
     `;
   }).join('');
@@ -517,7 +487,6 @@ function renderTable(data) {
             <th>Câu đúng</th>
             <th>Thời gian</th>
             <th>Ngày</th>
-            <th>Xóa</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
