@@ -274,6 +274,87 @@ function getRank(score) {
   return RANK_SYSTEM.find(r => score >= r.min && score <= r.max) || RANK_SYSTEM[0];
 }
 
+// ====================================================
+// HÌNH ẢNH ĐỘNG LỰC THEO CẤP ĐỘ ĐIỂM
+// ====================================================
+const MOTIVATION_IMAGES = [
+  // score < 5 — đang xây nền tảng, cần cố gắng
+  {
+    min: 0, max: 4.9,
+    src: 'https://images.unsplash.com/photo-1513258496099-48168024aec0?w=700&q=80',
+    alt: 'Học sinh chăm chỉ học bài',
+    quote: '💪 "Mỗi ngày cố gắng một chút — thành công đang chờ phía trước!"',
+    sub: 'Đừng bỏ cuộc. Thầy tin em sẽ làm được! 🌱',
+    cls: 'motiv-tb',
+  },
+  // 5–6.4 — đang tiến bộ
+  {
+    min: 5, max: 6.4,
+    src: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=700&q=80',
+    alt: 'Học sinh tự tin học toán',
+    quote: '📘 "Em đang tiến bộ rõ rệt — tiếp tục đi nào!"',
+    sub: 'Kiên trì mỗi ngày, kết quả sẽ bứt phá! 🚀',
+    cls: 'motiv-kha',
+  },
+  // 6.5–7.9 — chiến binh
+  {
+    min: 6.5, max: 7.9,
+    src: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=700&q=80',
+    alt: 'Học sinh chiến thắng, tự hào',
+    quote: '💎 "Em đang chinh phục những đỉnh cao mới!"',
+    sub: 'Thầy tự hào về sự nỗ lực của em. Vươn tới 8 điểm nào! 🏆',
+    cls: 'motiv-tot',
+  },
+  // 8–8.9 — huyền thoại
+  {
+    min: 8, max: 8.9,
+    src: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=700&q=80',
+    alt: 'Học sinh xuất sắc đứng trên đỉnh',
+    quote: '🔮 "Em là huyền thoại của lớp học — thật đáng tự hào!"',
+    sub: 'Chỉ một bước nữa thôi — đặt mục tiêu 9+ ngay hôm nay! 👑',
+    cls: 'motiv-legend',
+  },
+  // 9–9.9 — đại cao thủ
+  {
+    min: 9, max: 9.9,
+    src: 'https://images.unsplash.com/photo-1527736947477-2790e28f3443?w=700&q=80',
+    alt: 'Chiến binh đứng trên đỉnh vinh quang',
+    quote: '👑 "Em gần như hoàn hảo rồi — chỉ còn một bước nữa!"',
+    sub: 'Thầy cực kỳ tự hào! Hãy chinh phục điểm 10 tuyệt đối! 🔥',
+    cls: 'motiv-grandmaster',
+  },
+  // 10 — trùm cuối
+  {
+    min: 10, max: 10,
+    src: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=700&q=80',
+    alt: 'Học sinh đạt điểm tuyệt đối, vinh quang',
+    quote: '🔥 "TUYỆT VỜI! Em đã chinh phục đỉnh cao tuyệt đối!"',
+    sub: 'Thầy vô cùng tự hào về em! Em là niềm cảm hứng của cả lớp! 🎊',
+    cls: 'motiv-challenger',
+  },
+];
+
+function renderMotivationImage(score) {
+  const cfg = MOTIVATION_IMAGES.find(m => score >= m.min && score <= m.max) || MOTIVATION_IMAGES[0];
+  return `
+    <div class="motivation-img-block ${cfg.cls}">
+      <div class="motivation-img-wrap">
+        <img
+          src="${cfg.src}"
+          alt="${cfg.alt}"
+          class="motivation-img"
+          loading="lazy"
+          onerror="this.parentElement.style.display='none'"
+        />
+        <div class="motivation-img-overlay"></div>
+      </div>
+      <div class="motivation-quote">${cfg.quote}</div>
+      <div class="motivation-sub">${cfg.sub}</div>
+      ${score < 10 ? `<div class="motivation-nextlevel">${RANK_SYSTEM.find(r => score >= r.min && score <= r.max)?.nextMsg || ''}</div>` : ''}
+    </div>
+  `;
+}
+
 function renderRankBadge(score) {
   const r = getRank(score);
   return `<span class="rank-badge ${r.cls}">${r.icon} ${r.title}</span>`;
@@ -947,39 +1028,51 @@ async function renderAllLevelZones() {
     ).join('');
 
     zone.innerHTML = `
-      <!-- HEADER BANNER -->
-      <div class="lz-banner" style="background:${meta.grad};box-shadow:0 8px 32px ${meta.glow};">
-        <div class="lz-banner-deco">${meta.emoji}${meta.emoji}</div>
-        <div class="lz-banner-body">
-          <div class="lz-banner-top">
-            <div class="lz-rank-badge">${meta.rankIcon} ${meta.rankName}</div>
-            <div class="lz-score-range">${lv.scoreRange}</div>
-          </div>
-          <div class="lz-banner-title">${lv.icon} Khu Vực <strong>${lv.name.toUpperCase()}</strong></div>
-          <div class="lz-banner-desc">${lv.desc}</div>
+      <!-- COMPACT SQUARE BANNER -->
+      <div class="lz-sq-banner" style="--lz-grad:${meta.grad};--lz-glow:${meta.glow};--lz-accent:${meta.accent};">
+        <!-- Nền động -->
+        <div class="lz-sq-bg"></div>
+        <div class="lz-sq-orb lz-sq-orb1"></div>
+        <div class="lz-sq-orb lz-sq-orb2"></div>
+        <div class="lz-sq-particles">
+          ${[...Array(6)].map((_,i)=>`<span class="lz-sq-dot" style="--i:${i};"></span>`).join('')}
+        </div>
 
-          <!-- Con đường tiến cấp -->
-          <div class="lz-steps-wrap">
-            <div class="lz-steps">${stepsHtml}</div>
+        <!-- NỘI DUNG CHÍNH -->
+        <div class="lz-sq-content">
+          <!-- Trái: icon lớn + tên -->
+          <div class="lz-sq-left">
+            <div class="lz-sq-emoji">${meta.emoji}</div>
+            <div class="lz-sq-zone-name">Khu Vực</div>
+            <div class="lz-sq-zone-title">${lv.name.toUpperCase()}</div>
+            <div class="lz-sq-score-pill">${lv.scoreRange}</div>
           </div>
 
-          <!-- Tips + phần thưởng -->
-          <div class="lz-info-row">
-            <div class="lz-tips-box">
-              <div class="lz-tips-title">💡 Bí quyết chinh phục</div>
-              ${tipsHtml}
+          <!-- Phải: rank + thông tin -->
+          <div class="lz-sq-right">
+            <div class="lz-sq-rank-row">
+              <span class="lz-sq-rank-icon">${meta.rankIcon}</span>
+              <span class="lz-sq-rank-name">${meta.rankName}</span>
             </div>
-            <div class="lz-reward-box">
-              <div class="lz-reward-title">🎁 Phần thưởng</div>
-              <div class="lz-reward-text">${meta.reward}</div>
-              <div class="lz-next-badge">
-                Lên ${meta.nextIcon} ${meta.next} khi đạt ${meta.nextScore} →
-              </div>
+            <div class="lz-sq-tips-label">💡 Bí quyết chinh phục</div>
+            <div class="lz-sq-tips-list">
+              ${meta.tips.map(t => `<div class="lz-sq-tip-item"><span class="lz-sq-tip-dot">▸</span>${t}</div>`).join('')}
+            </div>
+            <div class="lz-sq-next">
+              ${meta.nextIcon} Lên <strong>${meta.next}</strong> khi đạt <strong>${meta.nextScore}</strong>
             </div>
           </div>
+        </div>
 
-          <!-- Quote thầy -->
-          <div class="lz-quote">💬 <em>${meta.quote}</em> — Thầy Trong</div>
+        <!-- BƯỚC TIẾN CẤP (mini) -->
+        <div class="lz-sq-steps">
+          ${meta.steps.map((s,i) => `
+            <div class="lz-sq-step ${i < meta.currentStep ? 'done' : ''} ${i === meta.currentStep ? 'current' : ''}">
+              <div class="lz-sq-step-dot">${i < meta.currentStep ? '✓' : (i === meta.currentStep ? meta.rankIcon : '')}</div>
+              <div class="lz-sq-step-lbl">${s.replace(/^[^\s]+ /,'')}</div>
+            </div>
+            ${i < meta.steps.length-1 ? '<div class="lz-sq-step-line"></div>' : ''}
+          `).join('')}
         </div>
       </div>
 
@@ -1996,17 +2089,8 @@ function renderResult(result, questions, answers) {
           ${rank.emoji} Danh hiệu: <strong>${rank.title}</strong> — <em>${rank.tierLabel}</em>
         </div>
 
-        <!-- Đặc quyền từ thầy -->
-        <div class="rank-privilege-box rank-privilege-${rank.tier}">
-          <div class="rank-privilege-label">🎁 Đặc quyền từ Thầy Trong</div>
-          <div class="rank-privilege-text">${rank.privilege}</div>
-        </div>
-
-        <!-- Kích thích lên cấp -->
-        ${result.score < 10 ? `
-        <div class="rank-nextlevel-box">
-          <div class="rank-nextlevel-text">${rank.nextMsg}</div>
-        </div>` : ''}
+        <!-- Hình ảnh kích thích động lực -->
+        ${renderMotivationImage(result.score)}
 
         <div style="color:var(--text-muted);margin-bottom:16px;font-size:0.88rem;">
           ${result.studentName} - ${result.studentClass} | ${result.topicName} | ⏱️ ${time}
