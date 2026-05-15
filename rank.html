@@ -6,364 +6,785 @@
   <title>Bảng Xếp Hạng - Ôn Thi Toán 9</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+
+  <!-- Firebase SDK -->
+ 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <style>
-    .rk-header{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:16px;padding:18px 22px 14px;margin-bottom:14px;text-align:center;}
-    .rk-header h1{font-size:1.35rem;font-weight:900;margin:0 0 3px;}
-    .rk-header p{font-size:.8rem;opacity:.8;margin:0;}
-    .rk-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
-    @media(max-width:520px){.rk-stats{grid-template-columns:repeat(2,1fr);}}
-    .rk-stat{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;text-align:center;}
-    .rk-stat-num{font-size:1.3rem;font-weight:900;color:var(--primary);}
-    .rk-stat-lbl{font-size:.70rem;color:var(--text-muted);margin-top:2px;}
-    .rk-tbtn{padding:5px 13px;border-radius:99px;font-size:.76rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;transition:all .15s;}
-    .rk-tbtn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
-    /* PODIUM — force override style.css */
-    .rk-podium{display:flex!important;flex-direction:row!important;justify-content:center!important;align-items:flex-end!important;gap:12px!important;margin-bottom:20px!important;background:linear-gradient(180deg,rgba(99,102,241,.05),transparent);border-radius:16px;padding:20px 10px 0;}
-    .rk-slot{display:flex!important;flex-direction:column!important;align-items:center!important;cursor:pointer;transition:transform .2s;text-decoration:none!important;}
-    .rk-slot:hover{transform:translateY(-5px)!important;}
-    .rk-av{border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;font-weight:900!important;color:#fff!important;letter-spacing:0!important;}
-    .rk-s1 .rk-av{width:64px!important;height:64px!important;font-size:1.5rem!important;background:linear-gradient(135deg,#f59e0b,#fbbf24)!important;box-shadow:0 6px 20px rgba(251,191,36,.5)!important;}
-    .rk-s2 .rk-av{width:50px!important;height:50px!important;font-size:1.2rem!important;background:linear-gradient(135deg,#64748b,#94a3b8)!important;}
-    .rk-s3 .rk-av{width:46px!important;height:46px!important;font-size:1.1rem!important;background:linear-gradient(135deg,#b45309,#d97706)!important;}
-    .rk-sname{font-size:.76rem!important;font-weight:700!important;margin-top:6px!important;text-align:center!important;max-width:80px!important;color:var(--text)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .rk-sscore{font-size:1rem!important;font-weight:900!important;color:var(--primary)!important;margin-top:2px!important;}
-    .rk-scls{font-size:.66rem!important;color:var(--text-muted)!important;margin-bottom:6px!important;}
-    .rk-block{border-radius:8px 8px 0 0!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:1.1rem!important;font-weight:900!important;color:rgba(255,255,255,.9)!important;margin-top:8px!important;flex-shrink:0!important;}
-    .rk-s1 .rk-block{width:72px!important;height:58px!important;background:linear-gradient(180deg,#fbbf24,#f59e0b)!important;}
-    .rk-s2 .rk-block{width:60px!important;height:40px!important;background:linear-gradient(180deg,#94a3b8,#64748b)!important;}
-    .rk-s3 .rk-block{width:54px!important;height:30px!important;background:linear-gradient(180deg,#d97706,#b45309)!important;}
-    .rk-crown{font-size:1.4rem;position:absolute;top:-18px;animation:crown-bob .8s ease-in-out infinite alternate;}
-    @keyframes crown-bob{0%{transform:translateY(0) rotate(-5deg);}100%{transform:translateY(-4px) rotate(5deg);}}
-    .rk-top10{display:flex;flex-direction:column;gap:7px;}
-    .rk-t10{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:11px;padding:9px 13px;cursor:pointer;transition:all .15s;}
-    .rk-t10:hover{box-shadow:0 3px 12px rgba(0,0,0,.08);transform:translateY(-1px);}
-    .rk-t10.r1{border-color:#fbbf24;background:linear-gradient(90deg,#fffbeb,var(--surface2));}
-    .rk-t10.r2{border-color:#94a3b8;}
-    .rk-t10.r3{border-color:#d97706;background:linear-gradient(90deg,#fffbeb,var(--surface2));}
-    .rk-t10-rk{width:26px;text-align:center;font-weight:900;font-size:.88rem;flex-shrink:0;}
-    .rk-t10-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:.9rem;background:linear-gradient(135deg,var(--primary),#6366f1);}
-    .rk-t10-info{flex:1;min-width:0;}
-    .rk-t10-name{font-weight:700;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .rk-t10-sub{font-size:.70rem;color:var(--text-muted);margin-top:1px;}
-    .rk-t10-score{font-size:1rem;font-weight:900;color:var(--primary);flex-shrink:0;}
-    .rk-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
-    .rk-filters select{padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:.80rem;color:var(--text);cursor:pointer;}
-    .rk-filters input{padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:.80rem;color:var(--text);flex:1;min-width:130px;}
-    .rk-tbl-wrap{overflow-x:auto;}
-    .rk-tbl{width:100%;border-collapse:collapse;font-size:.80rem;}
-    .rk-tbl th{background:var(--surface);font-size:.70rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);padding:8px 10px;border-bottom:2px solid var(--border);text-align:left;white-space:nowrap;}
-    .rk-tbl td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
-    .rk-tbl tr:last-child td{border-bottom:none;}
-    .rk-tbl tr:hover td{background:var(--surface);}
-    .rk-tbl tr.t1 td{background:linear-gradient(90deg,rgba(251,191,36,.07),transparent);}
-    .rk-tbl tr.t2 td{background:linear-gradient(90deg,rgba(148,163,184,.05),transparent);}
-    .rk-tbl tr.t3 td{background:linear-gradient(90deg,rgba(217,119,6,.05),transparent);}
-    .sp{display:inline-block;padding:2px 9px;border-radius:99px;font-weight:800;font-size:.78rem;}
-    .sp.h{background:#dcfce7;color:#15803d;}.sp.m{background:#fef9c3;color:#92400e;}.sp.l{background:#fee2e2;color:#991b1b;}
-    .rk-cls-item{display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid var(--border);}
-    .rk-cls-item:last-child{border-bottom:none;}
-    .rk-cls-name{font-weight:800;font-size:.88rem;width:36px;flex-shrink:0;}
-    .rk-cls-bar{flex:1;height:7px;background:var(--border);border-radius:99px;overflow:hidden;}
-    .rk-cls-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .4s;}
-    .rk-cls-avg{font-weight:900;font-size:.88rem;color:var(--primary);width:30px;flex-shrink:0;text-align:right;}
-    .rk-cls-pass{font-size:.72rem;color:var(--text-muted);white-space:nowrap;}
-    /* rank-badge gọn trong bảng */
-    .rk-tbl .rank-badge{font-size:.68rem!important;padding:2px 7px!important;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis;display:inline-block;}
-    /* top10 rank-badge */
-    .rk-t10-sub .rank-badge{font-size:.65rem!important;padding:1px 6px!important;}
-  </style>
+  
 </head>
 <body>
 
+<!-- ===== HEADER ===== -->
 <header class="header">
   <div class="header-inner">
     <a href="index.html" class="logo">
       <div class="logo-icon">📐</div>
-      <div class="logo-text"><span class="logo-tagline">Ôn thi tuyển sinh với Thầy Trong !!!</span></div>
+      <div class="logo-text">
+        <span class="logo-tagline">Ôn thi tuyển sinh với Thầy Trong !!!</span>
+      </div>
     </a>
     <nav class="nav">
       <a href="index.html"><span class="nav-emoji">🏠</span><span class="nav-label"> Làm bài</span></a>
       <a href="rank.html" class="active"><span class="nav-emoji">🏆</span><span class="nav-label"> Xếp hạng</span></a>
-      <a href="upload.html" id="navUpload" style="display:none;"><span class="nav-emoji">📤</span><span class="nav-label"> Upload đề</span></a>
+      <a href="upload.html"><span class="nav-emoji">📤</span><span class="nav-label"> Upload đề</span></a>
     </nav>
   </div>
 </header>
-<script>if(sessionStorage.getItem('teacher_auth')==='1')document.getElementById('navUpload').style.display='';</script>
 
 <main class="main">
 
-  <div class="rk-header">
-    <h1>🏆 Bảng Xếp Hạng</h1>
-    <p>Ôn thi tuyển sinh lớp 10 · Thầy Trong</p>
-  </div>
-
-  <!-- STATS -->
-  <div class="rk-stats">
-    <div class="rk-stat"><div class="rk-stat-num" id="sTotal">-</div><div class="rk-stat-lbl">Lượt làm bài</div></div>
-    <div class="rk-stat"><div class="rk-stat-num" id="sAvg">-</div><div class="rk-stat-lbl">Điểm TB</div></div>
-    <div class="rk-stat"><div class="rk-stat-num" id="sTop">-</div><div class="rk-stat-lbl">Cao nhất</div></div>
-    <div class="rk-stat"><div class="rk-stat-num" id="sPass">-</div><div class="rk-stat-lbl">Đạt ≥ 5</div></div>
-  </div>
-
-  <!-- TOP 10 -->
-  <div class="card mb-3">
-    <div class="card-header" style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <span style="font-weight:800;">🥇 Top 10 Cao Thủ</span>
-      <div style="display:flex;gap:6px;margin-left:auto;">
-        <button class="rk-tbtn active" id="tbWeek"  onclick="setTimeFilter('week')">Tuần</button>
-        <button class="rk-tbtn"        id="tbMonth" onclick="setTimeFilter('month')">Tháng</button>
-        <button class="rk-tbtn"        id="tbAll"   onclick="setTimeFilter('all')">Tất cả</button>
+  <!-- TOP 10 BẢO BỐI - LEADERBOARD -->
+  <div class="card mb-4">
+    <div class="card-header" style="background:linear-gradient(135deg,#1e3a8a,#1d4ed8);border:none;">
+      <div class="leaderboard-title" style="-webkit-text-fill-color:#fff;background:none;color:#fff;">
+        🏆 Top 10 Cao Thủ
       </div>
     </div>
-    <div class="card-body" style="padding:14px 16px;">
-      <div id="rkLeaderboard"><div class="loading"><div class="spinner"></div></div></div>
+    <div class="card-body">
+      <!-- Bộ lọc thời gian -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" id="filterWeek" onclick="setTimeFilter('week')">📅 Tuần này</button>
+        <button class="btn btn-outline btn-sm" id="filterMonth" onclick="setTimeFilter('month')">📆 Tháng này</button>
+        <button class="btn btn-outline btn-sm" id="filterAll" onclick="setTimeFilter('all')">🌐 Tất cả thời gian</button>
+      </div>
+      <div id="leaderboardContent">
+        <div class="loading"><div class="spinner"></div><p>Đang tải...</p></div>
+      </div>
     </div>
   </div>
 
-  <!-- BẢNG KẾT QUẢ -->
-  <div class="card mb-3">
-    <div class="card-header" style="padding:12px 16px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
-      <span style="font-weight:800;">📋 Tất cả kết quả</span>
-      <div style="margin-left:auto;display:flex;gap:8px;">
-        <button class="rk-tbtn" onclick="loadRankings()">🔄</button>
-        <button class="rk-tbtn" onclick="exportCSV()">📥 CSV</button>
+  <!-- Stats tổng quan -->
+  <div id="statsSection" class="stats-grid mb-4">
+    <div class="stats-card">
+      <span class="icon">👥</span>
+      <div class="info">
+        <div class="num" id="statStudents">-</div>
+        <div class="lbl">Lượt làm bài</div>
       </div>
     </div>
-    <div class="card-body" style="padding:12px 16px;">
-      <div class="rk-filters">
-        <select id="fClass" onchange="applyFilters()"><option value="">Tất cả lớp</option></select>
-        <select id="fTopic" onchange="applyFilters()">
-          <option value="">Tất cả chủ đề</option>
-          <option value="dai-so">Đại số</option>
-          <option value="hinh-hoc">Hình học</option>
-          <option value="tong-hop">Tổng hợp</option>
-        </select>
-        <select id="fSort" onchange="applyFilters()">
-          <option value="score">Điểm cao nhất</option>
-          <option value="recent">Mới nhất</option>
-          <option value="name">Theo tên</option>
-        </select>
-        <input id="fSearch" type="text" placeholder="🔍 Tìm tên học sinh..." oninput="applyFilters()">
+    <div class="stats-card">
+      <span class="icon">⭐</span>
+      <div class="info">
+        <div class="num" id="statAvg">-</div>
+        <div class="lbl">Điểm trung bình</div>
       </div>
-      <div id="rkTable"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+    <div class="stats-card">
+      <span class="icon">🏅</span>
+      <div class="info">
+        <div class="num" id="statTop">-</div>
+        <div class="lbl">Điểm cao nhất</div>
+      </div>
+    </div>
+    <div class="stats-card">
+      <span class="icon">✅</span>
+      <div class="info">
+        <div class="num" id="statPass">-</div>
+        <div class="lbl">Đạt ≥ 5 điểm</div>
+      </div>
     </div>
   </div>
 
-  <!-- THỐNG KÊ THEO LỚP -->
-  <div class="card mb-3">
-    <div class="card-header" style="padding:12px 16px;"><span style="font-weight:800;">📊 Thống kê theo lớp</span></div>
-    <div class="card-body" style="padding:4px 0;" id="rkClassStats">
-      <div class="loading"><div class="spinner"></div></div>
+  <!-- Bảng xếp hạng -->
+  <div class="card">
+    <div class="card-header">
+      <h2>🏆 Bảng Xếp Hạng</h2>
+    </div>
+    <div class="card-body">
+
+      <!-- Bộ lọc -->
+      <div class="rank-filters">
+        <div class="form-group mb-0" style="min-width:160px;">
+          <select class="form-control" id="filterClass" onchange="applyFilters()">
+            <option value="">📚 Tất cả lớp</option>
+            <!-- Các lớp sẽ được thêm động từ dữ liệu thực -->
+          </select>
+        </div>
+        <div class="form-group mb-0" style="min-width:160px;">
+          <select class="form-control" id="filterTopic" onchange="applyFilters()">
+            <option value="">📖 Tất cả chủ đề</option>
+            <option value="dai-so">Đại số</option>
+            <option value="hinh-hoc">Hình học</option>
+            <option value="tong-hop">Tổng hợp</option>
+          </select>
+        </div>
+        <div class="form-group mb-0" style="min-width:160px;">
+          <select class="form-control" id="filterSort" onchange="applyFilters()">
+            <option value="score">⬆ Điểm cao nhất</option>
+            <option value="recent">🕐 Mới nhất</option>
+            <option value="name">🔤 Theo tên</option>
+          </select>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="loadRankings()">🔄 Làm mới</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 Xuất CSV</button>
+      </div>
+
+      <!-- Search -->
+      <div class="form-group">
+        <input class="form-control" id="searchInput" type="text" 
+               placeholder="🔍 Tìm kiếm theo tên học sinh..."
+               oninput="applyFilters()">
+      </div>
+
+      <!-- Table -->
+      <div id="rankContent">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Đang tải bảng xếp hạng...</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Thống kê theo lớp -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <h2>📊 Thống kê theo lớp</h2>
+    </div>
+    <div class="card-body">
+      <div id="classStats">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
     </div>
   </div>
 
 </main>
 
 <div id="toastContainer" class="toast-container"></div>
+
 <script src="app.js"></script>
 <script>
-let allResults = [];
-let timeFilter = 'week';
+// ====================================================
+// RANKING PAGE LOGIC
+// ====================================================
 
-function setTimeFilter(f) {
-  timeFilter = f;
-  ['Week','Month','All'].forEach(k => {
-    const b = document.getElementById('tb'+k);
-    if (b) b.className = 'rk-tbtn' + (k.toLowerCase()===f?' active':'');
+let allResults = [];
+let currentTimeFilter = 'week'; // 'week' | 'month' | 'all'
+
+function setTimeFilter(filter) {
+  currentTimeFilter = filter;
+  ['week','month','all'].forEach(f => {
+    const btn = document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1));
+    if (btn) {
+      btn.className = f === filter ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
+    }
   });
   renderLeaderboard(allResults);
 }
 
-function filterByTime(data, f) {
+function filterByTime(data, filter) {
   const now = new Date();
   return data.filter(r => {
-    if (f==='all') return true;
+    if (filter === 'all') return true;
     const ts = new Date(r.timestamp);
-    if (f==='week')  return ts >= new Date(now - 7*24*3600*1000);
-    if (f==='month') return ts.getMonth()===now.getMonth() && ts.getFullYear()===now.getFullYear();
+    if (filter === 'week') {
+      const weekAgo = new Date(now - 7 * 24 * 3600 * 1000);
+      return ts >= weekAgo;
+    }
+    if (filter === 'month') {
+      return ts.getMonth() === now.getMonth() && ts.getFullYear() === now.getFullYear();
+    }
     return true;
   });
 }
 
+// Render Top 10 Leaderboard với podium
 function renderLeaderboard(data) {
-  const filtered = filterByTime(data, timeFilter);
-  const bm = {};
+  const filtered = filterByTime(data, currentTimeFilter);
+  // Lấy điểm cao nhất của mỗi học sinh
+  const bestMap = {};
   filtered.forEach(r => {
-    const k = r.studentName+'_'+r.studentClass;
-    if (!bm[k] || r.score>bm[k].score || (r.score===bm[k].score && r.timeTaken<bm[k].timeTaken)) bm[k]=r;
+    const key = r.studentName + '_' + r.studentClass;
+    if (!bestMap[key] || r.score > bestMap[key].score) {
+      bestMap[key] = r;
+    }
   });
-  const top10 = Object.values(bm).sort((a,b)=>b.score-a.score||a.timeTaken-b.timeTaken).slice(0,10);
-  const el = document.getElementById('rkLeaderboard');
-  if (!el) return;
-  if (!top10.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);">Chưa có dữ liệu trong khoảng này.</div>'; return; }
+  const top10 = Object.values(bestMap)
+    .sort((a, b) => b.score - a.score || a.timeTaken - b.timeTaken)
+    .slice(0, 10);
 
-  // Podium
-  let pod = '';
-  if (top10.length >= 2) {
-    // Thứ tự podium: 🥈 trái, 🥇 giữa (cao nhất), 🥉 phải
-    const podSlots = [];
-    if (top10[1]) podSlots.push({r:top10[1], cls:'rk-s2', icon:'🥈', rank:2});
-    podSlots.push({r:top10[0], cls:'rk-s1', icon:'🥇', rank:1});
-    if (top10[2]) podSlots.push({r:top10[2], cls:'rk-s3', icon:'🥉', rank:3});
-    pod = '<div class="rk-podium">' + podSlots.map(s => {
-      const crown = s.rank===1 ? '<div class="rk-crown">👑</div>' : '';
-      return '<div class="rk-slot '+s.cls+'" style="position:relative;" onclick="rankFirework('+s.rank+',\''+s.r.studentName.replace(/'/g,"\\'")+'\')">'+
-        crown+
-        '<div class="rk-av">'+s.r.studentName.charAt(0).toUpperCase()+'</div>'+
-        '<div class="rk-sname">'+s.r.studentName+'</div>'+
-        '<div class="rk-sscore">'+s.r.score+'<span style="font-size:.6rem;font-weight:600;opacity:.7">/10</span></div>'+
-        '<div class="rk-scls">'+s.r.studentClass+'</div>'+
-        '<div class="rk-block">'+s.icon+'</div></div>';
-    }).join('') + '</div>';
+  const el = document.getElementById('leaderboardContent');
+  if (!el) return;
+
+  if (top10.length === 0) {
+    el.innerHTML = `<div class="alert alert-info">Chưa có dữ liệu trong khoảng thời gian này.</div>`;
+    return;
   }
 
-  const medals=['🥇','🥈','🥉'];
-  const list = '<div class="rk-top10">' + top10.map((r,i)=>{
-    const rk=i+1;
-    return '<div class="rk-t10 r'+rk+'"'+(rk<=3?' onclick="rankFirework('+rk+',\''+r.studentName.replace(/'/g,"\\'")+'\') "':'')+'>'+
-      '<div class="rk-t10-rk">'+(rk<=3?medals[rk-1]:rk)+'</div>'+
-      '<div class="rk-t10-av">'+r.studentName.charAt(0).toUpperCase()+'</div>'+
-      '<div class="rk-t10-info"><div class="rk-t10-name">'+r.studentName+'</div>'+
-      '<div class="rk-t10-sub">'+r.studentClass+' · '+renderRankBadge(r.score)+'</div></div>'+
-      '<div class="rk-t10-score">'+r.score+'<span style="font-size:.62rem;color:var(--text-muted)">/10</span></div></div>';
-  }).join('') + '</div>';
+  // Podium top 3
+  const podiumOrder = [top10[1], top10[0], top10[2]].filter(Boolean);
+  const podiumClasses = top10[1] ? [2, 1, 3] : [1, 2, 3];
+  const podiumIcons = ['🥈','🥇','🥉'];
 
-  el.innerHTML = pod + list;
+  let podiumHtml = '';
+  if (top10.length >= 2) {
+    const slots = [
+      { data: top10[1], pos: 2, icon: '🥈', blockClass: 'podium-2' },
+      { data: top10[0], pos: 1, icon: '🥇', blockClass: 'podium-1' },
+    ];
+    if (top10[2]) slots.push({ data: top10[2], pos: 3, icon: '🥉', blockClass: 'podium-3' });
+
+    podiumHtml = `
+      <div class="leaderboard-podium">
+        ${slots.map(s => `
+          <div class="podium-slot ${s.blockClass}" onclick="rankFirework(${s.pos},'${s.data.studentName.replace(/'/g,"\\'")}')" style="cursor:pointer;" title="Chạm để chúc mừng!">
+            <div class="podium-avatar">${s.data.studentName.charAt(0).toUpperCase()}</div>
+            <div class="podium-name">
+              ${s.data.studentName}
+            </div>
+            <div class="podium-score">${s.data.score}</div>
+            <div class="podium-block">${s.icon}</div>
+            <div style="font-size:0.6rem;color:#6366f1;animation:hint-pulse 1.8s ease-in-out infinite;margin-top:4px;">👆 Chạm!</div>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+
+  // Top 10 list
+  const medals = ['🥇','🥈','🥉'];
+  const isTeacher = sessionStorage.getItem('teacher_auth') === '1';
+  const listHtml = top10.map((r, i) => {
+    const rank = i + 1;
+    const clickAttr = rank <= 3
+      ? `onclick="rankFirework(${rank},'${r.studentName.replace(/'/g,"\\'")}') " style="cursor:pointer;" title="Chạm để chúc mừng!"`
+      : '';
+    const rid = r.id || `__idx__${allResults.indexOf(r)}`;
+    const safeName = r.studentName.replace(/'/g,"\\'");
+    const deleteBtn = isTeacher
+      ? `<button onclick="event.stopPropagation();deleteResult('${rid}','${safeName}')" class="btn-delete-result" title="Xóa">🗑️</button>`
+      : '';
+    return `
+      <div class="top10-item" ${clickAttr} style="position:relative;">
+        <div class="top10-rank">${rank <= 3 ? medals[rank-1] : rank}</div>
+        <div style="flex:1;">
+          <div class="top10-name">
+            ${r.studentName}
+          </div>
+          <div class="top10-class">${r.studentClass} · ${renderRankBadge(r.score)}</div>
+        </div>
+        <div class="top10-score">${r.score}<span style="font-size:0.7rem;color:var(--text-muted)">/10</span></div>
+      </div>
+    `;
+  }).join('');
+
+  el.innerHTML = podiumHtml + `<div class="top10-list">${listHtml}</div>`;
 }
 
+
+
+// Load dữ liệu
 async function loadRankings() {
-  document.getElementById('rkTable').innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  document.getElementById('rankContent').innerHTML = `
+    <div class="loading"><div class="spinner"></div><p>Đang tải...</p></div>
+  `;
+
   allResults = await fetchResults();
-  if (!allResults.length) allResults = generateSampleResults();
-  const cls=[...new Set(allResults.map(r=>r.studentClass).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'vi'));
-  const sel=document.getElementById('fClass');
-  if(sel) sel.innerHTML='<option value="">Tất cả lớp</option>'+cls.map(c=>'<option value="'+c+'">Lớp '+c+'</option>').join('');
+
+  if (allResults.length === 0) {
+    allResults = generateSampleResults();
+  }
+
+  // Cập nhật danh sách lớp động từ dữ liệu thực
+  populateClassFilter(allResults);
+
   updateStats(allResults);
   renderLeaderboard(allResults);
   applyFilters();
   renderClassStats(allResults);
 }
 
-function updateStats(d) {
-  const n=d.length, avg=n?(d.reduce((s,r)=>s+r.score,0)/n).toFixed(1):0;
-  const top=n?Math.max(...d.map(r=>r.score)):0, pass=d.filter(r=>r.score>=5).length;
-  document.getElementById('sTotal').textContent=n;
-  document.getElementById('sAvg').textContent=avg;
-  document.getElementById('sTop').textContent=top;
-  document.getElementById('sPass').textContent=pass+' ('+(n?Math.round(pass/n*100):0)+'%)';
+// Tạo danh sách lớp động từ dữ liệu
+function populateClassFilter(data) {
+  const classes = [...new Set(data.map(r => r.studentClass).filter(Boolean))].sort((a,b) => a.localeCompare(b,'vi'));
+  const sel = document.getElementById('filterClass');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">📚 Tất cả lớp</option>' +
+    classes.map(c => `<option value="${c}">Lớp ${c}</option>`).join('');
 }
 
+// Xóa 1 kết quả
+async function deleteResult(id, name) {
+  if (!confirm(`Xóa kết quả của "${name}"?`)) return;
+
+  if (AppState.useFirebase && AppState.db && !id.startsWith('__idx__')) {
+    // Xóa trên Firebase bằng document id
+    try {
+      await AppState.db.collection('results').doc(id).delete();
+      showToast(`Đã xóa kết quả của ${name}`, 'success');
+      loadRankings();
+    } catch(e) {
+      showToast('Lỗi khi xóa: ' + e.message, 'error');
+    }
+  } else {
+    // Xóa trong localStorage bằng index
+    let results = JSON.parse(localStorage.getItem('quiz_results') || '[]');
+    if (id.startsWith('__idx__')) {
+      const idx = parseInt(id.replace('__idx__',''));
+      results.splice(idx, 1);
+    } else {
+      results = results.filter(r => r.id !== id);
+    }
+    localStorage.setItem('quiz_results', JSON.stringify(results));
+    showToast(`Đã xóa kết quả của ${name}`, 'success');
+    loadRankings();
+  }
+}
+
+// Tạo dữ liệu mẫu demo
+function generateSampleResults() {
+  const names = ['Nguyễn Văn An','Trần Thị Bình','Lê Minh Châu','Phạm Quốc Dũng',
+                 'Hoàng Thu Hà','Vũ Thanh Hưng','Đặng Thị Mai','Bùi Văn Nam',
+                 'Đinh Thu Phương','Ngô Minh Quân'];
+  const classes = ['9A','9B','9C','9D','9A','9B','9C','9A','9B','9D'];
+  const topics = ['dai-so','hinh-hoc','tong-hop'];
+  const topicNames = {'dai-so':'Đại số','hinh-hoc':'Hình học','tong-hop':'Tổng hợp'};
+
+  return names.map((name, i) => {
+    const topic = topics[i % 3];
+    const score = +(5 + Math.random() * 5).toFixed(1);
+    const correct = Math.round(score);
+    return {
+      studentName: name,
+      studentClass: classes[i],
+      topic: topic,
+      topicName: topicNames[topic],
+      score: score,
+      correct: correct,
+      total: 10,
+      timeTaken: 300 + Math.floor(Math.random() * 900),
+      timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 3600000).toISOString()
+    };
+  });
+}
+
+// Cập nhật thống kê tổng quan
+function updateStats(data) {
+  const total = data.length;
+  const avg = total > 0 ? (data.reduce((s, r) => s + r.score, 0) / total).toFixed(1) : 0;
+  const top = total > 0 ? Math.max(...data.map(r => r.score)) : 0;
+  const pass = data.filter(r => r.score >= 5).length;
+
+  document.getElementById('statStudents').textContent = total;
+  document.getElementById('statAvg').textContent = avg;
+  document.getElementById('statTop').textContent = top;
+  document.getElementById('statPass').textContent = `${pass} (${total > 0 ? Math.round(pass/total*100) : 0}%)`;
+}
+
+// Áp dụng bộ lọc và render
 function applyFilters() {
-  const fc=document.getElementById('fClass').value;
-  const ft=document.getElementById('fTopic').value;
-  const fs=document.getElementById('fSort').value;
-  const q=document.getElementById('fSearch').value.toLowerCase();
-  let d=allResults.filter(r=>(!fc||r.studentClass===fc)&&(!ft||r.topic===ft)&&(!q||r.studentName.toLowerCase().includes(q)));
-  if(fs==='score') d.sort((a,b)=>b.score-a.score||a.timeTaken-b.timeTaken);
-  else if(fs==='recent') d.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
-  else d.sort((a,b)=>a.studentName.localeCompare(b.studentName,'vi'));
-  renderTable(d);
+  const filterClass = document.getElementById('filterClass').value;
+  const filterTopic = document.getElementById('filterTopic').value;
+  const filterSort = document.getElementById('filterSort').value;
+  const search = document.getElementById('searchInput').value.toLowerCase();
+
+  let filtered = allResults.filter(r => {
+    if (filterClass && r.studentClass !== filterClass) return false;
+    if (filterTopic && r.topic !== filterTopic) return false;
+    if (search && !r.studentName.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  // Sort
+  if (filterSort === 'score') {
+    filtered.sort((a, b) => b.score - a.score || a.timeTaken - b.timeTaken);
+  } else if (filterSort === 'recent') {
+    filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  } else if (filterSort === 'name') {
+    filtered.sort((a, b) => a.studentName.localeCompare(b.studentName, 'vi'));
+  }
+
+  renderTable(filtered);
 }
 
+// Render bảng xếp hạng
 function renderTable(data) {
-  const el=document.getElementById('rkTable');
-  if(!el) return;
-  if(!data.length){
-    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);">Chưa có kết quả. <a href="index.html" class="btn btn-primary btn-sm" style="margin-left:8px;">Làm bài ngay</a></div>';
+  const rankContent = document.getElementById('rankContent');
+
+  if (data.length === 0) {
+    rankContent.innerHTML = `
+      <div class="alert alert-info">
+        Chưa có dữ liệu. Hãy làm bài thi trước nhé! 
+        <a href="index.html" class="btn btn-primary btn-sm" style="margin-left:12px;">Làm bài ngay</a>
+      </div>
+    `;
     return;
   }
-  const medals=['🥇','🥈','🥉'];
-  const rows=data.map((r,i)=>{
-    const rk=i+1, sc=r.score>=8?'h':r.score>=5?'m':'l';
-    const tm=Math.floor(r.timeTaken/60)+':'+String(r.timeTaken%60).padStart(2,'0');
-    const dt=r.timestamp?new Date(r.timestamp).toLocaleDateString('vi-VN'):'-';
-    const rc=rk===1?'t1':rk===2?'t2':rk===3?'t3':'';
-    return '<tr class="'+rc+'"><td style="font-weight:800;text-align:center;">'+(rk<=3?medals[rk-1]:rk)+'</td>'+
-      '<td><strong>'+r.studentName+'</strong></td>'+
-      '<td><span class="class-badge">'+r.studentClass+'</span></td>'+
-      '<td>'+renderRankBadge(r.score)+'</td>'+
-      '<td style="color:var(--text-muted)">'+( r.topicName||'-')+'</td>'+
-      '<td><span class="sp '+sc+'">'+r.score+'/10</span></td>'+
-      '<td style="color:var(--text-muted)">'+r.correct+'/'+r.total+'</td>'+
-      '<td style="color:var(--text-muted)">⏱ '+tm+'</td>'+
-      '<td style="color:var(--text-muted);font-size:.76rem">'+dt+'</td></tr>';
+
+  const medals = ['🥇','🥈','🥉'];
+
+  const rows = data.map((r, i) => {
+    const rank = i + 1;
+    const rankData = getRank(r.score);
+    const scoreClass = r.score >= 8 ? 'high' : r.score >= 5 ? 'mid' : 'low';
+    const time = `${Math.floor(r.timeTaken/60)}:${(r.timeTaken%60).toString().padStart(2,'0')}`;
+    const date = r.timestamp ? new Date(r.timestamp).toLocaleDateString('vi-VN') : '-';
+    const rid = r.id || `__idx__${i}`;
+    const safeName = r.studentName.replace(/'/g,"\\'");
+
+    // Special name styles per rank tier
+    let nameStyle = '';
+    let namePrefix = '';
+    let rowClass = rank <= 3 ? `rank-${rank}` : '';
+    if (rankData.tier === 'challenger') {
+      nameStyle = 'font-size:1.08rem;font-weight:900;background:linear-gradient(90deg,#f59e0b,#fbbf24,#fef08a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;';
+      namePrefix = '👑 ';
+      rowClass += ' row-challenger';
+    } else if (rankData.tier === 'grandmaster') {
+      nameStyle = 'font-weight:800;background:linear-gradient(90deg,#c026d3,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;';
+      rowClass += ' row-grandmaster';
+    } else if (rankData.tier === 'legend') {
+      nameStyle = 'font-weight:700;color:#dc2626;';
+    }
+
+    // Rank tier badge cell
+    const tierBadge = `<span class="rank-tier-badge rtb-${rankData.tier}">${rankData.icon} ${rankData.tierLabel}</span>`;
+
+    // Praise + advice based on tier
+    const PRAISE_MAP = {
+      'silver-gold': {
+        praise: '⭐ Khởi đầu tốt! Đã đủ kiến thức để trụ hạng. Lên Rank tiếp thôi!',
+        advice: '💡 Nắm chắc lý thuyết và tập bấm máy cơ bản để không mất điểm oan nhé.',
+        cls: 'praise-silver',
+      },
+      'platinum': {
+        praise: '🎯 Múa phím Casio rất bén! Em bắt đầu đáng gờm rồi đấy.',
+        advice: '💡 Tập trung giải quyết các câu hình học để bứt phá lên mức 8 điểm!',
+        cls: 'praise-platinum',
+      },
+      'diamond': {
+        praise: '💥 Quá tinh nhuệ! Tốc độ và độ chính xác của em gần như hoàn hảo.',
+        advice: '💡 Cẩn thận các câu hỏi bẫy. Chỉ cần tỉ mỉ hơn là em chạm mức Huyền thoại.',
+        cls: 'praise-diamond',
+      },
+      'legend': {
+        praise: '🔥 BOOYAH! Đẳng cấp thực sự. Đề thi này không còn là đối thủ của em.',
+        advice: '💡 Đừng chủ quan. Hãy rà soát lại bài làm để bảo vệ điểm số tuyệt đối.',
+        cls: 'praise-legend',
+      },
+      'grandmaster': {
+        praise: '🏆 VÔ ĐỐI! Em đã quét sạch mọi cạm bẫy. Pháo hoa này dành cho em!',
+        advice: '💡 Duy trì sự tập trung này. Em chính là tấm gương cho cả lớp noi theo.',
+        cls: 'praise-gm',
+      },
+      'challenger': {
+        praise: '👑 VỊ VUA MỸ QUÝ! Em đang đứng trên đỉnh cao nhất của bảng xếp hạng.',
+        advice: '💡 Kẻ mạnh nhất là kẻ giữ được ngôi Vương lâu nhất. Đừng để bị soán ngôi!',
+        cls: 'praise-ch',
+      },
+    };
+    const praise = PRAISE_MAP[rankData.tier] || PRAISE_MAP['silver-gold'];
+
+    return `
+      <tr class="${rowClass}">
+        <td class="rank-num">
+          ${rank <= 3 ? `<span class="rank-medal">${medals[rank-1]}</span>` : rank}
+          ${rank === 1 ? ' <span class="rank-top1-crown">👑</span>' : ''}
+        </td>
+        <td><strong style="${nameStyle}">${namePrefix}${r.studentName}</strong></td>
+        <td><span class="class-badge">${r.studentClass}</span></td>
+        <td>${tierBadge}</td>
+        <td>${renderRankBadge(r.score)}</td>
+        <td><span style="font-size:0.85rem;color:var(--text-muted)">${r.topicName || '-'}</span></td>
+        <td><span class="score-pill ${scoreClass}">${r.score} / 10</span></td>
+        <td style="font-size:0.85rem;color:var(--text-muted)">${r.correct}/${r.total} câu</td>
+        <td style="font-size:0.85rem;color:var(--text-muted)">⏱️ ${time}</td>
+        <td style="font-size:0.8rem;color:var(--text-muted)">${date}</td>
+      </tr>
+    `;
   }).join('');
-  el.innerHTML='<div class="rk-tbl-wrap"><table class="rk-tbl"><thead><tr>'+
-    '<th>Hạng</th><th>Họ tên</th><th>Lớp</th><th>Danh hiệu</th><th>Chủ đề</th><th>Điểm</th><th>Đúng</th><th>Thời gian</th><th>Ngày</th>'+
-    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+
-    '<p style="text-align:right;font-size:.76rem;color:var(--text-muted);margin-top:6px;">'+data.length+' kết quả</p>';
+
+  rankContent.innerHTML = `
+    <div class="rank-table-wrap">
+      <table class="rank-table">
+        <thead>
+          <tr>
+            <th>Hạng</th>
+            <th>Họ và tên</th>
+            <th>Lớp</th>
+            <th>Cấp độ</th>
+            <th>Danh hiệu</th>
+            <th>Chủ đề</th>
+            <th>Điểm</th>
+            <th>Câu đúng</th>
+            <th>Thời gian</th>
+            <th>Ngày</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <p style="text-align:right;font-size:0.82rem;color:var(--text-muted);margin-top:10px;">
+      Hiển thị ${data.length} kết quả
+    </p>
+  `;
 }
 
+// Thống kê theo lớp
 function renderClassStats(data) {
-  const map={};
-  data.forEach(r=>{
-    if(!map[r.studentClass]) map[r.studentClass]={n:0,sum:0,pass:0};
-    map[r.studentClass].n++; map[r.studentClass].sum+=r.score;
-    if(r.score>=5) map[r.studentClass].pass++;
+  const classMap = {};
+  data.forEach(r => {
+    if (!classMap[r.studentClass]) {
+      classMap[r.studentClass] = { count: 0, totalScore: 0, pass: 0 };
+    }
+    classMap[r.studentClass].count++;
+    classMap[r.studentClass].totalScore += r.score;
+    if (r.score >= 5) classMap[r.studentClass].pass++;
   });
-  const cls=Object.entries(map).sort((a,b)=>(b[1].sum/b[1].n)-(a[1].sum/a[1].n));
-  const el=document.getElementById('rkClassStats');
-  if(!el) return;
-  if(!cls.length){el.innerHTML='<div style="text-align:center;padding:14px;color:var(--text-muted);">Chưa có dữ liệu</div>';return;}
-  el.innerHTML=cls.map(([name,s])=>{
-    const avg=(s.sum/s.n).toFixed(1), pct=Math.round(s.pass/s.n*100);
-    const col=pct>=80?'#15803d':pct>=50?'#92400e':'#991b1b';
-    return '<div class="rk-cls-item"><div class="rk-cls-name">'+name+'</div>'+
-      '<div class="rk-cls-bar"><div class="rk-cls-fill" style="width:'+(parseFloat(avg)/10*100).toFixed(0)+'%"></div></div>'+
-      '<div class="rk-cls-avg">'+avg+'</div>'+
-      '<div class="rk-cls-pass" style="color:'+col+'">'+pct+'% đạt · '+s.n+' lượt</div></div>';
+
+  const classes = Object.entries(classMap).sort((a, b) => {
+    const avgA = a[1].totalScore / a[1].count;
+    const avgB = b[1].totalScore / b[1].count;
+    return avgB - avgA;
+  });
+
+  if (classes.length === 0) {
+    document.getElementById('classStats').innerHTML = '<p class="text-muted text-center">Chưa có dữ liệu</p>';
+    return;
+  }
+
+  const rows = classes.map(([cls, stats]) => {
+    const avg = (stats.totalScore / stats.count).toFixed(1);
+    const passRate = Math.round(stats.pass / stats.count * 100);
+    const barWidth = (parseFloat(avg) / 10 * 100).toFixed(0);
+
+    return `
+      <tr>
+        <td><span class="class-badge" style="font-size:1rem;">${cls}</span></td>
+        <td>${stats.count} lượt</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="flex:1;height:8px;background:var(--border);border-radius:99px;overflow:hidden;">
+              <div style="width:${barWidth}%;height:100%;background:var(--primary);border-radius:99px;"></div>
+            </div>
+            <strong>${avg}</strong>
+          </div>
+        </td>
+        <td>
+          <span style="color:${passRate >= 80 ? 'var(--success)' : passRate >= 50 ? 'var(--secondary-dark)' : 'var(--danger)'};">
+            ${passRate}%
+          </span>
+        </td>
+        <td style="font-size:0.85rem;color:var(--text-muted)">${stats.pass}/${stats.count} HS</td>
+      </tr>
+    `;
   }).join('');
+
+  document.getElementById('classStats').innerHTML = `
+    <div class="rank-table-wrap">
+      <table class="rank-table">
+        <thead>
+          <tr>
+            <th>Lớp</th>
+            <th>Lượt làm bài</th>
+            <th>Điểm TB</th>
+            <th>Tỷ lệ đạt (≥5)</th>
+            <th>Số HS đạt</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
 }
 
+// Xuất CSV
 function exportCSV() {
-  if(!allResults.length){showToast('Chưa có dữ liệu!','warning');return;}
-  const h=['Họ tên','Lớp','Chủ đề','Điểm','Câu đúng','Tổng','Thời gian(s)','Ngày'];
-  const rows=allResults.map(r=>[r.studentName,r.studentClass,r.topicName||r.topic,r.score,r.correct,r.total,r.timeTaken,r.timestamp?new Date(r.timestamp).toLocaleDateString('vi-VN'):'']);
-  const csv=[h,...rows].map(row=>row.map(c=>'"'+c+'"').join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
-  a.download='ketqua_'+new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')+'.csv';
-  a.click(); showToast('Đã xuất CSV!','success');
+  if (allResults.length === 0) {
+    showToast('Chưa có dữ liệu để xuất!', 'warning');
+    return;
+  }
+
+  const headers = ['Họ tên','Lớp','Chủ đề','Điểm','Câu đúng','Tổng câu','Thời gian (giây)','Ngày làm'];
+  const rows = allResults.map(r => [
+    r.studentName,
+    r.studentClass,
+    r.topicName || r.topic,
+    r.score,
+    r.correct,
+    r.total,
+    r.timeTaken,
+    r.timestamp ? new Date(r.timestamp).toLocaleDateString('vi-VN') : ''
+  ]);
+
+  const csv = [headers, ...rows]
+    .map(row => row.map(cell => `"${cell}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `ketqua_toan9_${new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')}.csv`;
+  link.click();
+  showToast('Đã xuất file CSV thành công!', 'success');
 }
 
-function generateSampleResults() {
-  const names=['Nguyễn Văn An','Trần Thị Bình','Lê Minh Châu','Phạm Quốc Dũng','Hoàng Thu Hà','Vũ Thanh Hưng','Đặng Thị Mai','Bùi Văn Nam','Đinh Thu Phương','Ngô Minh Quân'];
-  const clss=['9A','9B','9C','9D','9A','9B','9C','9A','9B','9D'];
-  const topics=['dai-so','hinh-hoc','tong-hop'];
-  const tN={'dai-so':'Đại số','hinh-hoc':'Hình học','tong-hop':'Tổng hợp'};
-  return names.map((name,i)=>{
-    const t=topics[i%3],score=+(5+Math.random()*5).toFixed(1);
-    return{studentName:name,studentClass:clss[i],topic:t,topicName:tN[t],score,correct:Math.round(score),total:10,timeTaken:300+Math.floor(Math.random()*900),timestamp:new Date(Date.now()-Math.random()*7*24*3600000).toISOString()};
-  });
-}
+// Khởi động
+document.addEventListener('DOMContentLoaded', () => {
+  initFirebase();
+  loadRankings();
+});
 
+// ====================================================
+// PHÁO HOA BẢNG XẾP HẠNG
+// ====================================================
 function rankFirework(rank, name) {
-  try {
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    const now=ctx.currentTime;
-    const colors=['#fbbf24','#10b981','#3b82f6','#f472b6','#a78bfa','#34d399','#fb923c'];
-    const W=window.innerWidth,H=window.innerHeight;
-    const pts=rank===1?[{x:W*.2,y:H*.3},{x:W*.8,y:H*.25},{x:W*.5,y:H*.15},{x:W*.15,y:H*.6},{x:W*.85,y:H*.55},{x:W*.5,y:H*.5}]:rank===2?[{x:W*.3,y:H*.3},{x:W*.7,y:H*.3},{x:W*.5,y:H*.2}]:[{x:W*.4,y:H*.4},{x:W*.6,y:H*.35}];
-    pts.forEach((pt,bi)=>{
-      setTimeout(()=>{
-        for(let i=0;i<28;i++){
-          const p=document.createElement('div');p.className='firework-particle';
-          const a=(i/28)*360+Math.random()*10,dist=70+Math.random()*130,sz=5+Math.random()*8;
-          p.style.cssText='left:'+pt.x+'px;top:'+pt.y+'px;width:'+sz+'px;height:'+sz+'px;background:'+colors[(i+bi*3)%colors.length]+';--dx:'+Math.cos(a*Math.PI/180)*dist+'px;--dy:'+Math.sin(a*Math.PI/180)*dist+'px;animation-duration:'+(0.6+Math.random()*.5)+'s;border-radius:'+(Math.random()>.5?'50%':'3px')+';position:fixed;z-index:9999;pointer-events:none;';
-          document.body.appendChild(p);setTimeout(()=>p.remove(),1300);
-        }
-      },bi*130);
-    });
-    const notes=rank===1?[523,659,784,1047]:rank===2?[659,784,1047]:[523,659];
-    notes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(0.09,now+i*.12);g.gain.exponentialRampToValueAtTime(0.001,now+i*.12+.4);o.connect(g);g.connect(ctx.destination);o.start(now+i*.12);o.stop(now+i*.12+.45);});
-    const msgs=['🥇 '+name+' — SỐ 1! Pháo hoa! 🎆','🥈 '+name+' — Hạng 2! Tuyệt! ✨','🥉 '+name+' — Hạng 3! Cố lên! 🎉'];
-    showToast(msgs[rank-1]||'🎉 Xuất sắc!','success',3000);
-  } catch(e){}
-}
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const now = ctx.currentTime;
 
-document.addEventListener('DOMContentLoaded',()=>{initFirebase();loadRankings();});
+  if (rank === 1) {
+    // 🥇 HẠNG 1: Pháo hoa KHẮP MÀN HÌNH — 8 đợt nổ liên tiếp + fanfare hoành tráng
+    const colors = ['#fbbf24','#fef08a','#f59e0b','#fff','#f43f5e','#a78bfa','#34d399','#38bdf8','#fb923c'];
+    const W = window.innerWidth, H = window.innerHeight;
+
+    // 8 điểm nổ phủ kín màn hình
+    const points = [
+      {x:W*.1, y:H*.2}, {x:W*.9, y:H*.2},
+      {x:W*.5, y:H*.1}, {x:W*.25,y:H*.45},
+      {x:W*.75,y:H*.45},{x:W*.15,y:H*.7},
+      {x:W*.85,y:H*.7}, {x:W*.5, y:H*.55},
+    ];
+    points.forEach((pt, bi) => {
+      setTimeout(() => {
+        for (let i = 0; i < 40; i++) {
+          const p = document.createElement('div');
+          p.className = 'firework-particle';
+          const angle = (i/40)*360 + Math.random()*9;
+          const dist = 70 + Math.random()*160;
+          const size = 5 + Math.random()*9;
+          p.style.cssText = `left:${pt.x}px;top:${pt.y}px;width:${size}px;height:${size}px;
+            background:${colors[(i+bi*4)%colors.length]};
+            --dx:${Math.cos(angle*Math.PI/180)*dist}px;
+            --dy:${Math.sin(angle*Math.PI/180)*dist}px;
+            animation-duration:${0.7+Math.random()*0.7}s;
+            border-radius:${Math.random()>.4?'50%':'3px'};
+            position:fixed;z-index:9999;pointer-events:none;`;
+          document.body.appendChild(p);
+          setTimeout(()=>p.remove(), 1600);
+        }
+      }, bi * 180);
+    });
+
+    // Đợt thứ 2 sau 1.5s — mưa sao từ trên xuống
+    setTimeout(() => {
+      for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+          const p = document.createElement('div');
+          p.className = 'firework-particle';
+          const x = Math.random() * W;
+          const size = 4 + Math.random()*8;
+          p.style.cssText = `left:${x}px;top:-10px;width:${size}px;height:${size}px;
+            background:${colors[i%colors.length]};
+            --dx:${(Math.random()-.5)*60}px;--dy:${100+Math.random()*250}px;
+            animation-duration:${0.8+Math.random()*0.6}s;
+            border-radius:50%;position:fixed;z-index:9999;pointer-events:none;`;
+          document.body.appendChild(p);
+          setTimeout(()=>p.remove(), 1600);
+        }, i * 20);
+      }
+    }, 1500);
+
+    // Âm thanh: fanfare kèn hoành tráng nhiều lớp
+    // Lớp 1: chord fanfare
+    [[523,0],[659,0],[784,0],[1047,0.05]].forEach(([f,t])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='square'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,now+t);
+      g.gain.linearRampToValueAtTime(0.12,now+t+0.06);
+      g.gain.exponentialRampToValueAtTime(0.001,now+t+0.5);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(now+t);o.stop(now+t+0.55);
+    });
+    // Lớp 2: giai điệu thăng tiến
+    [[523,.3],[587,.45],[659,.6],[784,.75],[1047,.9],[1319,1.1]].forEach(([f,t])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sawtooth'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,now+t);
+      g.gain.linearRampToValueAtTime(0.09,now+t+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001,now+t+0.28);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(now+t);o.stop(now+t+0.32);
+    });
+    // Lớp 3: trống bass thình thịch
+    [0, 0.35, 0.7, 1.05].forEach(t=>{
+      const buf=ctx.createBuffer(1,ctx.sampleRate*0.15,ctx.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(d.length*0.2));
+      const src=ctx.createBufferSource(),g=ctx.createGain();
+      const flt=ctx.createBiquadFilter();
+      flt.type='lowpass';flt.frequency.value=150;
+      src.buffer=buf;
+      g.gain.setValueAtTime(0.7,now+t);
+      g.gain.exponentialRampToValueAtTime(0.001,now+t+0.18);
+      src.connect(flt);flt.connect(g);g.connect(ctx.destination);
+      src.start(now+t);
+    });
+
+    showToast(`🥇🎊 XUẤT SẮC! ${name} đứng đầu bảng! Quá tuyệt vời! 🎆`, 'success', 4000);
+  }
+  else if (rank === 2) {
+    // 🥈 Hạng 2: Xoáy ốc + chuông trong
+    const colors=['#e2e8f0','#94a3b8','#7dd3fc','#38bdf8','#fff','#a5f3fc'];
+    const cx=window.innerWidth/2, cy=window.innerHeight*.4;
+    for(let i=0;i<70;i++){
+      setTimeout(()=>{
+        const p=document.createElement('div');
+        p.className='firework-particle';
+        const angle=(i/70)*720;
+        const dist=30+(i/70)*170;
+        const size=4+Math.random()*7;
+        p.style.cssText=`left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;
+          background:${colors[i%colors.length]};
+          --dx:${Math.cos(angle*Math.PI/180)*dist}px;
+          --dy:${Math.sin(angle*Math.PI/180)*dist-90}px;
+          animation-duration:${0.8+Math.random()*0.5}s;
+          border-radius:50%;position:fixed;z-index:9999;pointer-events:none;`;
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),1500);
+      }, i*14);
+    }
+    // Chuông ngân 3 nốt
+    [880,1108,1320,1760].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0.18,now+i*.2);
+      g.gain.exponentialRampToValueAtTime(0.001,now+i*.2+1.4);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(now+i*.2);o.stop(now+i*.2+1.5);
+    });
+    showToast(`🥈✨ Tuyệt vời! ${name} xếp hạng 2! 🌟`, 'success', 3500);
+  }
+  else {
+    // 🥉 Hạng 3: Mưa sao vui + giai điệu bouncy
+    const colors=['#f97316','#fb923c','#fdba74','#10b981','#34d399','#a78bfa','#f43f5e'];
+    for(let i=0;i<70;i++){
+      setTimeout(()=>{
+        const p=document.createElement('div');
+        p.className='firework-particle';
+        const x=Math.random()*window.innerWidth;
+        const size=4+Math.random()*8;
+        p.style.cssText=`left:${x}px;top:-10px;width:${size}px;height:${size}px;
+          background:${colors[i%colors.length]};
+          --dx:${(Math.random()-.5)*80}px;--dy:${80+Math.random()*220}px;
+          animation-duration:${0.7+Math.random()*0.6}s;
+          border-radius:${Math.random()>.5?'50%':'3px'};
+          position:fixed;z-index:9999;pointer-events:none;`;
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),1500);
+      }, i*18);
+    }
+    [392,494,587,698,784,880].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='triangle';o.frequency.value=f;
+      g.gain.setValueAtTime(0.13,now+i*.1);
+      g.gain.exponentialRampToValueAtTime(0.001,now+i*.1+0.28);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(now+i*.1);o.stop(now+i*.1+0.32);
+    });
+    showToast(`🥉🎉 Giỏi lắm! ${name} xếp hạng 3! Cố lên!`, 'success', 3000);
+  }
+}
 </script>
 </body>
 </html>
