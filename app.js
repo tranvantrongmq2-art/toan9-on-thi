@@ -737,13 +737,13 @@ function renderHome() {
   if (!app) return;
 
   app.innerHTML = `
-    <!-- ===== BẢNG VINH DANH ===== -->
+    <!-- BẢNG VINH DANH -->
     <div class="home-section-label" style="margin-top:0;">🏆 Bảng Vinh Danh</div>
     <div class="honor-board" id="honorBoard">
       <div class="honor-loading"><div class="spinner"></div></div>
     </div>
 
-    <!-- Hero banner -->
+    <!-- HERO -->
     <div class="home-hero" style="margin-top:20px;">
       <div class="home-hero-bg"></div>
       <div class="home-hero-content">
@@ -752,210 +752,42 @@ function renderHome() {
         <p class="home-hero-sub">Luyện đề trắc nghiệm chuẩn cấu trúc thi — xem điểm ngay sau khi nộp bài</p>
       </div>
       <div class="home-hero-deco">
-        <span class="deco-shape s1">π</span>
-        <span class="deco-shape s2">∫</span>
-        <span class="deco-shape s3">√</span>
-        <span class="deco-shape s4">∑</span>
-        <span class="deco-shape s5">△</span>
+        <span class="deco-shape s1">π</span><span class="deco-shape s2">∫</span>
+        <span class="deco-shape s3">√</span><span class="deco-shape s4">∑</span><span class="deco-shape s5">△</span>
       </div>
     </div>
 
-    <!-- ===== TÀI LIỆU ÔN TẬP ===== -->
+    <!-- TÀI LIỆU -->
     <div class="home-section-label" style="margin-top:24px;">📚 Tài Liệu Ôn Tập</div>
     <div class="doc-library" id="docLibrary">
       <div style="display:flex;justify-content:center;padding:20px;"><div class="spinner"></div></div>
     </div>
 
-    <!-- ===== THÔNG TIN HỌC SINH ===== -->
+    <!-- THÔNG TIN HỌC SINH -->
     <div class="home-info-card" style="margin-top:24px;">
       <div class="home-info-icon">✏️</div>
       <div class="home-info-fields">
         <div class="home-field">
           <label>Họ và tên</label>
-          <input class="home-input" id="studentName" type="text"
-                 placeholder="Nguyễn Văn An" autocomplete="name">
+          <input class="home-input" id="studentName" type="text" placeholder="Nguyễn Văn An" autocomplete="name">
         </div>
         <div class="home-field">
           <label>Lớp</label>
-          <input class="home-input" id="studentClass" type="text"
-                 placeholder="Ví dụ: 9A, 9B2..." maxlength="10" autocomplete="off">
-        </div>
-        <div class="home-field">
-          <label>Trình độ của em</label>
-          <select class="home-input" id="studentLevel" onchange="onLevelSelectChange()">
-            <option value="">-- Chọn trình độ --</option>
-            <option value="tb">📗 Trung Bình (0–5 điểm)</option>
-            <option value="kha">📘 Khá (5–6.5 điểm)</option>
-            <option value="tot">📙 Tốt (6.5–8 điểm)</option>
-            <option value="xs">📕 Xuất Sắc (8–10 điểm)</option>
-          </select>
+          <input class="home-input" id="studentClass" type="text" placeholder="9A, 9B2..." maxlength="10" autocomplete="off">
         </div>
       </div>
     </div>
 
-    <!-- ===== 4 KHU VỰC TRÌNH ĐỘ ===== -->
-    <div class="home-section-label" style="margin-top:24px;">🎯 Chọn khu vực làm bài</div>
-
-    <!-- Tab chọn khu vực -->
-    <div class="level-tabs" id="levelTabs">
-      ${LEVEL_ORDER.map(lvId => {
-        const lv = LEVELS[lvId];
-        const lvRankInfo = LEVEL_RANK_META[lvId];
-        return `
-          <div class="level-tab" data-level="${lvId}" onclick="switchLevel('${lvId}')">
-            <div class="lv-lock" id="lvLock_${lvId}">🔒</div>
-            <div class="lv-icon">${lv.icon}</div>
-            <div class="lv-name" style="color:${lv.color}">${lv.name}</div>
-            <div class="lv-score">${lv.scoreRange}</div>
-            <div class="lv-rank-mini">${lvRankInfo.rankIcon} <span>${lvRankInfo.rankShort}</span></div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-
-    <!-- Banner kích thích cấp Trung Bình -->
-    <div class="tb-motivate-banner" id="tbMotivateBanner" style="display:none;">
-      <div class="tb-motivate-inner">
-        <div class="tb-motivate-title">🚀 Em đang ở khu vực TRUNG BÌNH — Hãy vươn lên!</div>
-        <div class="tb-motivate-path">
-          ${[
-            { icon:'🥈', label:'Trung Bình', sub:'0–4.9đ', cls:'step-current' },
-            { icon:'🏅', label:'Bạch Kim', sub:'5–6.4đ', cls:'step-next' },
-            { icon:'💎', label:'Kim Cương', sub:'6.5–7.9đ', cls:'step-future' },
-            { icon:'🔮', label:'Huyền Thoại', sub:'8–8.9đ', cls:'step-future' },
-            { icon:'👑', label:'Đại Cao Thủ', sub:'9–9.9đ', cls:'step-future' },
-            { icon:'🔥', label:'Thách Đấu', sub:'10đ', cls:'step-future' },
-          ].map((s,i) => `
-            <div class="tb-step ${s.cls}">
-              <div class="tb-step-icon">${s.icon}</div>
-              <div class="tb-step-label">${s.label}</div>
-              <div class="tb-step-sub">${s.sub}</div>
-              ${i < 5 ? '<div class="tb-step-arrow">→</div>' : ''}
-            </div>
-          `).join('')}
-        </div>
-        <div class="tb-motivate-rewards">
-          <div class="tb-reward-item">🏅 <strong>Bạch Kim:</strong> Sticker "Chiến binh" vào vở</div>
-          <div class="tb-reward-item">💎 <strong>Kim Cương:</strong> Được thầy giải 1 câu khó</div>
-          <div class="tb-reward-item">👑 <strong>Đại Cao Thủ:</strong> Pháo hoa + Bút bi xịn</div>
-          <div class="tb-reward-item">🔥 <strong>Thách Đấu:</strong> Phiếu miễn kiểm tra miệng!</div>
-        </div>
-        <div class="tb-motivate-quote">💬 <em>"Mỗi câu đúng hôm nay là một bước lên bục vinh quang ngày mai!"</em> — Thầy Trong</div>
-      </div>
-    </div>
-
-    <!-- Banner kích thích cấp Khá -->
-    <div class="level-motivate-banner kha-banner" id="khaMotivateBanner" style="display:none;">
-      <div class="lmb-inner">
-        <div class="lmb-header">
-          <span class="lmb-icon">📘</span>
-          <div>
-            <div class="lmb-title">💪 Khu vực KHÁ — Em đang bứt phá!</div>
-            <div class="lmb-sub">Điểm mục tiêu: <strong>5.0 – 6.5</strong> · Danh hiệu: 🏅 CAO THỦ CASIO</div>
-          </div>
-        </div>
-        <div class="lmb-path">
-          ${[
-            { icon:'📗', label:'Trung Bình', sub:'✓ Qua rồi!', cls:'step-done' },
-            { icon:'📘', label:'Khá', sub:'5–6.5đ', cls:'step-current' },
-            { icon:'📙', label:'Tốt', sub:'6.5–8đ', cls:'step-next' },
-            { icon:'📕', label:'Xuất Sắc', sub:'8–10đ', cls:'step-future' },
-          ].map((s,i,arr) => `
-            <div class="tb-step ${s.cls}">
-              <div class="tb-step-icon">${s.icon}</div>
-              <div class="tb-step-label">${s.label}</div>
-              <div class="tb-step-sub">${s.sub}</div>
-              ${i < arr.length-1 ? '<div class="tb-step-arrow">→</div>' : ''}
-            </div>
-          `).join('')}
-        </div>
-        <div class="lmb-tips">
-          <div class="lmb-tip">🧩 Luyện bài trung cấp: phương trình bậc 2, tam giác đồng dạng</div>
-          <div class="lmb-tip">⏱️ Tập làm bài trong thời gian quy định để quen với áp lực thi</div>
-          <div class="lmb-tip">🏅 Đạt 6.5+ → Được thầy giải 1 câu khó bất kỳ em muốn!</div>
-        </div>
-        <div class="lmb-quote">💬 <em>"Khá rồi nhưng đừng dừng ở đây — đỉnh cao còn ở phía trước!"</em> — Thầy Trong</div>
-      </div>
-    </div>
-
-    <!-- Banner kích thích cấp Tốt -->
-    <div class="level-motivate-banner tot-banner" id="totMotivateBanner" style="display:none;">
-      <div class="lmb-inner">
-        <div class="lmb-header">
-          <span class="lmb-icon">📙</span>
-          <div>
-            <div class="lmb-title">🔥 Khu vực TỐT — Chiến binh tinh nhuệ!</div>
-            <div class="lmb-sub">Điểm mục tiêu: <strong>6.5 – 8.0</strong> · Danh hiệu: 💎 CHIẾN BINH TINH NHUỆ</div>
-          </div>
-        </div>
-        <div class="lmb-path">
-          ${[
-            { icon:'📗', label:'Trung Bình', sub:'✓', cls:'step-done' },
-            { icon:'📘', label:'Khá', sub:'✓', cls:'step-done' },
-            { icon:'📙', label:'Tốt', sub:'6.5–8đ', cls:'step-current' },
-            { icon:'📕', label:'Xuất Sắc', sub:'8–10đ', cls:'step-next' },
-          ].map((s,i,arr) => `
-            <div class="tb-step ${s.cls}">
-              <div class="tb-step-icon">${s.icon}</div>
-              <div class="tb-step-label">${s.label}</div>
-              <div class="tb-step-sub">${s.sub}</div>
-              ${i < arr.length-1 ? '<div class="tb-step-arrow">→</div>' : ''}
-            </div>
-          `).join('')}
-        </div>
-        <div class="lmb-tips">
-          <div class="lmb-tip">🏆 Thử sức với bài toán tổng hợp, kết hợp nhiều kiến thức</div>
-          <div class="lmb-tip">📐 Rèn kỹ năng vẽ hình và phân tích bài hình học phức tạp</div>
-          <div class="lmb-tip">💎 Đạt 8.0+ → Tên được in đậm, màu đỏ rực rỡ trên bảng xếp hạng!</div>
-        </div>
-        <div class="lmb-quote">💬 <em>"Người giỏi không phải người không sai — mà là người học từ cái sai!"</em> — Thầy Trong</div>
-      </div>
-    </div>
-
-    <!-- Banner kích thích cấp Xuất Sắc -->
-    <div class="level-motivate-banner xs-banner" id="xsMotivateBanner" style="display:none;">
-      <div class="lmb-inner">
-        <div class="lmb-header">
-          <span class="lmb-icon">📕</span>
-          <div>
-            <div class="lmb-title">👑 Khu vực XUẤT SẮC — Đỉnh cao thách đấu!</div>
-            <div class="lmb-sub">Điểm mục tiêu: <strong>8.0 – 10</strong> · Danh hiệu: 👑 BẬC THẦY → 🔥 TRÙM CUỐI</div>
-          </div>
-        </div>
-        <div class="lmb-path">
-          ${[
-            { icon:'📗', label:'TB', sub:'✓', cls:'step-done' },
-            { icon:'📘', label:'Khá', sub:'✓', cls:'step-done' },
-            { icon:'📙', label:'Tốt', sub:'✓', cls:'step-done' },
-            { icon:'📕', label:'Xuất Sắc', sub:'8–10đ', cls:'step-current' },
-            { icon:'🔥', label:'TRÙM CUỐI', sub:'10đ !!', cls:'step-next' },
-          ].map((s,i,arr) => `
-            <div class="tb-step ${s.cls}">
-              <div class="tb-step-icon">${s.icon}</div>
-              <div class="tb-step-label">${s.label}</div>
-              <div class="tb-step-sub">${s.sub}</div>
-              ${i < arr.length-1 ? '<div class="tb-step-arrow">→</div>' : ''}
-            </div>
-          `).join('')}
-        </div>
-        <div class="lmb-tips">
-          <div class="lmb-tip">🧠 Ôn các bài "bẫy" — đề thi lớp 10 luôn có câu phân loại cực khó</div>
-          <div class="lmb-tip">⚡ Luyện tốc độ: hoàn thành bài trong 2/3 thời gian để kiểm tra lại</div>
-          <div class="lmb-tip">🔥 Đạt 10 điểm → Vinh danh trang chủ + Phiếu miễn kiểm tra miệng!</div>
-        </div>
-        <div class="lmb-quote">💬 <em>"Em đã ở đỉnh rồi — nhiệm vụ bây giờ là giữ vững và truyền cảm hứng cho bạn bè!"</em> — Thầy Trong</div>
-      </div>
-    </div>
-
-    <!-- Khu vực bộ đề theo level -->
-    <div class="level-sets-area card" id="levelSetsArea" style="padding:20px;">
-      <div style="text-align:center;color:var(--text-muted);padding:24px 0;">
-        👆 Chọn trình độ của em ở trên trước nhé!
-      </div>
-    </div>
+    <!-- 4 KHU VỰC — mỗi khu vực 1 card gồm giới thiệu + bộ đề -->
+    <div class="home-section-label" style="margin-top:28px;">🎯 Chọn khu vực & làm bài</div>
+    <div id="allLevelZones"></div>
   `;
 
-  setTimeout(() => { loadSetList(); loadHonorBoard(); loadDocLibrary(); }, 800);
+  setTimeout(() => {
+    loadHonorBoard();
+    loadDocLibrary();
+    renderAllLevelZones();
+  }, 600);
 }
 
 // Khi học sinh đổi select trình độ
@@ -1006,6 +838,240 @@ function updateLockIcons(selectedLvId) {
     const el = document.getElementById('lvLock_' + id);
     if (!el) return;
     el.textContent = id === selectedLvId ? '✅' : '🔒';
+  });
+}
+
+// ====================================================
+// RENDER TẤT CẢ 4 KHU VỰC — mỗi khu vực 1 card đẹp
+// ====================================================
+const LEVEL_META = {
+  tb: {
+    grad:    'linear-gradient(135deg,#64748b 0%,#94a3b8 100%)',
+    gradDark:'linear-gradient(135deg,#475569 0%,#64748b 100%)',
+    glow:    'rgba(100,116,139,0.35)',
+    accent:  '#64748b',
+    emoji:   '📗',
+    rankIcon:'🥈',
+    rankName:'TÂN BINH CASIO',
+    reward:  'Sticker "Chiến binh" dán vào vở bài tập',
+    tips:    ['Ôn lại công thức cơ bản mỗi ngày 15 phút','Làm đúng 70% → em đã sẵn sàng lên Khá!','Đừng bỏ câu nào — cú may cũng tính điểm 😄'],
+    quote:   '"Mỗi câu đúng hôm nay là một bước lên bục vinh quang ngày mai!"',
+    next:    'Khá',
+    nextIcon:'📘',
+    nextScore:'5.0+',
+    steps:   ['🥈 Tân Binh','🏅 Bạch Kim','💎 Kim Cương','🔮 Huyền Thoại','👑 Đại Cao Thủ','🔥 Thách Đấu'],
+    currentStep: 0,
+  },
+  kha: {
+    grad:    'linear-gradient(135deg,#2563eb 0%,#7c3aed 100%)',
+    gradDark:'linear-gradient(135deg,#1d4ed8 0%,#6d28d9 100%)',
+    glow:    'rgba(99,102,241,0.4)',
+    accent:  '#6366f1',
+    emoji:   '📘',
+    rankIcon:'🏅',
+    rankName:'CAO THỦ CASIO',
+    reward:  'Tặng sticker "Chiến binh" + được nhờ thầy giải 1 câu khó',
+    tips:    ['Luyện phương trình bậc 2, tam giác đồng dạng','Tập làm bài trong thời gian quy định','Sai câu nào → đọc giải thích ngay, đừng bỏ qua!'],
+    quote:   '"Khá rồi nhưng đừng dừng ở đây — đỉnh cao còn ở phía trước!"',
+    next:    'Tốt',
+    nextIcon:'📙',
+    nextScore:'6.5+',
+    steps:   ['🥈 TB','🏅 Bạch Kim','💎 Kim Cương','🔮 Huyền Thoại','👑 Đại Cao Thủ','🔥 Thách Đấu'],
+    currentStep: 1,
+  },
+  tot: {
+    grad:    'linear-gradient(135deg,#059669 0%,#0891b2 100%)',
+    gradDark:'linear-gradient(135deg,#047857 0%,#0e7490 100%)',
+    glow:    'rgba(16,185,129,0.4)',
+    accent:  '#10b981',
+    emoji:   '📙',
+    rankIcon:'💎',
+    rankName:'CHIẾN BINH TINH NHUỆ',
+    reward:  'Tên in đậm màu đỏ rực rỡ trên bảng xếp hạng toàn trường!',
+    tips:    ['Chinh phục bài toán tổng hợp kết hợp nhiều chương','Rèn kỹ năng vẽ hình, phân tích hình học phức tạp','Người giỏi học từ cái sai — đọc kỹ giải thích nhé!'],
+    quote:   '"Người giỏi không phải người không sai — mà là người học từ cái sai!"',
+    next:    'Xuất Sắc',
+    nextIcon:'📕',
+    nextScore:'8.0+',
+    steps:   ['🥈 TB','🏅 KHÁ','💎 Tốt','🔮 Huyền Thoại','👑 Đại Cao Thủ','🔥 Thách Đấu'],
+    currentStep: 2,
+  },
+  xs: {
+    grad:    'linear-gradient(135deg,#d97706 0%,#dc2626 100%)',
+    gradDark:'linear-gradient(135deg,#b45309 0%,#b91c1c 100%)',
+    glow:    'rgba(239,68,68,0.4)',
+    accent:  '#f59e0b',
+    emoji:   '📕',
+    rankIcon:'👑',
+    rankName:'BẬC THẦY → 🔥 TRÙM CUỐI',
+    reward:  'Pháo hoa + Phiếu miễn kiểm tra miệng + Vinh danh trang chủ!',
+    tips:    ['Luyện câu "bẫy" — đề lớp 10 luôn có câu phân loại cực khó','Tập hoàn thành trong 2/3 thời gian để kiểm tra lại','Đạt 10 → Vinh danh trang chủ toàn trường biết tên em!'],
+    quote:   '"Em đã ở đỉnh rồi — nhiệm vụ bây giờ là giữ vững và truyền cảm hứng!"',
+    next:    'TRÙM CUỐI',
+    nextIcon:'🔥',
+    nextScore:'10 điểm',
+    steps:   ['🥈 TB','🏅 KHÁ','💎 TỐT','📕 Xuất Sắc','🔥 TRÙM CUỐI MỸ QUÝ'],
+    currentStep: 3,
+  },
+};
+
+async function renderAllLevelZones() {
+  const container = document.getElementById('allLevelZones');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  for (const lvId of LEVEL_ORDER) {
+    const lv   = LEVELS[lvId];
+    const meta = LEVEL_META[lvId];
+
+    // Tạo zone card
+    const zone = document.createElement('div');
+    zone.className = 'level-zone';
+    zone.id = 'zone_' + lvId;
+
+    // Progress bar cho các bước
+    const stepsHtml = meta.steps.map((s, i) => {
+      const done    = i < meta.currentStep;
+      const current = i === meta.currentStep;
+      return `<div class="lz-step ${done?'lz-step-done':''} ${current?'lz-step-current':''}">
+        <div class="lz-step-dot">${done ? '✓' : (current ? meta.emoji : (i+1))}</div>
+        <div class="lz-step-label">${s}</div>
+        ${i < meta.steps.length-1 ? '<div class="lz-step-line"></div>' : ''}
+      </div>`;
+    }).join('');
+
+    // Tips
+    const tipsHtml = meta.tips.map(t =>
+      `<div class="lz-tip"><span class="lz-tip-dot">▸</span>${t}</div>`
+    ).join('');
+
+    zone.innerHTML = `
+      <!-- HEADER BANNER -->
+      <div class="lz-banner" style="background:${meta.grad};box-shadow:0 8px 32px ${meta.glow};">
+        <div class="lz-banner-deco">${meta.emoji}${meta.emoji}</div>
+        <div class="lz-banner-body">
+          <div class="lz-banner-top">
+            <div class="lz-rank-badge">${meta.rankIcon} ${meta.rankName}</div>
+            <div class="lz-score-range">${lv.scoreRange}</div>
+          </div>
+          <div class="lz-banner-title">${lv.icon} Khu Vực <strong>${lv.name.toUpperCase()}</strong></div>
+          <div class="lz-banner-desc">${lv.desc}</div>
+
+          <!-- Con đường tiến cấp -->
+          <div class="lz-steps-wrap">
+            <div class="lz-steps">${stepsHtml}</div>
+          </div>
+
+          <!-- Tips + phần thưởng -->
+          <div class="lz-info-row">
+            <div class="lz-tips-box">
+              <div class="lz-tips-title">💡 Bí quyết chinh phục</div>
+              ${tipsHtml}
+            </div>
+            <div class="lz-reward-box">
+              <div class="lz-reward-title">🎁 Phần thưởng</div>
+              <div class="lz-reward-text">${meta.reward}</div>
+              <div class="lz-next-badge">
+                Lên ${meta.nextIcon} ${meta.next} khi đạt ${meta.nextScore} →
+              </div>
+            </div>
+          </div>
+
+          <!-- Quote thầy -->
+          <div class="lz-quote">💬 <em>${meta.quote}</em> — Thầy Trong</div>
+        </div>
+      </div>
+
+      <!-- BỘ ĐỀ BÊN DƯỚI BANNER -->
+      <div class="lz-sets" id="sets_${lvId}">
+        <div style="display:flex;justify-content:center;padding:20px;"><div class="spinner"></div></div>
+      </div>
+    `;
+
+    container.appendChild(zone);
+
+    // Load bộ đề ngay cho zone này
+    loadSetsForZone(lvId);
+  }
+}
+
+async function loadSetsForZone(lvId) {
+  const el = document.getElementById('sets_' + lvId);
+  if (!el) return;
+  const lv = LEVELS[lvId];
+  const meta = LEVEL_META[lvId];
+
+  let sets = [];
+  try {
+    if (AppState.useFirebase && AppState.db) {
+      const snap = await AppState.db.collection('question_sets').where('level','==',lvId).get();
+      sets = snap.docs.map(d => {
+        const data = d.data();
+        return { ...data, uploadedAt: data.uploadedAt?.toDate?.()?.toISOString?.() || data.uploadedAt || '' };
+      }).sort((a,b) => b.uploadedAt.localeCompare(a.uploadedAt));
+    } else {
+      const stored = JSON.parse(localStorage.getItem('question_sets') || '{}');
+      sets = Object.values(stored)
+        .filter(s => (s.level||'tb') === lvId)
+        .sort((a,b) => (b.uploadedAt||'').localeCompare(a.uploadedAt||''));
+    }
+  } catch(e) {
+    try {
+      if (AppState.useFirebase && AppState.db) {
+        const snap2 = await AppState.db.collection('question_sets').get();
+        sets = snap2.docs.map(d => {
+          const data = d.data();
+          return { ...data, uploadedAt: data.uploadedAt?.toDate?.()?.toISOString?.() || '' };
+        }).filter(s => (s.level||'tb') === lvId);
+      }
+    } catch(e2) {
+      const stored = JSON.parse(localStorage.getItem('question_sets') || '{}');
+      sets = Object.values(stored).filter(s => (s.level||'tb') === lvId);
+    }
+  }
+
+  sets = sets.filter(s => !s.locked);
+
+  if (sets.length === 0) {
+    el.innerHTML = `
+      <div class="lz-empty">
+        <div class="lz-empty-icon">📭</div>
+        <div class="lz-empty-text">Thầy chưa upload đề cho khu vực <strong>${lv.name}</strong>.<br>Hãy quay lại sau nhé! 💪</div>
+      </div>`;
+    return;
+  }
+
+  window._levelSetsMap = window._levelSetsMap || {};
+
+  let html = '<div class="lz-sets-grid">';
+  sets.forEach(s => {
+    window._levelSetsMap[s.setId] = s;
+    const ts = TOPIC_STYLES[s.topic] || TOPIC_STYLES['tong-hop'];
+    const uploadDate = s.uploadedAt ? new Date(s.uploadedAt).toLocaleDateString('vi-VN') : '';
+    const safeId = encodeURIComponent(s.setId);
+    html += `
+      <div class="lz-set-card" data-setid="${safeId}" data-topic="${s.topic||'tong-hop'}" data-level="${lvId}"
+           style="--lz-accent:${meta.accent};--lz-glow:${meta.glow};">
+        <div class="lz-set-icon" style="background:${ts.grad};">${ts.glyph}</div>
+        <div class="lz-set-body">
+          <div class="lz-set-topic">${ts.icon} ${TOPIC_NAMES[s.topic]||'Tổng hợp'}</div>
+          <div class="lz-set-name">${s.setName}</div>
+          <div class="lz-set-meta">📝 ${s.count||'?'} câu${uploadDate ? ' · 📅 '+uploadDate : ''}</div>
+        </div>
+        <div class="lz-set-arrow">→</div>
+      </div>`;
+  });
+  html += '</div>';
+  el.innerHTML = html;
+
+  el.querySelectorAll('.lz-set-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const setId = decodeURIComponent(card.dataset.setid);
+      const topic = card.dataset.topic;
+      const level = card.dataset.level;
+      selectSet(setId, topic, level);
+    });
   });
 }
 
