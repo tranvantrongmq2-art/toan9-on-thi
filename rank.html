@@ -19,20 +19,23 @@
     .rk-stat-lbl{font-size:.70rem;color:var(--text-muted);margin-top:2px;}
     .rk-tbtn{padding:5px 13px;border-radius:99px;font-size:.76rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;transition:all .15s;}
     .rk-tbtn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
-    .rk-podium{display:flex;justify-content:center;align-items:flex-end;gap:10px;margin-bottom:16px;}
-    .rk-slot{display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform .15s;}
-    .rk-slot:hover{transform:translateY(-4px);}
-    .rk-av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;}
-    .rk-s1 .rk-av{width:60px;height:60px;font-size:1.4rem;background:linear-gradient(135deg,#f59e0b,#fbbf24);box-shadow:0 4px 16px rgba(251,191,36,.45);}
-    .rk-s2 .rk-av{width:48px;height:48px;font-size:1.15rem;background:linear-gradient(135deg,#64748b,#94a3b8);}
-    .rk-s3 .rk-av{width:44px;height:44px;font-size:1.05rem;background:linear-gradient(135deg,#b45309,#d97706);}
-    .rk-sname{font-size:.76rem;font-weight:700;margin-top:5px;text-align:center;max-width:76px;}
-    .rk-sscore{font-size:.95rem;font-weight:900;color:var(--primary);}
-    .rk-scls{font-size:.66rem;color:var(--text-muted);}
-    .rk-block{border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;color:rgba(255,255,255,.85);margin-top:6px;}
-    .rk-s1 .rk-block{width:64px;height:54px;background:linear-gradient(180deg,#fbbf24,#f59e0b);}
-    .rk-s2 .rk-block{width:54px;height:38px;background:linear-gradient(180deg,#94a3b8,#64748b);}
-    .rk-s3 .rk-block{width:48px;height:28px;background:linear-gradient(180deg,#d97706,#b45309);}
+    /* PODIUM — force override style.css */
+    .rk-podium{display:flex!important;flex-direction:row!important;justify-content:center!important;align-items:flex-end!important;gap:12px!important;margin-bottom:20px!important;background:linear-gradient(180deg,rgba(99,102,241,.05),transparent);border-radius:16px;padding:20px 10px 0;}
+    .rk-slot{display:flex!important;flex-direction:column!important;align-items:center!important;cursor:pointer;transition:transform .2s;text-decoration:none!important;}
+    .rk-slot:hover{transform:translateY(-5px)!important;}
+    .rk-av{border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;font-weight:900!important;color:#fff!important;letter-spacing:0!important;}
+    .rk-s1 .rk-av{width:64px!important;height:64px!important;font-size:1.5rem!important;background:linear-gradient(135deg,#f59e0b,#fbbf24)!important;box-shadow:0 6px 20px rgba(251,191,36,.5)!important;}
+    .rk-s2 .rk-av{width:50px!important;height:50px!important;font-size:1.2rem!important;background:linear-gradient(135deg,#64748b,#94a3b8)!important;}
+    .rk-s3 .rk-av{width:46px!important;height:46px!important;font-size:1.1rem!important;background:linear-gradient(135deg,#b45309,#d97706)!important;}
+    .rk-sname{font-size:.76rem!important;font-weight:700!important;margin-top:6px!important;text-align:center!important;max-width:80px!important;color:var(--text)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .rk-sscore{font-size:1rem!important;font-weight:900!important;color:var(--primary)!important;margin-top:2px!important;}
+    .rk-scls{font-size:.66rem!important;color:var(--text-muted)!important;margin-bottom:6px!important;}
+    .rk-block{border-radius:8px 8px 0 0!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:1.1rem!important;font-weight:900!important;color:rgba(255,255,255,.9)!important;margin-top:8px!important;flex-shrink:0!important;}
+    .rk-s1 .rk-block{width:72px!important;height:58px!important;background:linear-gradient(180deg,#fbbf24,#f59e0b)!important;}
+    .rk-s2 .rk-block{width:60px!important;height:40px!important;background:linear-gradient(180deg,#94a3b8,#64748b)!important;}
+    .rk-s3 .rk-block{width:54px!important;height:30px!important;background:linear-gradient(180deg,#d97706,#b45309)!important;}
+    .rk-crown{font-size:1.4rem;position:absolute;top:-18px;animation:crown-bob .8s ease-in-out infinite alternate;}
+    @keyframes crown-bob{0%{transform:translateY(0) rotate(-5deg);}100%{transform:translateY(-4px) rotate(5deg);}}
     .rk-top10{display:flex;flex-direction:column;gap:7px;}
     .rk-t10{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:11px;padding:9px 13px;cursor:pointer;transition:all .15s;}
     .rk-t10:hover{box-shadow:0 3px 12px rgba(0,0,0,.08);transform:translateY(-1px);}
@@ -66,6 +69,10 @@
     .rk-cls-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .4s;}
     .rk-cls-avg{font-weight:900;font-size:.88rem;color:var(--primary);width:30px;flex-shrink:0;text-align:right;}
     .rk-cls-pass{font-size:.72rem;color:var(--text-muted);white-space:nowrap;}
+    /* rank-badge gọn trong bảng */
+    .rk-tbl .rank-badge{font-size:.68rem!important;padding:2px 7px!important;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis;display:inline-block;}
+    /* top10 rank-badge */
+    .rk-t10-sub .rank-badge{font-size:.65rem!important;padding:1px 6px!important;}
   </style>
 </head>
 <body>
@@ -195,16 +202,21 @@ function renderLeaderboard(data) {
   // Podium
   let pod = '';
   if (top10.length >= 2) {
-    const slots=[{r:top10[1],cls:'rk-s2',icon:'🥈'},{r:top10[0],cls:'rk-s1',icon:'🥇'}];
-    if (top10[2]) slots.push({r:top10[2],cls:'rk-s3',icon:'🥉'});
-    pod = '<div class="rk-podium">' + slots.map((s,i) =>
-      '<div class="rk-slot '+s.cls+'" onclick="rankFirework('+(i===1?1:i===0?2:3)+',\''+s.r.studentName.replace(/'/g,"\\'")+'\')">'+
-      '<div class="rk-av">'+s.r.studentName.charAt(0).toUpperCase()+'</div>'+
-      '<div class="rk-sname">'+s.r.studentName+'</div>'+
-      '<div class="rk-sscore">'+s.r.score+'</div>'+
-      '<div class="rk-scls">'+s.r.studentClass+'</div>'+
-      '<div class="rk-block">'+s.icon+'</div></div>'
-    ).join('') + '</div>';
+    // Thứ tự podium: 🥈 trái, 🥇 giữa (cao nhất), 🥉 phải
+    const podSlots = [];
+    if (top10[1]) podSlots.push({r:top10[1], cls:'rk-s2', icon:'🥈', rank:2});
+    podSlots.push({r:top10[0], cls:'rk-s1', icon:'🥇', rank:1});
+    if (top10[2]) podSlots.push({r:top10[2], cls:'rk-s3', icon:'🥉', rank:3});
+    pod = '<div class="rk-podium">' + podSlots.map(s => {
+      const crown = s.rank===1 ? '<div class="rk-crown">👑</div>' : '';
+      return '<div class="rk-slot '+s.cls+'" style="position:relative;" onclick="rankFirework('+s.rank+',\''+s.r.studentName.replace(/'/g,"\\'")+'\')">'+
+        crown+
+        '<div class="rk-av">'+s.r.studentName.charAt(0).toUpperCase()+'</div>'+
+        '<div class="rk-sname">'+s.r.studentName+'</div>'+
+        '<div class="rk-sscore">'+s.r.score+'<span style="font-size:.6rem;font-weight:600;opacity:.7">/10</span></div>'+
+        '<div class="rk-scls">'+s.r.studentClass+'</div>'+
+        '<div class="rk-block">'+s.icon+'</div></div>';
+    }).join('') + '</div>';
   }
 
   const medals=['🥇','🥈','🥉'];
