@@ -446,7 +446,7 @@ function parseMultipleSets(rawText) {
     // Không có tiêu đề → toàn bộ file là 1 bộ đề, dùng cài đặt mặc định
     const defaultTopic = document.getElementById('uploadTopic')?.value || 'tong-hop';
     const defaultLevel = document.getElementById('uploadLevel')?.value || 'tb';
-    const defaultName  = document.getElementById('uploadSetName')?.value.trim() || 'Bộ đề mới';
+    const defaultName  = document.getElementById('uploadSetName')?.value.trim() || 'Bộ đề mới'; // sẽ được sync lại lúc lưu
     const questions = parseQuestionsFromLines(lines, defaultTopic);
     if (questions.length === 0) return [];
     return [{ setName: defaultName, topic: defaultTopic, level: defaultLevel, questions }];
@@ -677,9 +677,10 @@ function renderMultiPreview(sets) {
               <option value="xs"  ${set.level==='xs' ?'selected':''}>📕 Xuất Sắc</option>
             </select>
             <input type="text" value="${set.setName}"
+                   data-setname-idx="${si}"
                    oninput="updateSetMeta(${si},'setName',this.value)"
                    style="padding:4px 10px;border-radius:7px;border:1px solid var(--border);
-                          font-size:0.8rem;background:var(--surface);color:var(--text);width:160px;">
+                          font-size:0.8rem;background:var(--surface);color:var(--text);width:180px;font-weight:700;">
           </div>
         </div>
         <!-- Danh sách câu hỏi -->
@@ -736,6 +737,21 @@ function handleExplanation(si, qi, value) {
 // ====================================================
 async function saveAllSets() {
   if (parsedSets.length === 0) { showToast('Không có bộ đề để lưu!', 'warning'); return; }
+
+  // Sync setName từ input DOM trước khi lưu (tránh lỗi tên cũ)
+  document.querySelectorAll('[data-setname-idx]').forEach(inp => {
+    const idx = parseInt(inp.dataset.setnameIdx);
+    if (!isNaN(idx) && parsedSets[idx]) {
+      parsedSets[idx].setName = inp.value.trim() || parsedSets[idx].setName;
+    }
+  });
+  // Với bộ đề đơn, đọc từ ô uploadSetName nếu setName vẫn là mặc định
+  if (parsedSets.length === 1) {
+    const mainInput = document.getElementById('uploadSetName');
+    if (mainInput && mainInput.value.trim()) {
+      parsedSets[0].setName = mainInput.value.trim();
+    }
+  }
 
   // Kiểm tra tên bộ đề
   for (let i = 0; i < parsedSets.length; i++) {
